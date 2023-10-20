@@ -1,0 +1,17 @@
+.page {
+    display: flex;
+    flex-direction: column;
+    max-width: 1640px;
+    min-height: 780px;
+    margin: auto;
+    background-color: #F5F5F5;
+}
+
+.header {
+    display: flex;
+    width: 100%;
+    max-height: 162px;
+    background-color: #C1CACA;
+    margin: 0;
+    padding: 0;
+}

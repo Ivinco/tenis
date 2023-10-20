@@ -1,0 +1,8 @@
+.logo {
+    width: 120px;
+    height: 90px;
+    background-image: url("../../../public/images/ivinco.svg");
+    background-size: contain;
+    background-repeat: no-repeat;
+    margin: 30px auto 30px 60px;
+}
