@@ -1,0 +1,9 @@
+[Unit]
+Description=Penis backend
+After=multi-user.target
+
+[Service]
+Type=simple
+Restart=always
+ExecStart=/usr/bin/python3 -m penis_backend
+WantedBy=multi-user.target
