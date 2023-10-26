@@ -5,6 +5,7 @@ const Header = () => {
     return (
         <>
             <div className={styles.logo}></div>
+            <div className={`${styles.avatar} ${styles.avatar_unknown}`}></div>
         </>
     )
 }

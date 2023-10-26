@@ -1,8 +1,9 @@
 .page {
     display: flex;
     flex-direction: column;
-    max-width: 1640px;
-    min-height: 780px;
+    width: 100vw;
+    max-width: 2500px;
+    height: 100vh;
     margin: auto;
     background-color: #F5F5F5;
 }
@@ -14,4 +15,45 @@
     background-color: #C1CACA;
     margin: 0;
     padding: 0;
+}
+
+.mainWindow {
+    display: flex;
+    width: 100%;
+    height: 100%;
+}
+
+.sideBar {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 30px;
+    background-color: #656B7A;
+    border-left: #656B7A solid 1px;
+}
+
+.menuErrow {
+    width: 30px;
+    height: 100%;
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+    margin: auto;
+    padding: 0;
+    transition: transform 0.2s;
+    background-color: transparent;
+    border: none;
+}
+
+.menuErrowClosed {
+    background-image: url("../../../public/images/white-arrow-left.png");
+}
+
+.menuErrowOpened {
+    background-image: url("../../../public/images/white-arrow-right.png");
+}
+
+.menuErrow:hover {
+    cursor: pointer;
+    transform: scale(1.2);
 }

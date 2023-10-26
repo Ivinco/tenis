@@ -1,8 +1,28 @@
 .logo {
     width: 120px;
-    height: 90px;
+    height: 42px;
     background-image: url("../../../public/images/ivinco.svg");
     background-size: contain;
     background-repeat: no-repeat;
-    margin: 30px auto 30px 60px;
+    margin: auto auto auto 60px;
+}
+
+.avatar {
+    width: 100px;
+    height: 100px;
+    background-size: cover;
+    background-repeat: no-repeat;
+    margin: 30px 60px 31px auto;
+    border-radius: 50%;
+    border: 3px solid slategrey;
+    transition: transform 0.2s;
+}
+
+.avatar:hover {
+    transform: scale(1.1);
+    cursor: pointer;
+}
+
+.avatar_unknown {
+    background-image: url("../../../public/images/avatar.svg");
 }
