@@ -12,7 +12,7 @@ const SideBarMenu = ({header, items}) => {
         dispatch(switchActiveSideBarMenuItem(item))
     }
     return (
-        <div className={isOpenedSideBar ? `${styles.menu} ${styles.menu_opened}` : `${styles.menu} ${styles.menu_closed}`}>
+        <div className={isOpenedSideBar ? `${styles.menu}` : `${styles.menu} ${styles.menu_closed}`}>
             <div className={styles.menuHeader}> {header}</div>
             <ul className={styles.menuList}>
                 {

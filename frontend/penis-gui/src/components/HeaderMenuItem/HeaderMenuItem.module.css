@@ -24,15 +24,17 @@
     display: flex;
     align-items: center;
     flex-direction: column;
+    justify-content: center;
     background-color: #E1F6F6FF;
     margin-top: 15px;
     overflow: hidden;
     height: 0;
-    transition: height 0.5s;
+    transition: height 0.2s;
+
 }
 
 .itemBody_active {
-    height: auto;
+    height: 320%;
 }
 
 .itemButton {
