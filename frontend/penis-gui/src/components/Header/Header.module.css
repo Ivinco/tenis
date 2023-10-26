@@ -7,6 +7,14 @@
     margin: auto auto auto 60px;
 }
 
+.headerMenu {
+    display: flex;
+    list-style: none;
+    padding: 0;
+    margin: auto auto 0 auto;
+    justify-content: space-between;
+}
+
 .avatar {
     width: 100px;
     height: 100px;

@@ -1,0 +1,51 @@
+.menuItem {
+    display: flex;
+    flex-direction: column;
+    margin: auto 40px;
+    position: relative;
+}
+
+.menuHeader {
+    padding:0;
+    border: none;
+    border-bottom: solid 1px black;
+    background-color: #DBFCFCFF;
+    font-size: 1.7rem;
+    text-align: center;
+    cursor: pointer;
+}
+
+.itemBody {
+    width: 100%;
+    position: absolute; /* Абсолютное позиционирование */
+    top: 55%; /* Смещение от верхней части родителя */
+    left: 0; /* Расположение слева от родителя */
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    background-color: #E1F6F6FF;
+    margin-top: 15px;
+    overflow: hidden;
+    height: 0;
+    transition: height 0.5s;
+}
+
+.itemBody_active {
+    height: auto;
+}
+
+.itemButton {
+    width: 100%;
+    padding: 0;
+    border: none;
+    background-color: transparent;
+    margin-top: 8px;
+    font-size: 1.4rem;
+    text-align: center;
+    cursor: pointer;
+}
+
+.itemButton:hover {
+    background-color: #a9a8a840;
+}

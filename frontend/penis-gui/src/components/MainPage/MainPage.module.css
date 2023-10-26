@@ -12,7 +12,7 @@
     display: flex;
     width: 100%;
     max-height: 162px;
-    background-color: #C1CACA;
+    background-color: #e1fafa;
     margin: 0;
     padding: 0;
 }
@@ -32,7 +32,7 @@
     border-left: #656B7A solid 1px;
 }
 
-.menuErrow {
+.menuArrow {
     width: 30px;
     height: 100%;
     background-repeat: no-repeat;
@@ -45,15 +45,15 @@
     border: none;
 }
 
-.menuErrowClosed {
+.menuArrowClosed {
     background-image: url("../../../public/images/white-arrow-left.png");
 }
 
-.menuErrowOpened {
+.menuArrowOpened {
     background-image: url("../../../public/images/white-arrow-right.png");
 }
 
-.menuErrow:hover {
+.menuArrow:hover {
     cursor: pointer;
     transform: scale(1.2);
 }

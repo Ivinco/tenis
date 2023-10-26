@@ -5,10 +5,12 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    overflow: hidden;
+    transition: width 0.2s;
 }
 
 .menu_closed {
-    display: none;
+   width: 0;
 }
 
 
@@ -52,7 +54,7 @@
 }
 
 .menuButton:hover {
-    background-color: grey;
+    background-color: #a9a8a81a;
     color: black;
 }
 

@@ -3,10 +3,11 @@ import Header from "../Header/Header";
 import SideBarMenu from "../SideBarMenu/SideBarMenu";
 import {useDispatch, useSelector} from "react-redux";
 import {switchSideBarState} from "../../store/reducers/sideBarReducer";
+import {sideBarMenuItems} from "../../utils/vars";
 
 
 function MainPage(){
-    const menuItems = [{value: 'Normal', href: '#'}, {value: 'History', href: '#'}, {value: 'Stats', href: '#'}]
+
     const dispatch = useDispatch()
     const isOpenedSideBar = useSelector(state => state.switchSideBar.isOpenedSideBar)
 
@@ -25,9 +26,9 @@ function MainPage(){
 
             </div>
             <div className={styles.mainWindow}>
-                <SideBarMenu header={'Mode'} items={menuItems}/>
+                <SideBarMenu header={'Mode'} items={sideBarMenuItems}/>
                 <div className={styles.sideBar}>
-                    <button className={isOpenedSideBar ? `${styles.menuErrow} ${styles.menuErrowOpened}` : `${styles.menuErrow} ${styles.menuErrowClosed}`}
+                    <button className={isOpenedSideBar ? `${styles.menuArrow} ${styles.menuArrowOpened}` : `${styles.menuArrow} ${styles.menuArrowClosed}`}
                     onClick={e => {
                         e.preventDefault()
                         onSideBarClick()
