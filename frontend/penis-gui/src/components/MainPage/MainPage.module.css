@@ -21,6 +21,7 @@
     display: flex;
     width: 100%;
     height: 100%;
+    overflow: hidden;
 }
 
 .sideBar {
@@ -56,4 +57,22 @@
 .menuArrow:hover {
     cursor: pointer;
     transform: scale(1.2);
+}
+
+@media screen and (max-width: 1650px){
+    .sideBar{
+        width: 20px;
+    }
+    .menuArrow {
+        width: 20px;
+    }
+}
+
+@media screen and (max-width: 1150px){
+    .sideBar{
+        width: 15px;
+    }
+    .menuArrow {
+        width: 15px;
+    }
 }

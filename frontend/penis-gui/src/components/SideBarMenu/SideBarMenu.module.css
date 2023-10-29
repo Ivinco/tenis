@@ -62,3 +62,45 @@
     color: black;
     background-color: white;
 }
+
+@media screen and (max-width: 1650px) {
+    .menu {
+        width: 200px;
+    }
+    .menu_closed {
+        width: 0;
+    }
+    .menuHeader {
+        font-size: 2rem;
+        padding-bottom: 6px;
+        margin: 20px 0 15px 20px;
+    }
+    .menuItem {
+        margin: 15px auto auto 20px;
+    }
+    .menuButton {
+        margin-right: 20px;
+        font-size: 1.13rem;
+    }
+}
+
+@media screen and (max-width: 1150px) {
+    .menu {
+        width: 140px;
+    }
+    .menu_closed {
+        width: 0;
+    }
+    .menuHeader {
+        font-size: 1.5rem;
+        padding-bottom: 4px;
+        margin: 15px 0 10px 15px;
+    }
+    .menuItem {
+        margin: 10px auto auto 15px;
+    }
+    .menuButton {
+        margin-right: 15px;
+        font-size: 0.75rem;
+    }
+}

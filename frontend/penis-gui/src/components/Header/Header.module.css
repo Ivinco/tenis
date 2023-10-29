@@ -59,3 +59,48 @@
 .avatar_unknown {
     background-image: url("../../../public/images/avatar.svg");
 }
+
+
+@media screen and (max-width: 1650px) {
+    .logo {
+        width: 80px;
+        height: 66px;
+        margin-left: 30px;
+    }
+    .avatar {
+        width: 66px;
+        height: 66px;
+        margin: 20px 30px 21px auto;
+        border: 2px solid slategrey;
+    }
+    .headerButton {
+        font-size: 1rem;
+        min-width: 90px;
+        min-height: 33px
+    }
+    .headerMenu {
+        height: 66px;
+    }
+}
+
+@media screen and (max-width: 1150px) {
+    .logo {
+        width: 53px;
+        height: 44px;
+        margin-left: 20px;
+    }
+    .avatar {
+        width: 44px;
+        height: 44px;
+        margin: 14px 20px 15px auto;
+        border: 1px solid slategrey;
+    }
+    .headerButton {
+        font-size: 0.6rem;
+        min-width: 60px;
+        min-height: 22px
+    }
+    .headerMenu {
+        height: 44px;
+    }
+}

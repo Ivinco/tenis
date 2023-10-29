@@ -6,7 +6,7 @@
     min-width: 251px;
 }
 
-.menuItem:last-child{
+.menuItem:first-child{
     margin-left: 0;
 }
 
@@ -69,4 +69,38 @@
 .itemButton:hover {
     background-color: #a9a8a840;
     color: #01A2D8;
+}
+
+@media screen and (max-width: 1650px) {
+    .menuItem {
+        min-width: 167px;
+        margin: auto 27px 0;
+    }
+    .menuHeader {
+        font-size: 1.13rem;
+    }
+    .itemBody {
+        margin-top: 10px;
+    }
+    .itemButton {
+        margin-top: 5px;
+        font-size: 0.9rem;
+    }
+}
+
+@media screen and (max-width: 1150px) {
+    .menuItem {
+        min-width: 111px;
+        margin: auto 18px 0;
+    }
+    .menuHeader {
+        font-size: 0.75rem;
+    }
+    .itemBody {
+        margin-top: 6px;
+    }
+    .itemButton {
+        margin-top: 3px;
+        font-size: 0.6rem;
+    }
 }
