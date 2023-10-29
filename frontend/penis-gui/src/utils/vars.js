@@ -1,52 +1,19 @@
-import {
-    boardreaderProjectFunction, browserTimeZone, dataCenterTimeZone,
-    groupedAlertsFunction,
-    ivincoProjectFunction,
-    ungroupedAlertsFunction, utcTimeZone
-} from "./utils";
+import {setGroupingMenuValue, setProjectMenuValue, setTimeZoneValue} from "../store/reducers/headerMenuReducer";
 
 export const sideBarMenuItems = [{value: 'Normal'}, {value: 'History'}, {value: 'Stats'}]
 export const headerMenuItems = [
     {   name: 'Project',
-        buttons: [
-            {
-                name: "Boardreader",
-                onClickFunction: boardreaderProjectFunction
-            },
-            {
-                name: "Ivinco",
-                onClickFunction: ivincoProjectFunction
-            }
-        ]
+        buttons: ["All","Boardreader", "Ivinco"],
+        action: setProjectMenuValue
     },
     {
         name: "Grouping",
-        buttons: [
-            {
-                name: "Grouped",
-                onClickFunction: groupedAlertsFunction
-            },
-            {
-                name: "Ungrouped",
-                onClickFunction: ungroupedAlertsFunction
-            }
-        ]
+        buttons: ["Disabled", "Enabled"],
+        action: setGroupingMenuValue
     },
     {
-        name: "Time Zone",
-        buttons: [
-            {
-                name: 'UTC',
-                onClickFunction: utcTimeZone
-            },
-            {
-                name: 'Data Center',
-                onClickFunction: dataCenterTimeZone
-            },
-            {
-                name: 'Browser',
-                onClickFunction: browserTimeZone
-            }
-        ]
+        name: "TZ",
+        buttons: ["Browser", "Data Center", "UTC"],
+        action: setTimeZoneValue
     }
 ]
