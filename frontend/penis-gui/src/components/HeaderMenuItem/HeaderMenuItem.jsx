@@ -1,19 +1,39 @@
-import React, {useState} from 'react';
+import React from 'react';
 import styles from './HeaderMenuItem.module.css'
+import {useDispatch, useSelector} from "react-redux";
+import {switchActiveHeaderMenuItem} from "../../store/reducers/headerMenuReducer";
 
 function HeaderMenuItem({item}, key) {
-    const [openItem, setOpenItem] = useState(null)
-    const onClickHandler = (menuItem) => {
-        if (menuItem === openItem){setOpenItem(null)}
-        else setOpenItem(menuItem)
+    const dispatch = useDispatch()
+    const activeHeaderMenuItem = useSelector(state => state.switchHeaderMenuItem.activeHeaderMenuItem)
+    const activeHeaderMenuSubItem = useSelector(state => state.setHeaderMenuItemValue)
+
+    const itemOnClickHandler = (itemName) => {
+        if (activeHeaderMenuItem === item.name){
+            dispatch(switchActiveHeaderMenuItem(null))
+        }
+        else {
+            dispatch(switchActiveHeaderMenuItem(itemName))
+        }
     }
+
+    const subItemOnClickHandler = (action, subItemName) => {
+        dispatch(action(subItemName))
+        dispatch(switchActiveHeaderMenuItem(null))
+    }
+
     return (
         <li key={key} className={styles.menuItem}>
-            <button className={styles.menuHeader} onClick={() => onClickHandler(key)}>{item.name}: {item.buttons[0].name}</button>
-            <div className={openItem === key ? `${styles.itemBody} ${styles.itemBody_active}`: styles.itemBody}>
+            <button className={styles.menuHeader} onClick={() => itemOnClickHandler(item.name)}>
+                {`${item.name}: ${activeHeaderMenuSubItem[item.name.toLowerCase()]}`}
+            </button>
+            <div className={activeHeaderMenuItem === item.name ? `${styles.itemBody} ${styles.itemBody_active}` : styles.itemBody}>
             {
                 item.buttons.map((button, index) =>
-                    <button key={index} onClick={button.onClickFunction} className={styles.itemButton}>{button.name}</button>
+                    <button key={index} onClick={(e) => {
+                        e.preventDefault()
+                        subItemOnClickHandler(item.action,button)
+                    }} className={styles.itemButton}>{button}</button>
                 )
             }
             </div>
