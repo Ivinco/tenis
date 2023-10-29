@@ -1,8 +1,9 @@
 .menuItem {
     display: flex;
     flex-direction: column;
-    margin: auto 40px;
+    margin: auto 40px 0;
     position: relative;
+    min-width: 251px;
 }
 
 .menuHeader {
@@ -30,7 +31,7 @@
     overflow: hidden;
     height: 0;
     transition: height 0.2s;
-
+    border-radius: 10px;
 }
 
 .itemBody_active {

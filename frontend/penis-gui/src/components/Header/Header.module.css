@@ -1,17 +1,19 @@
 .logo {
     width: 120px;
-    height: 42px;
+    height: 100px;
     background-image: url("../../../public/images/ivinco.svg");
     background-size: contain;
     background-repeat: no-repeat;
+    background-position: center;
     margin: auto auto auto 60px;
 }
 
 .headerMenu {
     display: flex;
     list-style: none;
+    height: 100px;
     padding: 0;
-    margin: auto auto 0 auto;
+    margin: auto;
     justify-content: space-between;
 }
 
