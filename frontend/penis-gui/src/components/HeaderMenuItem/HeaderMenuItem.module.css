@@ -6,6 +6,10 @@
     min-width: 251px;
 }
 
+.menuItem:last-child{
+    margin-left: 0;
+}
+
 .menuHeader {
     padding:0;
     border: none;
@@ -14,12 +18,25 @@
     font-size: 1.7rem;
     text-align: center;
     cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.menuHeader:hover {
+    transform: scale(1.1);
+    color:  #01A2D8;
+    border-bottom-color: #01A2D8;
+}
+
+.menuHeader_active {
+    transform: scale(1.1);
+    color:  #01A2D8;
+    border-bottom-color: #01A2D8;
 }
 
 .itemBody {
     width: 100%;
     position: absolute; /* Абсолютное позиционирование */
-    top: 55%; /* Смещение от верхней части родителя */
+    top: 75%; /* Смещение от верхней части родителя */
     left: 0; /* Расположение слева от родителя */
     z-index: 100;
     display: flex;
@@ -51,4 +68,5 @@
 
 .itemButton:hover {
     background-color: #a9a8a840;
+    color: #01A2D8;
 }

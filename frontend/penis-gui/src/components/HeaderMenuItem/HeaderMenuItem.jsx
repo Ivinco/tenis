@@ -24,7 +24,7 @@ function HeaderMenuItem({item}, key) {
 
     return (
         <li key={key} className={styles.menuItem}>
-            <button className={styles.menuHeader} onClick={() => itemOnClickHandler(item.name)}>
+            <button className={activeHeaderMenuItem === item.name ? `${styles.menuHeader} ${styles.menuHeader_active}`: styles.menuHeader} onClick={() => itemOnClickHandler(item.name)}>
                 {`${item.name}: ${activeHeaderMenuSubItem[item.name.toLowerCase()]}`}
             </button>
             <div className={activeHeaderMenuItem === item.name ? `${styles.itemBody} ${styles.itemBody_active}` : styles.itemBody}>

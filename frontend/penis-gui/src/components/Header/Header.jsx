@@ -6,6 +6,7 @@ const Header = () => {
     return (
         <>
             <div className={styles.logo}></div>
+            <button className={styles.headerButton}> Refresh</button>
             <ul className={styles.headerMenu}>
                 {
                     headerMenuItems.map((item, index) =>
@@ -16,6 +17,7 @@ const Header = () => {
 
 
             </ul>
+            <button className={`${styles.headerButton} ${styles.scheduleButton}`}> Schedule DT</button>
             <div className={`${styles.avatar} ${styles.avatar_unknown}`}></div>
         </>
     )

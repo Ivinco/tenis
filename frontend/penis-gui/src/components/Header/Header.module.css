@@ -5,7 +5,30 @@
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
-    margin: auto auto auto 60px;
+    margin: auto auto auto 45px;
+}
+
+.headerButton {
+    min-width: 135px;
+    min-height: 50px;
+    margin: auto auto 30px;
+    background-color: transparent;
+    border: #05F0D2 2px solid;
+    border-radius: 10px;
+    font-size: 1.5rem;
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.4s;
+}
+
+.headerButton:hover {
+    transform: scale(1.2);
+    border-color:  #01A2D8;
+    color:  #01A2D8;
+}
+
+.scheduleButton {
+    margin-left: 0;
 }
 
 .headerMenu {
@@ -22,7 +45,7 @@
     height: 100px;
     background-size: cover;
     background-repeat: no-repeat;
-    margin: 30px 60px 31px auto;
+    margin: 30px 45px 31px auto;
     border-radius: 50%;
     border: 3px solid slategrey;
     transition: transform 0.2s;
