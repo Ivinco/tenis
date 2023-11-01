@@ -1,0 +1,106 @@
+.menuItem {
+    display: flex;
+    flex-direction: column;
+    margin: auto 40px 0;
+    position: relative;
+    min-width: 251px;
+}
+
+.menuItem:first-child{
+    margin-left: 0;
+}
+
+.menuHeader {
+    padding:0;
+    border: none;
+    border-bottom: solid 1px black;
+    background-color: #DBFCFCFF;
+    font-size: 1.7rem;
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.menuHeader:hover {
+    transform: scale(1.1);
+    color:  #01A2D8;
+    border-bottom-color: #01A2D8;
+}
+
+.menuHeader_active {
+    transform: scale(1.1);
+    color:  #01A2D8;
+    border-bottom-color: #01A2D8;
+}
+
+.itemBody {
+    width: 100%;
+    position: absolute; /* Абсолютное позиционирование */
+    top: 75%; /* Смещение от верхней части родителя */
+    left: 0; /* Расположение слева от родителя */
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    justify-content: center;
+    background-color: #E1F6F6FF;
+    margin-top: 15px;
+    overflow: hidden;
+    height: 0;
+    transition: height 0.2s;
+    border-radius: 10px;
+}
+
+.itemBody_active {
+    height: 320%;
+}
+
+.itemButton {
+    width: 100%;
+    padding: 0;
+    border: none;
+    background-color: transparent;
+    margin-top: 8px;
+    font-size: 1.4rem;
+    text-align: center;
+    cursor: pointer;
+}
+
+.itemButton:hover {
+    background-color: #a9a8a840;
+    color: #01A2D8;
+}
+
+@media screen and (max-width: 1650px) {
+    .menuItem {
+        min-width: 167px;
+        margin: auto 27px 0;
+    }
+    .menuHeader {
+        font-size: 1.13rem;
+    }
+    .itemBody {
+        margin-top: 10px;
+    }
+    .itemButton {
+        margin-top: 5px;
+        font-size: 0.9rem;
+    }
+}
+
+@media screen and (max-width: 1150px) {
+    .menuItem {
+        min-width: 111px;
+        margin: auto 18px 0;
+    }
+    .menuHeader {
+        font-size: 0.75rem;
+    }
+    .itemBody {
+        margin-top: 6px;
+    }
+    .itemButton {
+        margin-top: 3px;
+        font-size: 0.6rem;
+    }
+}

@@ -1,8 +1,106 @@
 .logo {
     width: 120px;
-    height: 90px;
+    height: 100px;
     background-image: url("../../../public/images/ivinco.svg");
     background-size: contain;
     background-repeat: no-repeat;
-    margin: 30px auto 30px 60px;
+    background-position: center;
+    margin: auto auto auto 45px;
+}
+
+.headerButton {
+    min-width: 135px;
+    min-height: 50px;
+    margin: auto auto 30px;
+    background-color: transparent;
+    border: #05F0D2 2px solid;
+    border-radius: 10px;
+    font-size: 1.5rem;
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.4s;
+}
+
+.headerButton:hover {
+    transform: scale(1.2);
+    border-color:  #01A2D8;
+    color:  #01A2D8;
+}
+
+.scheduleButton {
+    margin-left: 0;
+}
+
+.headerMenu {
+    display: flex;
+    list-style: none;
+    height: 100px;
+    padding: 0;
+    margin: auto;
+    justify-content: space-between;
+}
+
+.avatar {
+    width: 100px;
+    height: 100px;
+    background-size: cover;
+    background-repeat: no-repeat;
+    margin: 30px 45px 31px auto;
+    border-radius: 50%;
+    border: 3px solid slategrey;
+    transition: transform 0.2s;
+}
+
+.avatar:hover {
+    transform: scale(1.1);
+    cursor: pointer;
+}
+
+.avatar_unknown {
+    background-image: url("../../../public/images/avatar.svg");
+}
+
+
+@media screen and (max-width: 1650px) {
+    .logo {
+        width: 80px;
+        height: 66px;
+        margin-left: 30px;
+    }
+    .avatar {
+        width: 66px;
+        height: 66px;
+        margin: 20px 30px 21px auto;
+        border: 2px solid slategrey;
+    }
+    .headerButton {
+        font-size: 1rem;
+        min-width: 90px;
+        min-height: 33px
+    }
+    .headerMenu {
+        height: 66px;
+    }
+}
+
+@media screen and (max-width: 1150px) {
+    .logo {
+        width: 53px;
+        height: 44px;
+        margin-left: 20px;
+    }
+    .avatar {
+        width: 44px;
+        height: 44px;
+        margin: 14px 20px 15px auto;
+        border: 1px solid slategrey;
+    }
+    .headerButton {
+        font-size: 0.6rem;
+        min-width: 60px;
+        min-height: 22px
+    }
+    .headerMenu {
+        height: 44px;
+    }
 }
