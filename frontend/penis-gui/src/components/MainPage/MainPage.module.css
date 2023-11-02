@@ -59,6 +59,13 @@
     transform: scale(1.2);
 }
 
+.mainDisplay {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    overflow-y: scroll;
+}
+
 @media screen and (max-width: 1650px){
     .sideBar{
         width: 20px;

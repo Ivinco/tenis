@@ -5,13 +5,15 @@ import {useDispatch, useSelector} from "react-redux";
 import {switchSideBarState} from "../../store/reducers/sideBarReducer";
 import {sideBarMenuItems} from "../../utils/vars";
 import {switchActiveHeaderMenuItem} from "../../store/reducers/headerMenuReducer";
+import {useConnectSocket} from "../../hooks/useConnectSocket";
+import Alert from "../Alert/Alert";
 
 
 function MainPage(){
 
     const dispatch = useDispatch()
     const isOpenedSideBar = useSelector(state => state.switchSideBar.isOpenedSideBar)
-    const activeHeaderMenuItem = useSelector(state => state.switchHeaderMenuItem.activeHeaderMenuItem)
+    const isActiveSocket = useSelector(state => state.webSocket.isOpened)
 
     const onSideBarClick = () => {
         dispatch(switchSideBarState())
@@ -20,7 +22,8 @@ function MainPage(){
         dispatch(switchActiveHeaderMenuItem(null))
     }
 
-
+    const rawAlerts = useConnectSocket()
+    console.log(rawAlerts)
 
     return (
         <div className={styles.page}>
@@ -40,7 +43,13 @@ function MainPage(){
                     }}
                     ></button>
                 </div>
-
+                <div className={styles.mainDisplay}>
+                    {
+                        rawAlerts.map((alert) => (
+                            <Alert alert={alert} key={alert.id}></Alert>
+                        ))
+                    }
+                </div>
             </div>
         </div>
     )
