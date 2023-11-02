@@ -5,12 +5,12 @@ class SocketAPI {
     static socket = null;
     static createConnection() {
         this.socket = io(`${URL}:${PORT}`)
-        this.socket.on ('connect', () => {
-            console.log('Websocket connected')
-        })
-        this.socket.on ('disconnect', (e) => {
-            console.log('Websocket disconnected')
-        })
+        // this.socket.on ('connect', () => {
+        //     console.log('Websocket connected')
+        // })
+        // this.socket.on ('disconnect', (e) => {
+        //     console.log('Websocket disconnected')
+        // })
     }
 
 }
