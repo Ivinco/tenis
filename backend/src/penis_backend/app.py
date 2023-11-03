@@ -1,0 +1,25 @@
+from flask import Flask
+from pymongo import MongoClient
+import pymongo
+import atexit
+
+app = Flask(__name__)
+app.mongodb_client = MongoClient("mongodb://localhost/penis")
+
+def cleanup_on_shutdown():
+    # Properly close MongoDB connection on shutdown
+    app.mongodb_client.close()
+
+atexit.register(cleanup_on_shutdown)
+
+@app.route("/")
+def index():
+    return "Hello, world!\n", 200
+
+@app.route("/healz")
+def healz():
+    try:
+        app.mongodb_client.admin.command('ping')
+    except Exception as e:
+        return f"Mongo error: {e!r}\n", 500
+    return "penis is up\n", 200
