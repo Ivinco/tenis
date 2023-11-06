@@ -17,3 +17,5 @@ export const headerMenuItems = [
         action: setTimeZoneValue
     }
 ]
+export const URL = process.env.SERVER || "http://localhost"
+export const PORT = process.env.PORT || '8080'

@@ -1,0 +1,7 @@
+export const OPEN_SOCKET = 'OPEN_SOCKET'
+export const CLOSE_SOCKET = 'CLOSE_SOCKET'
+export const SET_ALERTS = 'SET_ALERTS'
+export const ADD_ALERTS = 'ADD_ALERT'
+export const REMOVE_ALERTS = 'REMOVE_ALERTS'
+export const CHANGE_ALERTS = 'CHANGE_ALERTS'
+export const RESET_ALERTS = 'RESET_ALERTS'

@@ -13,6 +13,7 @@
     "react-scripts": "^5.0.1",
     "redux": "^4.2.1",
     "redux-devtools-extension": "^2.13.9",
+    "socket.io-client": "^4.7.2",
     "web-vitals": "^3.5.0"
   },
   "scripts": {

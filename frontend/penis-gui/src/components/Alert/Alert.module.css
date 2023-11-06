@@ -1,0 +1,19 @@
+.alertBody {
+    display: flex;
+    align-content: space-between;
+    margin: 10px auto;
+    border: #01A2D8 solid 3px;
+    border-radius: 10px;
+}
+
+.message {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.custom {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
