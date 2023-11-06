@@ -1,1 +1,1 @@
-P.E.N.I.S. stands for Pluggable Event Notificaton and Interoperability System!
+P.E.N.I.S. stands for Team Event Notificaton and Interoperability System!
