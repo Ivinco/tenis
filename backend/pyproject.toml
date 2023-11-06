@@ -18,6 +18,7 @@ classifiers = [
 ]
 dependencies = [
     "flask",
+    "pymongo >= 4.1"
 ]
 [project.urls]
 Homepage = "https://github.com/Ivinco/penis/backend"
