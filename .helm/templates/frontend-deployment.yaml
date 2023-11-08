@@ -1,0 +1,72 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Chart.Name }}-frontend
+  labels:
+    app: {{ .Chart.Name }}-frontend
+    component: frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Chart.Name }}-frontend
+  template:
+    metadata:
+      labels:
+        app: {{ .Chart.Name }}-frontend
+    spec:
+      imagePullSecrets:
+      - name: registrysecret
+      containers:
+      - name: {{ .Chart.Name }}-frontend
+        image: {{ $.Values.werf.image.frontend }}
+        imagePullPolicy: {{ .Values.frontend.image.pullPolicy }}
+        command:
+        - nginx
+        - -e
+        - /dev/stderr
+        ports:
+          - name: http
+            containerPort: 3000
+            protocol: TCP
+        volumeMounts:
+        - name: nginx-config-volume
+          mountPath: /etc/nginx/nginx.conf
+          subPath: nginx.conf
+          readOnly: true
+        resources:
+          {{- toYaml .Values.frontend.resources | nindent 10 }}
+      volumes:
+      - name: nginx-config-volume
+        configMap:
+          name: {{ .Chart.Name }}-nginx-config
+      {{- with .Values.frontend.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.frontend.tolerance }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.frontend.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Chart.Name }}-frontend
+  labels:
+    app: {{ .Chart.Name }}-frontend
+spec:
+  type: ClusterIP
+  ports:
+    - port: 3000
+      targetPort: 3000
+      protocol: TCP
+      name: http
+  selector:
+    app: {{ .Chart.Name }}-frontend

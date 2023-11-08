@@ -1,0 +1,8 @@
+apiVersion: v2
+name: tenis
+description: Team Event Notificaton and Interoperability System
+
+type: application
+
+version: 0.1.0
+appVersion: "1.0"
