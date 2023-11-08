@@ -5,15 +5,16 @@ import {useDispatch, useSelector} from "react-redux";
 import {switchSideBarState} from "../../store/reducers/sideBarReducer";
 import {sideBarMenuItems} from "../../utils/vars";
 import {switchActiveHeaderMenuItem} from "../../store/reducers/headerMenuReducer";
-import {useConnectSocket} from "../../hooks/useConnectSocket";
-import Alert from "../Alert/Alert";
+import MainDisplay from "../MainDisplay/MainDisplay";
+import Modal from "../Modal/Modal";
 
 
 function MainPage(){
 
     const dispatch = useDispatch()
     const isOpenedSideBar = useSelector(state => state.switchSideBar.isOpenedSideBar)
-    const isActiveSocket = useSelector(state => state.webSocket.isOpened)
+    const modalContent = useSelector(state => state.switchModal.content)
+
 
     const onSideBarClick = () => {
         dispatch(switchSideBarState())
@@ -22,17 +23,11 @@ function MainPage(){
         dispatch(switchActiveHeaderMenuItem(null))
     }
 
-    const rawAlerts = useConnectSocket()
-    console.log(rawAlerts)
-
     return (
         <div className={styles.page}>
             <header className={styles.header}>
                 <Header />
             </header>
-            <div>
-
-            </div>
             <div className={styles.mainWindow} onClick={closeHeaderMenu}>
                 <SideBarMenu header={'Mode'} items={sideBarMenuItems}/>
                 <div className={styles.sideBar}>
@@ -43,16 +38,9 @@ function MainPage(){
                     }}
                     ></button>
                 </div>
-                <div className={styles.mainDisplay}>
-                    {isActiveSocket ? (
-                        rawAlerts.map((alert) => (
-                            <Alert alert={alert} key={alert.id}></Alert>
-                        ))
-                    ) : (
-                        <div style={{textAlign: 'center', fontSize: '2rem', marginTop: '20px'}}>NO CONNECTION</div>
-                    )}
-                </div>
+                <MainDisplay/>
             </div>
+            <Modal content={modalContent}/>
         </div>
     )
 }

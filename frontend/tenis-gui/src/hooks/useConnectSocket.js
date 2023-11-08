@@ -1,5 +1,5 @@
 import {useEffect} from "react";
-import SocketAPI from "../api/alertApi";
+import SocketApiService from "../services/SocketApiService";
 import {useDispatch, useSelector} from "react-redux";
 import {
     addAlerts,
@@ -15,26 +15,26 @@ export const useConnectSocket = () => {
     const dispatch = useDispatch()
     const alerts = useSelector(state => state.webSocket.alerts)
     const connectSocket = () => {
-        SocketAPI.createConnection()
+        SocketApiService.createConnection()
 
-        SocketAPI.socket.on('connect', () => {
+        SocketApiService.socket.on('connect', () => {
             console.log("Websocket connected")
             dispatch(openWebSocket())
         })
 
-        SocketAPI.socket.on('disconnect', () => {
+        SocketApiService.socket.on('disconnect', () => {
             console.log("Websocket disconnected")
             dispatch(closeWebSocket())
             dispatch(resetAlerts())
         })
 
-        SocketAPI.socket.on ('alerts', (data) => {
+        SocketApiService.socket.on ('alerts', (data) => {
             dispatch(setAlerts(JSON.parse(data)))
         })
-        SocketAPI.socket.on ('new alerts', (data) => {
+        SocketApiService.socket.on ('new alerts', (data) => {
             dispatch(addAlerts(JSON.parse(data)))
         })
-        SocketAPI.socket.on('resolved alerts', (data) => {
+        SocketApiService.socket.on('resolved alerts', (data) => {
             dispatch(removeAlerts(JSON.parse(data)))
         })
     }
