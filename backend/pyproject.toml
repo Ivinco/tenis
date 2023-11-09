@@ -3,31 +3,32 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "penis_backend"
+name = "tenis_backend"
 version = "0.0.1"
 authors = [
     { name = "Valery Panov", email = "valery@ivinco.com" },
 ]
-description = "PENIS project backend server"
+description = "TENIS project backend server"
 readme = "README.md"
 requires-python = ">=3.6"
 classifiers = [
     "Programming Language :: Python :: 3",
-    "License :: Proprietary",
-    "Operating System :: Linux",
+    "License :: Other/Proprietary License",
+    "Operating System :: POSIX :: Linux",
 ]
 dependencies = [
     "flask",
-    "pymongo >= 4.1"
+    "pymongo >= 4.1",
+    "build"
 ]
 [project.urls]
-Homepage = "https://github.com/Ivinco/penis/backend"
+Homepage = "https://github.com/Ivinco/tenis/backend"
 
 [project.scripts]
-cliapp = "penis_server.__main__:main"
+cliapp = "tenis_server.__main__:main"
 
 [tool.hatch.build.targets.wheel]
-only-include = ["src/penis_backend"]
+only-include = ["src/tenis_backend"]
 
 [tool.hatch.build.targets.wheel.sources]
 "src" = ""

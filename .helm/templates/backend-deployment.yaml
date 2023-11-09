@@ -1,0 +1,72 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Chart.Name }}-backend
+  labels:
+    app: {{ .Chart.Name }}-backend
+    component: backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Chart.Name }}-backend
+  template:
+    metadata:
+      labels:
+        app: {{ .Chart.Name }}-backend
+    spec:
+      imagePullSecrets:
+      - name: registrysecret
+      containers:
+      - name: {{ .Chart.Name }}-backend
+        image: {{ $.Values.werf.image.backend }}
+        imagePullPolicy: {{ .Values.backend.image.pullPolicy }}
+        ports:
+          - name: http
+            containerPort: 8000
+            protocol: TCP
+        env:
+        - name: MONGO_HOST
+          value: {{ .Chart.Name }}-mongodb
+        - name: MONGO_DATABASE
+          value: tenis
+        livenessProbe:
+          httpGet:
+            path: /healz
+            port: http
+        readinessProbe:
+          httpGet:
+            path: /healz
+            port: http
+        resources:
+          {{- toYaml .Values.backend.resources | nindent 10 }}
+      {{- with .Values.backend.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.backend.tolerance }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.backend.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Chart.Name }}-backend
+  labels:
+    app: {{ .Chart.Name }}-backend
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8000
+      targetPort: 8000
+      protocol: TCP
+      name: http
+  selector:
+    app: {{ .Chart.Name }}-backend

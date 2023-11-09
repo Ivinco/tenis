@@ -1,10 +1,18 @@
+import os
 from flask import Flask
 from pymongo import MongoClient
 import pymongo
 import atexit
 
+
+# Get environment variables
+mongo_host = os.getenv('MONGO_HOST', 'localhost')  # Default to 'localhost' if not set
+mongo_dbname = os.getenv('MONGO_DBNAME', 'database')  # Default to 'database' if not set
+
+connection_string = f"mongodb://{mongo_host}/{mongo_dbname}"
+
 app = Flask(__name__)
-app.mongodb_client = MongoClient("mongodb://localhost/penis")
+app.mongodb_client = MongoClient(connection_string)
 
 def cleanup_on_shutdown():
     # Properly close MongoDB connection on shutdown
