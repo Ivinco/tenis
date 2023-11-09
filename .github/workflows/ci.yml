@@ -4,7 +4,7 @@ env:
   WERF_SECRET_KEY: ${{ secrets.WERF_SECRET_KEY }}
   WERF_REPO: registry.digitalocean.com/tenis/tenis
 
-on: push
+on: workflow_dispatch
 
 jobs:
   build:
