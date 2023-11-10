@@ -2,6 +2,8 @@
 
 set -e
 cd $(dirname "$0")
+
+sudo python3 -m pip install --upgrade pip
 dir=$(pwd)
 package=$(ls dist/tenis_backend-*.whl -t | head -1) # latest file in terms of mtime
 sudo pip3 install --upgrade "file://$dir/$package"
