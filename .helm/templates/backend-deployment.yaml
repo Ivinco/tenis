@@ -61,6 +61,7 @@ metadata:
   name: {{ .Chart.Name }}-backend
   labels:
     app: {{ .Chart.Name }}-backend
+    component: frontend
 spec:
   type: ClusterIP
   ports:
