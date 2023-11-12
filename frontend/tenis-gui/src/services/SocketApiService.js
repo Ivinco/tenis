@@ -6,6 +6,11 @@ class SocketApiService {
     static createConnection() {
         this.socket = io(`${URL}:${PORT}`)
     }
+    static closeConnection() {
+        if(this.socket){
+            this.socket.close()
+        }
+    }
 
 }
 

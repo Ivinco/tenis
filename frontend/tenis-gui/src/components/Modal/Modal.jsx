@@ -4,6 +4,7 @@ import {closeModal} from "../../store/reducers/modalReducer";
 import {useEffect} from "react";
 import ReactDOM from 'react-dom'
 import AuthForm from "../AuthForm/AuthForm";
+import UserInfo from "../UserInfo/UserInfo";
 
 const Modal = (content) => {
     const portalElement = document.getElementById("portal")
@@ -38,7 +39,7 @@ const Modal = (content) => {
                     <button className={styles.closeButton}
                     onClick={(e) => onClose()}
                     />
-                    { modalContent === "LOGIN" ? <AuthForm/> : null}
+                    { modalContent === "LOGIN" ? <AuthForm/> : <UserInfo/>}
                 </div>
             </div>
     ), portalElement)

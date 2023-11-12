@@ -59,6 +59,14 @@
     transform: scale(1.2);
 }
 
+.noLoginMainDisplay {
+    display: flex;
+    background-image: url("../../../public/images/Matrix.gif");
+    background-size: cover;
+    background-repeat: no-repeat;
+    width: 100%;
+}
+
 @media screen and (max-width: 1650px){
     .sideBar{
         width: 20px;

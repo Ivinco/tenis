@@ -38,9 +38,15 @@ export const useConnectSocket = () => {
             dispatch(removeAlerts(JSON.parse(data)))
         })
     }
+    const closeSocket = () => {
+        SocketApiService.closeConnection()
+    }
 
     useEffect(() => {
         connectSocket()
+        return () => {
+            closeSocket()
+        }
 
     }, []);
 

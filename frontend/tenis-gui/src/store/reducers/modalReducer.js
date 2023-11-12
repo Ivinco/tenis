@@ -1,26 +1,22 @@
-import {CLOSE_MODAL, LOGIN_MODAL, OPEN_MODAL} from "../actions/MODAL_ACTIONS";
+import {CLOSE_MODAL, LOGIN_MODAL, PROFILE_MODAL} from "../actions/MODAL_ACTIONS";
 
 const modalState = {
-    isOpened: true,
-    content: "LOGIN"
+    isOpened: false,
+    content: ""
 }
 
 export const modalReducer = (state = modalState, action) => {
     switch (action.type) {
-        case OPEN_MODAL:
-            return {...state, isOpened: true}
         case CLOSE_MODAL:
-            return {...state, isOpened: false}
+            return {...state, isOpened: false, content: ""}
         case LOGIN_MODAL:
-            return {...state, content: "LOGIN"}
+            return {...state, content: "LOGIN", isOpened: true}
+        case PROFILE_MODAL:
+            return {...state, content: "PROFILE", isOpened: true}
         default:
             return state
     }
 }
-
-export const openModal = () => ({
-    type: OPEN_MODAL
-})
 
 export const closeModal = () => ({
     type: CLOSE_MODAL
@@ -28,4 +24,8 @@ export const closeModal = () => ({
 
 export const switchLoginModal = () => ({
     type: LOGIN_MODAL
+})
+
+export const switchProfileModal = () => ({
+    type: PROFILE_MODAL
 })

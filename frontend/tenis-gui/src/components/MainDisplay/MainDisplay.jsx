@@ -1,8 +1,9 @@
 import React from 'react';
 import styles from "./MainDisplay.module.css";
 import Alert from "../Alert/Alert";
-import {useSelector} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {useConnectSocket} from "../../hooks/useConnectSocket";
+import {openModal} from "../../store/reducers/modalReducer";
 
 const MainDisplay = () => {
     const isActiveSocket = useSelector(state => state.webSocket.isOpened)
