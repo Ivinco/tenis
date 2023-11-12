@@ -19,7 +19,6 @@ function MainPage(){
     const modalContent = useSelector(state => state.switchModal.content)
     const isLoggedIn = useSelector(state => state.authReducer.isLogged)
 
-
     const onSideBarClick = () => {
         dispatch(switchSideBarState())
     }

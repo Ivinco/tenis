@@ -1,0 +1,50 @@
+configVersion: 1
+project: tenis
+---
+image: backend
+from: python:alpine3.17
+docker:
+  CMD: [ "/usr/local/bin/python3", "-m", "tenis_backend" ]
+git:
+- add: /backend
+  to: /app
+  excludePaths:
+  - LICENSE
+  - "**.sh"
+  stageDependencies:
+    install:
+    - "**/*"
+    - "pyproject.toml"
+shell:
+  install:
+  - cd /app
+  - pip install .
+
+---
+image: frontend-build
+from: node:16.13-alpine3.15
+git:
+- add: /frontend
+  to: /app
+  stageDependencies:
+    install:
+    - "package.json"
+    - "package-lock.json"
+    setup:
+    - "**/*"
+shell:
+  install:
+  - cd /app
+  - npm install
+  setup:
+  - cd /app
+  - npm run build
+
+---
+image: frontend
+from: nginx:1.22-alpine
+import:
+- image: frontend-build
+  add: /app/build
+  to: /usr/share/nginx/html
+  before: install

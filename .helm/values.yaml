@@ -1,0 +1,27 @@
+backend:
+  replicaCount: 1
+
+  image:
+    pullPolicy: IfNotPresent
+
+  resources: {}
+
+  nodeSelector: {}
+
+  tolerations: []
+
+  affinity: {}
+
+frontend:
+  replicaCount: 1
+
+  image:
+    pullPolicy: IfNotPresent
+
+  resources: {}
+
+  nodeSelector: {}
+
+  tolerations: []
+
+  affinity: {}

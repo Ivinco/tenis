@@ -1,0 +1,93 @@
+name: CI/CD Pipeline with Manual Approval
+
+env:
+  WERF_SECRET_KEY: ${{ secrets.WERF_SECRET_KEY }}
+  WERF_REPO: registry.digitalocean.com/tenis/tenis
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: self-hosted
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: registry.digitalocean.com
+          username: ${{ secrets.DO_USER }}
+          password: ${{ secrets.DO_PASSWORD }}
+
+
+      - name: Install werf
+        uses: werf/actions/install@v1.2
+
+      - name: Build and Publish
+        run: |
+          . $(werf ci-env github --as-file)
+          werf build
+        env:
+          WERF_ENV: development
+
+
+  render-and-lint:
+    needs: build
+    runs-on: self-hosted
+    strategy:
+      matrix:
+        jobs: [ "render", "helm lint .helm" ]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: registry.digitalocean.com
+          username: ${{ secrets.DO_USER }}
+          password: ${{ secrets.DO_PASSWORD }}
+
+      - name: Install werf
+        uses: werf/actions/install@v1.2
+
+      - name: Render and Lint
+        run: werf ${{ matrix.jobs }}
+
+
+  converge:
+    needs: build
+    runs-on: self-hosted
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: registry.digitalocean.com
+          username: ${{ secrets.DO_USER }}
+          password: ${{ secrets.DO_PASSWORD }}
+
+      - name: Install werf
+        uses: werf/actions/install@v1.2
+
+      - name: Converge
+        uses: werf/actions/converge@v1.2
+        with:
+          kube-config-base64-data: ${{ secrets.KUBE_CONFIG_BASE64_DATA }}
+          env: development
+        env:
+          WERF_SET_ENV_URL: "env_url=tenis-dev.k8s-test.ivinco.com"
+          WERF_NAMESPACE: tenis-dev
+          WERF_RELEASE: tenis-dev
+
