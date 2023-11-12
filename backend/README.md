@@ -28,7 +28,7 @@ db.users.insertOne({
 $ sudo systemctl restart tenis-backend.service
 ```
 
-Tenis backend listens on port `8000` (can be overridden by `TENIS_BACKEND_PORT` environment variable).
+Tenis backend listens on port `8000` (can be overridden by `LISTEN_PORT` environment variable).
 Once everything is configured, you should be able to perform basic health check:
 ```
 $ curl http://localhost:8000/healz
