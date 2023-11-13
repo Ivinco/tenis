@@ -59,11 +59,12 @@
     transform: scale(1.2);
 }
 
-.mainDisplay {
+.noLoginMainDisplay {
     display: flex;
-    flex-direction: column;
+    background-image: url("../../../public/images/Matrix.gif");
+    background-size: cover;
+    background-repeat: no-repeat;
     width: 100%;
-    overflow-y: scroll;
 }
 
 @media screen and (max-width: 1650px){

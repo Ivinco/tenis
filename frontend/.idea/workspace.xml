@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="303f9fff-3dda-4e17-bbe2-ae14173abb31" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/tenis-gui/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tenis-gui/.idea/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tenis-gui/.idea/modules.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tenis-gui/.idea/tenis_gui.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tenis-gui/.idea/vcs.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tenis-gui/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tenis-gui/package.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tenis-gui/public/favicon.ico" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tenis-gui/public/images/Matrix.gif" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tenis-gui/public/images/avatar.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tenis-gui/public/images/close-icon.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tenis-gui/public/images/ivinco.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tenis-gui/public/images/white-arrow-left.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tenis-gui/public/images/white-arrow-right.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tenis-gui/public/images/white-arrow.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tenis-gui/public/index.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tenis-gui/public/logo.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tenis-gui/public/logo_192.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tenis-gui/public/logo_512.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tenis-gui/public/manifest.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tenis-gui/public/robots.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tenis-gui/src/api/api.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tenis-gui/src/components/Alert/Alert.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tenis-gui/src/components/Alert/Alert.module.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tenis-gui/src/components/App/App.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tenis-gui/src/components/AuthForm/AuthForm.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tenis-gui/src/components/AuthForm/AuthForm.module.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tenis-gui/src/components/Header/Header.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tenis-gui/src/components/Header/Header.module.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tenis-gui/src/components/HeaderMenuItem/HeaderMenuItem.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tenis-gui/src/components/HeaderMenuItem/HeaderMenuItem.module.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tenis-gui/src/components/MainDisplay/MainDisplay.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tenis-gui/src/components/MainDisplay/MainDisplay.module.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tenis-gui/src/components/MainPage/MainPage.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tenis-gui/src/components/MainPage/MainPage.module.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tenis-gui/src/components/Modal/Modal.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tenis-gui/src/components/Modal/Modal.module.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tenis-gui/src/components/SideBarMenu/SideBarMenu.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tenis-gui/src/components/SideBarMenu/SideBarMenu.module.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tenis-gui/src/components/UserInfo/UserInfo.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tenis-gui/src/components/UserInfo/UserInfo.module.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tenis-gui/src/hooks/useConnectSocket.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tenis-gui/src/hooks/vallidationHooks.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tenis-gui/src/index.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tenis-gui/src/index.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tenis-gui/src/services/AuthService.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tenis-gui/src/services/SocketApiService.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tenis-gui/src/store/actions/AUTH_ACTIONS.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tenis-gui/src/store/actions/HEADER_MENU_ACTIONS.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tenis-gui/src/store/actions/MODAL_ACTIONS.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tenis-gui/src/store/actions/SIDEBAR_ACTIONS.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tenis-gui/src/store/actions/WEBSOCKET_ACTIONS.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tenis-gui/src/store/index.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tenis-gui/src/store/reducers/authReducer.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tenis-gui/src/store/reducers/headerMenuReducer.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tenis-gui/src/store/reducers/modalReducer.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tenis-gui/src/store/reducers/sideBarReducer.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tenis-gui/src/store/reducers/webSocketReducer.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tenis-gui/src/utils/utils.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tenis-gui/src/utils/vars.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tenis-gui/yarn.lock" beforeDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 5
+}</component>
+  <component name="ProjectId" id="2XJTP7K3vqQsMTIXgKLLFj1D0ai" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;MNU-122&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/Users/stas/Documents/work/ivinco/tenis/frontend&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.standard&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.standard&quot;: &quot;&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;yarn&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;settings.javascript.linters.eslint&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  }
+}</component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/public" />
+    </key>
+  </component>
+  <component name="RunManager" selected="npm.start">
+    <configuration name="build" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
+      <package-json value="$PROJECT_DIR$/package.json" />
+      <command value="run" />
+      <scripts>
+        <script value="build" />
+      </scripts>
+      <node-interpreter value="project" />
+      <envs />
+      <method v="2" />
+    </configuration>
+    <configuration name="start" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
+      <package-json value="$PROJECT_DIR$/package.json" />
+      <command value="run" />
+      <scripts>
+        <script value="start" />
+      </scripts>
+      <node-interpreter value="project" />
+      <envs />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="npm.start" />
+        <item itemvalue="npm.build" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="303f9fff-3dda-4e17-bbe2-ae14173abb31" name="Changes" comment="" />
+      <created>1698346155652</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1698346155652</updated>
+      <workItem from="1698346156841" duration="12508000" />
+      <workItem from="1698407046553" duration="12647000" />
+      <workItem from="1698575203827" duration="19725000" />
+      <workItem from="1698857096332" duration="8724000" />
+      <workItem from="1698928569979" duration="19328000" />
+      <workItem from="1699182126174" duration="239000" />
+      <workItem from="1699257201212" duration="2708000" />
+      <workItem from="1699809676154" duration="51000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>

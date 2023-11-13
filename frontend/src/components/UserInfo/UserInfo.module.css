@@ -1,0 +1,54 @@
+.userInfoHeader {
+    display: flex;
+    height: 15%;
+    margin: 30px;
+    padding: 0 152px 15px 0;
+    border-bottom: grey 1px solid;
+}
+
+.userInfoLogo {
+    width: 120px;
+    height: 100px;
+    background-image: url("../../../public/images/ivinco.svg");
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    margin: auto 0 auto 30px;
+}
+
+.userInfoTitle {
+    display: flex;
+    text-align: center;
+    font-size: 2.5rem;
+    margin: auto;
+}
+
+.userInfoInfoBlock {
+    display: flex;
+    flex-direction: column;
+    list-style: none;
+    height: 35%;
+}
+
+.userInfoItem {
+    font-size: 1.5rem;
+    margin: 12px auto 0 25px;
+    padding: 0;
+}
+
+.logoutButton {
+    width: 45%;
+    margin: 60px auto 0;
+    padding: 14px 20px;
+    border-radius: 10px;
+    background-color: #0A9393;
+    color: white;
+    font-size: 1rem;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.logoutButton:hover {
+    transform: scale(1.1);
+}
