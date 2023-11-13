@@ -17,7 +17,7 @@ spec:
         app: {{ .Chart.Name }}-frontend
     spec:
       imagePullSecrets:
-      - name: registrysecret
+      - name: registry-secret
       containers:
       - name: {{ .Chart.Name }}-frontend
         image: {{ $.Values.werf.image.frontend }}
