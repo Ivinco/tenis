@@ -19,6 +19,13 @@ spec:
               number: 3000
         path: /
         pathType: Prefix
+      - backend:
+          service:
+            name: {{ .Chart.Name }}-backend
+            port:
+              number: 8000
+        path: /api
+        pathType: Prefix
   tls:
   - hosts:
     - {{ .Values.env_url }}
