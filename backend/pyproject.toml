@@ -20,6 +20,7 @@ dependencies = [
     "build",
     "flask",
     "flask-sock",
+    "flask_cors",
     "pymongo >= 4.1",
     "Werkzeug >= 3.0",
     "PyJWT >= 1.6.4",

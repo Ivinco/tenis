@@ -3,6 +3,7 @@ kind: Ingress
 metadata:
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/rewrite-target: /
   name: {{ .Chart.Name }}-ingress
   labels:
     component: frontend
@@ -18,6 +19,13 @@ spec:
             port:
               number: 3000
         path: /
+        pathType: Prefix
+      - backend:
+          service:
+            name: {{ .Chart.Name }}-backend
+            port:
+              number: 8000
+        path: /api
         pathType: Prefix
   tls:
   - hosts:

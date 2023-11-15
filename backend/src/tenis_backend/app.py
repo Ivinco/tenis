@@ -2,6 +2,7 @@ import os
 import jwt
 import atexit
 from flask import Flask, request
+from flask_cors import CORS
 from pymongo import MongoClient
 from flask_sock import Sock
 from .auth import token_required, sock_auth
@@ -15,6 +16,7 @@ secret_key = os.getenv('SECRET', 'big tenis')  # Secret key to use
 
 app = Flask(__name__)
 sock = Sock(app)
+CORS(app)
 app.mongodb_client = MongoClient(connection_string)
 app.db = app.mongodb_client[mongo_dbname]
 app.config['SECRET_KEY'] = secret_key
