@@ -1,4 +1,4 @@
-name: CI/CD Pipeline with Manual Approval
+name: Auto deploy to dev
 
 env:
   WERF_SECRET_KEY: ${{ secrets.WERF_SECRET_KEY }}
@@ -44,7 +44,7 @@ jobs:
     runs-on: self-hosted
     strategy:
       matrix:
-        jobs: [ "render", "helm lint .helm" ]
+        jobs: [ "render --env dev", "helm lint .helm" ]
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -85,9 +85,9 @@ jobs:
         uses: werf/actions/converge@v1.2
         with:
           kube-config-base64-data: ${{ secrets.KUBE_CONFIG_BASE64_DATA }}
-          env: development
+          env: dev
         env:
           WERF_SET_ENV_URL: "env_url=tenis-dev.k8s-test.ivinco.com"
           WERF_NAMESPACE: tenis-dev
           WERF_RELEASE: tenis-dev
-
+          WERF_ENV: dev

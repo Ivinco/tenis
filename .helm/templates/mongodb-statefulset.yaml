@@ -14,7 +14,37 @@ spec:
       labels:
         app: {{.Chart.Name }}-mongodb
     spec:
+      imagePullSecrets:
+      - name: registry-secret
       terminationGracePeriodSeconds: 10
+      initContainers:
+      - name: mongo-init
+        image: mongo:7.0-rc
+        command:
+        - bash
+        - "-c"
+        - |
+          mongod --fork --logpath /var/log/mongod.log --bind_ip_all
+          set -e
+          until mongosh --eval "print(\"Connection established, mongodb should be up\")"; do
+            echo waiting for mongo
+            sleep 2
+          done
+          mongosh $INIT_DB --eval 'if (db.getCollectionNames().includes("users") === false) {db.createCollection("users", { capped: true, size: 5242880, max: 5000 });}'
+          mongosh $INIT_DB --eval 'if (db.users.findOne({ name: "$INIT_USER_NAME" }) === null) {db.users.insertOne({ name: "$INIT_USER_NAME", email: "$INIT_USER_EMAIL", password: "$INIT_PASSWORD", active: true });}'
+          mongod --shutdown
+        volumeMounts:
+        - name: mongo-persistent-storage
+          mountPath: /data/db
+        env:
+        - name: INIT_DB
+          value: {{ pluck .Values.werf.env .Values.monbodb.env.INIT_DB | first | default .Values.monbodb.env.INIT_DB._default }}
+        - name: INIT_USER_NAME
+          value: {{ pluck .Values.werf.env .Values.monbodb.env.INIT_USER_NAME | first | default .Values.monbodb.env.INIT_USER_NAME._default }}
+        - name: INIT_USER_EMAIL
+          value: {{ pluck .Values.werf.env .Values.monbodb.env.INIT_USER_EMAIL | first | default .Values.monbodb.env.INIT_USER_EMAIL._default }}
+        - name: INIT_PASSWORD
+          value: {{ pluck .Values.werf.env .Values.monbodb.env.INIT_PASSWORD | first | default .Values.monbodb.env.INIT_PASSWORD._default }}
       containers:
       - name: mongo
         image: mongo:7.0-rc

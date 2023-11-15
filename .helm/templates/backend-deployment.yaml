@@ -18,6 +18,17 @@ spec:
     spec:
       imagePullSecrets:
       - name: registry-secret
+      initContainers:
+      - name: check-mongodb
+        image: busybox:1.31
+        command:
+        - ash
+        - "-c"
+        - |
+          until nc -z tenis-mongodb 27017
+          do
+              sleep 1
+          done
       containers:
       - name: {{ .Chart.Name }}-backend
         image: {{ $.Values.werf.image.backend }}
@@ -30,7 +41,7 @@ spec:
         - name: MONGO_HOST
           value: {{ .Chart.Name }}-mongodb
         - name: MONGO_DATABASE
-          value: tenis
+          value: {{ pluck .Values.werf.env .Values.monbodb.env.INIT_DB | first | default .Values.monbodb.env.INIT_DB._default }}
         livenessProbe:
           httpGet:
             path: /healz
@@ -38,15 +49,7 @@ spec:
           initialDelaySeconds: 30
           periodSeconds: 10
           timeoutSeconds: 5
-          failureThreshold: 3
-        readinessProbe:
-          httpGet:
-            path: /healz
-            port: http
-          initialDelaySeconds: 15
-          periodSeconds: 10
-          timeoutSeconds: 5
-          successThreshold: 1
+          failureThreshold: 6
         startupProbe:
           httpGet:
             path: /healz
