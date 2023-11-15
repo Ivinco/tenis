@@ -1,11 +1,11 @@
 import React from 'react';
 import styles from './SideBarMenu.module.css'
 import {useDispatch, useSelector} from "react-redux";
-import {switchActiveSideBarMenuItem} from "../../store/reducers/sideBarReducer";
+import {switchActiveSideBarMenuItem} from "../../store/reducers/hiddenMenuReducer";
 
 const SideBarMenu = ({header, items}) => {
     const dispatch = useDispatch()
-    const isOpenedSideBar = useSelector(state => state.switchSideBar.isOpenedSideBar)
+    const isOpenedSideBar = useSelector(state => state.hiddenMenu.isOpenedSideBar)
     const activeMenuItem = useSelector(state => state.switchSideBarMenuItem.activeMenuItem)
 
     const onClickItem = (item) => {

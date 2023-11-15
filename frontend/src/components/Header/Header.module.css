@@ -1,3 +1,8 @@
+.header {
+    display: flex;
+    width: 100%;
+
+}
 .logo {
     width: 120px;
     height: 100px;
@@ -8,10 +13,47 @@
     margin: auto auto auto 45px;
 }
 
+.onDutyPortal {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 250px;
+    min-height: 50px;
+    background-color: white;
+    border: darkgrey 2px solid;
+    border-radius: 10px;
+    margin: auto auto 30px 0;
+    font-size: 1.5rem;
+}
+
+.onDutyPortalActive {
+    border: #05F0D2 2px solid;
+}
+
+.navbar {
+    display: flex;
+    margin: auto auto 30px auto;
+    width: 50%;
+}
+
+.itemsBlock {
+    display: flex;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.navItem {
+    display: flex;
+}
+
 .headerButton {
     min-width: 135px;
     min-height: 50px;
-    margin: auto auto 30px;
+    margin: auto auto;
     background-color: transparent;
     border: #05F0D2 2px solid;
     border-radius: 10px;
@@ -35,9 +77,6 @@
     color:  #01A2D8;
 }
 
-.scheduleButton {
-    margin-left: 0;
-}
 
 .headerMenu {
     display: flex;
@@ -46,6 +85,37 @@
     padding: 0;
     margin: auto;
     justify-content: space-between;
+}
+
+.funcButton {
+    width: 50px;
+    height: 50px;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-color: transparent;
+    margin: auto 0 30px auto;
+    border: none;
+    filter: grayscale(100%);
+}
+
+.funcButtonEnabled {
+    cursor: pointer;
+    transition: transform 0.4s;
+    border: #05F0D2 2px solid;
+    filter: none;
+}
+.funcButtonEnabled:hover {
+    transform: scale(1.2);
+}
+
+.refreshButton {
+    border: none;
+    background-image: url("../../../public/images/refresh-svgrepo-com.svg");
+}
+
+.filterButton {
+    background-image: url("../../../public/images/filter-svgrepo-com.svg");
 }
 
 .avatar {

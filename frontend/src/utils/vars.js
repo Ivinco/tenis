@@ -17,5 +17,5 @@ export const headerMenuItems = [
         action: setTimeZoneValue
     }
 ]
-export const URL = process.env.SERVER || "http://localhost"
-export const PORT = process.env.PORT || '8080'
+export const URL = process.env.SERVER || "https://tenis-dev.k8s-test.ivinco.com/api"
+export const PORT = process.env.PORT || '443'
