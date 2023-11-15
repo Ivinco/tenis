@@ -1,5 +1,6 @@
 import os, jwt
 from flask import Flask, request
+from flask_cors import CORS
 from pymongo import MongoClient
 import atexit
 from .auth import token_required
@@ -12,6 +13,7 @@ connection_string = f"mongodb://{mongo_host}/{mongo_dbname}"
 secret_key = os.getenv('SECRET', 'big tenis') # Secret key to use 
 
 app = Flask(__name__)
+CORS(app)
 app.mongodb_client = MongoClient(connection_string)
 app.db = app.mongodb_client[mongo_dbname]
 app.config['SECRET_KEY'] = secret_key
