@@ -1,2 +1,5 @@
 .werf_secret_key
 .DS_Store
+.idea
+*.pyc
+venv
