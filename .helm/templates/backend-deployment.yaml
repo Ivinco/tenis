@@ -35,10 +35,26 @@ spec:
           httpGet:
             path: /healz
             port: http
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
         readinessProbe:
           httpGet:
             path: /healz
             port: http
+          initialDelaySeconds: 15
+          periodSeconds: 10
+          timeoutSeconds: 5
+          successThreshold: 1
+        startupProbe:
+          httpGet:
+            path: /healz
+            port: http
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          failureThreshold: 10
+          timeoutSeconds: 5
         resources:
           {{- toYaml .Values.backend.resources | nindent 10 }}
       {{- with .Values.backend.nodeSelector }}
