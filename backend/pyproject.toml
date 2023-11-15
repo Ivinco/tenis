@@ -19,8 +19,9 @@ classifiers = [
 dependencies = [
     "build",
     "flask",
+    "flask-sock",
     "pymongo >= 4.1",
-    "Werkzeug >= 2.0",
+    "Werkzeug >= 3.0",
     "PyJWT >= 1.6.4",
 ]
 [project.urls]

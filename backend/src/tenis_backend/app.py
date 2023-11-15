@@ -4,7 +4,7 @@ import atexit
 from flask import Flask, request
 from pymongo import MongoClient
 from flask_sock import Sock
-from .auth import token_required
+from .auth import token_required, sock_auth
 from .user import User
 
 # Get environment variables - probably later to be moved to config file
@@ -29,31 +29,39 @@ atexit.register(cleanup_on_shutdown)
 
 
 @sock.route('/alerts')
-def alerts(sock):
+def alerts(ws):
+    if not sock_auth(request):
+        ws.close(reason=1000, message="Auth failed")
     while True:
-        data = sock.receive()
-        sock.send(data)
+        data = ws.receive()
+        ws.send(data)
 
 
 @sock.route('/new')
-def new(sock):
+def new(ws):
+    if not sock_auth(request):
+        ws.close(reason=1000, message="Auth failed")
     while True:
-        data = sock.receive()
-        sock.send(data)
+        data = ws.receive()
+        ws.send(data)
 
 
 @sock.route('/changed')
-def changed(sock):
+def changed(ws):
+    if not sock_auth(request):
+        ws.close(reason=1000, message="Auth failed")
     while True:
-        data = sock.receive()
-        sock.send(data)
+        data = ws.receive()
+        ws.send(data)
 
 
 @sock.route('/resolved')
-def resolved(sock):
+def resolved(ws):
+    if not sock_auth(request):
+        ws.close(reason=1000, message="Auth failed")
     while True:
-        data = sock.receive()
-        sock.send(data)
+        data = ws.receive()
+        ws.send(data)
 
 
 @app.route("/")
