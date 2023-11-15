@@ -25,3 +25,12 @@ frontend:
   tolerations: []
 
   affinity: {}
+
+monbodb:
+  env:
+    INIT_DB:
+      _default: "tenis"
+    INIT_USER_NAME:
+      _default: "Admin"
+    INIT_USER_EMAIL:
+      _default: "sys@ivinco.com"

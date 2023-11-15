@@ -48,3 +48,7 @@ import:
   add: /app/build
   to: /usr/share/nginx/html
   before: install
+
+---
+image: mongodb
+from: mongo:7.0-rc
