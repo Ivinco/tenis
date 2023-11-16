@@ -30,7 +30,8 @@ shell:
   - pip install .
 
 ```
-Werf can also utilize ready Dockerfiles, but this way gives us more flexibility in the building process.
+> Werf can also utilize ready Dockerfiles, but this way gives us more flexibility in the building process.
+
 Once definition is ready, images are build with `werf build`, see `ci-dev.yml`.
 # How it's deployed
 We use Github Actions as a CI/CD tool.
