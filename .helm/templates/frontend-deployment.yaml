@@ -26,6 +26,9 @@ spec:
         - nginx
         - -e
         - /dev/stderr
+        env:
+        - name: SERVER
+          value: https://{{ .Values.env_url }}/api
         ports:
         - name: http
           containerPort: 3000
