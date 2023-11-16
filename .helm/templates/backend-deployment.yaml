@@ -41,7 +41,7 @@ spec:
         - name: MONGO_HOST
           value: {{ .Chart.Name }}-mongodb
         - name: MONGO_DATABASE
-          value: {{ pluck .Values.werf.env .Values.monbodb.env.INIT_DB | first | default .Values.monbodb.env.INIT_DB._default }}
+          value: {{ pluck .Values.werf.env .Values.mongodb.env.INIT_DB | first | default .Values.mongodb.env.INIT_DB._default }}
         livenessProbe:
           httpGet:
             path: /healz

@@ -26,7 +26,7 @@ frontend:
 
   affinity: {}
 
-monbodb:
+mongodb:
   env:
     INIT_DB:
       _default: "tenis"

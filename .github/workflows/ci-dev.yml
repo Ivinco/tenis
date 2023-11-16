@@ -27,7 +27,6 @@ jobs:
           username: ${{ secrets.REGISTRY_SECRET_USER }}
           password: ${{ secrets.REGISTRY_SECRET_PASSWORD }}
 
-
       - name: Install werf
         uses: werf/actions/install@v1.2
 
@@ -35,16 +34,11 @@ jobs:
         run: |
           . $(werf ci-env github --as-file)
           werf build
-        env:
-          WERF_ENV: development
 
 
   render-and-lint:
     needs: build
     runs-on: self-hosted
-    strategy:
-      matrix:
-        jobs: [ "render --env dev", "helm lint .helm" ]
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -59,12 +53,18 @@ jobs:
       - name: Install werf
         uses: werf/actions/install@v1.2
 
-      - name: Render and Lint
-        run: werf ${{ matrix.jobs }}
+      - name: Render chart
+        run: werf render --env dev --ignore-secret-key
+        env:
+          WERF_SET_ENV_URL: "env_url=tenis.k8s-test.ivinco.com"
+
+      - name: Lint chart
+        run: werf helm lint .helm
+
 
 
   converge:
-    needs: build
+    needs: render-and-lint
     runs-on: self-hosted
     steps:
       - name: Checkout code
