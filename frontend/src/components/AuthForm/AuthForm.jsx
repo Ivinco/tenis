@@ -49,7 +49,7 @@ const AuthForm = () => {
                                             ? `${styles.loginInput} ${styles.inputInvalid}`
                                             : `${styles.loginInput}`}
                    value={(emailValidator.value)}
-                   placeholder={"LOGIN"}
+                   placeholder={"E-MAIL"}
                    onChange={(e) => emailValidator.onChange(e)}
                    onBlur={(e) => emailValidator.onBlur(e)}
                    onKeyDown={handleKeyDown}

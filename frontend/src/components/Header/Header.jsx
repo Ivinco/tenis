@@ -26,7 +26,7 @@ const Header = () => {
             <div className={styles.header}>
                 <div className={styles.logo}></div>
                 <div className={`${styles.onDutyPortal} ${isLogged ? styles.onDutyPortalActive : null}`}>
-                    {isLogged ? "Vasya Pupkin" : null}
+                    {isLogged ? " On call: Vasya Pupkin" : null}
                 </div>
                 <nav className={styles.navbar}>
                     <ul className={styles.itemsBlock}>
