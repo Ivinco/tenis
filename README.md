@@ -147,7 +147,8 @@ On step `render-and-lint` there's a step called `Render chart`, which contains a
 ## How to generate new password for mongodb init user
 Password should be hashed with werkzeug.security:
 ```
-from werkzeug.security import generate_password_hash
+$ python
+>>> from werkzeug.security import generate_password_hash
 >>> print(generate_password_hash("example-password"), "\n")
 scrypt:32768:8:1$wlKfg9o3d9jtl0AU$0aebc1e1d841a46b049a53052ac9c53ccd998975ce84b0dd98089029f072b360316a9c0283e0ef26aa313835b29bf5ad4e8c1674737953ffcc0c2647fe912d64
 
