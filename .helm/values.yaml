@@ -4,7 +4,14 @@ backend:
   image:
     pullPolicy: IfNotPresent
 
-  resources: {}
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "250m"
+    limits:
+      memory: "256Mi"
+
+
 
   nodeSelector: {}
 
@@ -18,7 +25,13 @@ frontend:
   image:
     pullPolicy: IfNotPresent
 
-  resources: {}
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "250m"
+    limits:
+      memory: "128Mi"
+
 
   nodeSelector: {}
 
@@ -27,6 +40,14 @@ frontend:
   affinity: {}
 
 mongodb:
+  resources:
+    requests:
+      memory: "512Mi"
+      cpu: "250m"
+    limits:
+      memory: "512Mi"
+
+
   env:
     INIT_DB:
       _default: "tenis"

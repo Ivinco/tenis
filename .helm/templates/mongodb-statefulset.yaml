@@ -56,6 +56,8 @@ spec:
         volumeMounts:
         - name: mongo-persistent-storage
           mountPath: /data/db
+        resources:
+          {{- toYaml .Values.mongodb.resources | nindent 10 }}
   volumeClaimTemplates:
   - metadata:
       name: mongo-persistent-storage
