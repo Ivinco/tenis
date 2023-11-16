@@ -192,3 +192,6 @@ To deploy:
 $ werf converge --repo registry.example.ru/tenis
 ```
 
+# Misc
+- Registry cleanup is defined in `.github/workflows/cleanup.yml`
+- CodeQL checks are defined in `.github/workflows/codeql.yml`
