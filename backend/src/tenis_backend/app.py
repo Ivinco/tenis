@@ -16,7 +16,7 @@ secret_key = os.getenv('SECRET', 'big tenis')  # Secret key to use
 
 app = Flask(__name__)
 sock = Sock(app)
-CORS(app)
+CORS(app, resources={r"/*": {"origins": "*"}})
 app.mongodb_client = MongoClient(connection_string)
 app.db = app.mongodb_client[mongo_dbname]
 app.config['SECRET_KEY'] = secret_key
