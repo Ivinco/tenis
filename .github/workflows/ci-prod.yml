@@ -89,7 +89,7 @@ jobs:
           kube-config-base64-data: ${{ secrets.KUBE_CONFIG_BASE64_DATA }}
           env: prod
         env:
-          WERF_SET_ENV_URL: "env_url=tenis-dev.k8s-test.ivinco.com"
+          WERF_SET_ENV_URL: "env_url=tenis.k8s-test.ivinco.com"
           WERF_NAMESPACE: tenis-prod
           WERF_RELEASE: tenis-prod
           WERF_ENV: prod
