@@ -90,4 +90,3 @@ jobs:
           WERF_SET_ENV_URL: "env_url=tenis-dev.k8s-test.ivinco.com"
           WERF_NAMESPACE: tenis-dev
           WERF_RELEASE: tenis-dev
-          WERF_ENV: dev

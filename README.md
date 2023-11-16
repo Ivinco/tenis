@@ -73,7 +73,6 @@ Deploy in both cases is happening due to such actions job:
           WERF_SET_ENV_URL: "env_url=tenis-dev.k8s-test.ivinco.com"
           WERF_NAMESPACE: tenis-dev
           WERF_RELEASE: tenis-dev
-          WERF_ENV: dev
 
 ```
 > All the secrets like KUBE_CONFIG_BASE64_DATA,REGISTRY_SECRET_USER, REGISTRY_SECRET_PASSWORD are defined in the repo's secrets. You can find them in repo's settings'
@@ -85,13 +84,10 @@ Here's the variables list:
 WERF_SET_ENV_URL: "env_url=tenis-dev.k8s-test.ivinco.com" <===== URL on which your app will be available
 WERF_NAMESPACE: tenis-dev                                 <===== k8s namespace
 WERF_RELEASE: tenis-dev                                   <===== helm release
-WERF_ENV: dev                                             <===== environment id
+steps.converge.with.env: dev                              <===== environment id
 ```
-You'll also need to update `env: dev` parameter for it to be the same as WERF_ENV
 
 Once the deploy is complete, you can access your environment by the URL set in `WERF_SET_ENV_URL: "env_url=example.com"`
-
-**Note! Don't forget to remove created namespace and CI changes once you've finished with your tests!**
 
 ### Example of CI changes:
 ```
@@ -122,7 +118,6 @@ Once the deploy is complete, you can access your environment by the URL set in `
           WERF_SET_ENV_URL: "env_url=tenis-andrew.k8s-test.ivinco.com"
           WERF_NAMESPACE: tenis-andrew
           WERF_RELEASE: tenis-andrew
-          WERF_ENV: dev_andrew
 ```
 ### Example of how you can use env name to pass custom values to variables
 ```
@@ -130,8 +125,8 @@ values.yaml
 mongodb:
   env:
     INIT_DB:
-      _default: "tenis"                         <==== If WERF_ENV and `env` has no custom value configured, _default is used
-      dev_andrew: "tenis-andrew-or-whatever"    <==== if WERF_ENV and `env` == dev_andrew, this value is used
+      _default: "tenis"                         <==== If `steps.converge.with.env` has no custom value configured, _default is used
+      dev_andrew: "tenis-andrew-or-whatever"    <==== if `steps.converge.with.env` == dev_andrew, this value is used
 ```
 This behaviour is achieved by the following constriction inside the template files:
 ```
@@ -178,7 +173,7 @@ mongodb:
   env:
     INIT_PASSWORD:
       _default: "scrypt-password-generated-with-werkzeug.security"
-      dev_andrew: "scrypt:32768:8:1$wlKfg9o3d9jtl0AU$0aebc1e1d841a46b049a53052ac9c53ccd998975ce84b0dd98089029f072b360316a9c0283e0ef26aa313835b29bf5ad4e8c1674737953ffcc0c2647fe912d64" (env should be the same as `WERF_ENV` and `env` in CI)
+      dev_andrew: "scrypt:32768:8:1$wlKfg9o3d9jtl0AU$0aebc1e1d841a46b049a53052ac9c53ccd998975ce84b0dd98089029f072b360316a9c0283e0ef26aa313835b29bf5ad4e8c1674737953ffcc0c2647fe912d64" (env should be the same as `steps.converge.with.env` in CI)
 ```
 
 
