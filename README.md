@@ -47,7 +47,7 @@ We use Github Actions as a CI/CD tool.
 Deploy in both cases is happening due to this actions job:
 ```
   converge:
-    needs: build
+    needs: render-and-lint
     runs-on: self-hosted
     steps:
       - name: Checkout code
@@ -85,7 +85,7 @@ Once the deploy is complete, you can access your environment by the URL set in `
 ### Example of CI changes:
 ```
   converge-updated:
-    needs: build
+    needs: render-and-lint
     runs-on: self-hosted
     steps:
       - name: Checkout code
