@@ -44,7 +44,7 @@ We use Github Actions as a CI/CD tool.
 
 
 
-Deploy in both cases is happening due to this actions job:
+Deploy in both cases is happening due to such actions job:
 ```
   converge:
     needs: render-and-lint
@@ -76,11 +76,22 @@ Deploy in both cases is happening due to this actions job:
           WERF_ENV: dev
 
 ```
-All the secrets are defined in the repo's secrets.
-Anyone can easily create a new environment for personal tesing. To do so you can just alter `ci-dev.yml` - `converge` job, change it's name and all the env variables (including `env: dev`), or simply create additional job.
+> All the secrets like KUBE_CONFIG_BASE64_DATA,REGISTRY_SECRET_USER, REGISTRY_SECRET_PASSWORD are defined in the repo's secrets. You can find them in repo's settings'
+## How to create new environment for personal testing
+Creating of a new environment is extremely easy. You need to define new job in ci-dev.yml (or you can make a copy of `.github/workflows/ci-dev.yml` file and define your own workflow with minor changes).
+For most of the cases it will be enough to change several variables in the converge.
+Here's the variables list:
+```
+WERF_SET_ENV_URL: "env_url=tenis-dev.k8s-test.ivinco.com" <===== URL on which your app will be available
+WERF_NAMESPACE: tenis-dev                                 <===== k8s namespace
+WERF_RELEASE: tenis-dev                                   <===== helm release
+WERF_ENV: dev                                             <===== environment id
+```
+You'll also need to update `env: dev` parameter for it to be the same as WERF_ENV
+
 Once the deploy is complete, you can access your environment by the URL set in `WERF_SET_ENV_URL: "env_url=example.com"`
 
-**Note! Don't forget to remove created namespace and CI changes once you've finished your tests!**
+**Note! Don't forget to remove created namespace and CI changes once you've finished with your tests!**
 
 ### Example of CI changes:
 ```
