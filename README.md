@@ -30,14 +30,15 @@ shell:
   - pip install .
 
 ```
+Werf can also utilize ready Dockerfiles, but this way gives us more flexibility in the building process.
 Once definition is ready, images are build with `werf build`, see `ci-dev.yml`.
 # How it's deployed
 We use Github Actions as a CI/CD tool.
 - Deploy to `dev` is happening on any push, opened PR to master, or manually.
-    - `ci-dev.yml` pipeline is responsible for Automatically depploying any changes to `tenis-dev` namespace.
+    - `ci-dev.yml` workflow is responsible for Automatically depploying any changes to `tenis-dev` namespace.
 
 - Deploy to `prod` is happening on merge to master or manually,
-    - `ci-prod.yml` pipeline deploys the code to ns `tenis-prod`, available on url `tenis.k8s-test.ivinco.com`
+    - `ci-prod.yml` workflow deploys the code to ns `tenis-prod`, available on url `tenis.k8s-test.ivinco.com`
 
 
 
