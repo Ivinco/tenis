@@ -1,14 +1,17 @@
 import os
 import jwt
 import atexit
-from datetime import timedelta
+from datetime import datetime, timezone, timedelta
 from pymongo import MongoClient
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, make_response
 from flask_cors import CORS
 from flask_sock import Sock
 from werkzeug.exceptions import Unauthorized, BadRequest, InternalServerError
 from .auth import token_required, create_token
 from .user import User
+
+# XXX:
+import sys
 
 # App configuration parameters
 app = Flask(__name__)
@@ -73,20 +76,32 @@ def login():
         raise Unauthorized("Invalid credentials")
 
     try:
-        access_token = create_token(user["_id"], app.config["SECRET_KEY"], 'access', app.config["JWT_ACCESS_TOKEN_EXPIRES"])
-        refresh_token = create_token(user["_id"], app.config["SECRET_KEY"], 'refresh', app.config["JWT_REFRESH_TOKEN_EXPIRES"])
-        return jsonify(access_token=access_token, refresh_token=refresh_token, user=user), 200
+        now = datetime.now(timezone.utc)
+        acccess_token_expires = now + app.config["JWT_ACCESS_TOKEN_EXPIRES"]
+        refresh_token_expires = now + app.config["JWT_REFRESH_TOKEN_EXPIRES"]
+        
+        access_token = create_token(user["_id"], app.config["SECRET_KEY"], 'access', acccess_token_expires)
+        refresh_token = create_token(user["_id"], app.config["SECRET_KEY"], 'refresh', refresh_token_expires)
+        resp = make_response(jsonify(access_token=access_token, user=user))
+        # httponly means 'cookie is not available for JS code in the browser'
+        resp.set_cookie('refresh_token', refresh_token, secure=False, httponly=True, expires=refresh_token_expires)
+        return resp, 200
     except Exception as e:
         raise InternalServerError("Failed to create JWT token")
 
 
 # We are using the `refresh=True` options in jwt_required to only allow
 # refresh tokens to access this route.
+# Note that refresh=True also changes @token_required behavior: it looks for refresh token
+# in cookie called 'refresh_token', not in Authorization header
 @app.route("/refresh")
 @token_required(refresh=True)
 def refresh(user):
     try:
-        access_token = create_token(user["_id"], app.config["SECRET_KEY"], 'access', app.config["JWT_ACCESS_TOKEN_EXPIRES"])
+        now = datetime.now(timezone.utc)
+        acccess_token_expires = now + app.config["JWT_ACCESS_TOKEN_EXPIRES"]
+        access_token = create_token(user["_id"], app.config["SECRET_KEY"], 'access', acccess_token_expires)
+        print("3\n", file=sys.stderr)
         return jsonify(access_token=access_token)
     except Exception as e:
         raise InternalServerError("Failed to issue refresh token")
