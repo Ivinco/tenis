@@ -75,7 +75,7 @@ def login():
     try:
         access_token = create_token(user["_id"], app.config["SECRET_KEY"], 'access', app.config["JWT_ACCESS_TOKEN_EXPIRES"])
         refresh_token = create_token(user["_id"], app.config["SECRET_KEY"], 'refresh', app.config["JWT_REFRESH_TOKEN_EXPIRES"])
-        return jsonify(access_token=access_token, refresh_token=refresh_token), 200
+        return jsonify(access_token=access_token, refresh_token=refresh_token, user=user), 200
     except Exception as e:
         raise InternalServerError("Failed to create JWT token")
 
