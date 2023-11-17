@@ -10,9 +10,6 @@ from werkzeug.exceptions import Unauthorized, BadRequest, InternalServerError
 from .auth import token_required, create_token
 from .user import User
 
-# XXX:
-import sys
-
 # App configuration parameters
 app = Flask(__name__)
 sock = Sock(app)
