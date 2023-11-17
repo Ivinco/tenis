@@ -10,9 +10,6 @@ from werkzeug.exceptions import Unauthorized, BadRequest, InternalServerError
 from .auth import token_required, create_token
 from .user import User
 
-# XXX:
-import sys
-
 # App configuration parameters
 app = Flask(__name__)
 sock = Sock(app)
@@ -100,9 +97,13 @@ def refresh(user):
     try:
         now = datetime.now(timezone.utc)
         acccess_token_expires = now + app.config["JWT_ACCESS_TOKEN_EXPIRES"]
+        refresh_token_expires = now + app.config["JWT_REFRESH_TOKEN_EXPIRES"]
+
         access_token = create_token(user["_id"], app.config["SECRET_KEY"], 'access', acccess_token_expires)
-        print("3\n", file=sys.stderr)
-        return jsonify(access_token=access_token)
+        refresh_token = create_token(user["_id"], app.config["SECRET_KEY"], 'refresh', refresh_token_expires)
+        resp = make_response(jsonify(access_token=access_token))
+        resp.set_cookie('refresh_token', refresh_token, secure=False, httponly=True, expires=refresh_token_expires)
+        return resp, 200
     except Exception as e:
         raise InternalServerError("Failed to issue refresh token")
 
