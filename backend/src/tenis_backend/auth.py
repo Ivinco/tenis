@@ -1,59 +1,56 @@
 from functools import wraps
 import jwt
+import uuid
+from datetime import datetime, timezone
 from flask import request, abort
 from flask import current_app
+from werkzeug.exceptions import NotAcceptable, Forbidden, Unauthorized, BadRequest, InternalServerError
 from .user import User
 
+def create_token(user_id, secret, token_type, expires):
+    now = datetime.now(timezone.utc)
+    token_data = {
+        "iat": now, # Issued at
+        "jti": str(uuid.uuid4()), # JSON Token ID
+        "type": token_type, # 'refresh' or 'access'
+        "exp": now + expires,
+        "sub": user_id # token subject
+    }
+    return jwt.encode(
+        token_data,
+        secret,
+        algorithm="HS256"
+    )
 
-def sock_auth(request):
-    token = None
-    if "Authorization" in request.headers:
-        token = request.headers["Authorization"].split(" ")[1]
-    if not token:
-        return False
-    try:
-        data = jwt.decode(token, current_app.config["SECRET_KEY"], algorithms=["HS256"])
-        current_user = User().get_by_id(data["user_id"])
-        if current_user is None:
-            return False
-        if not current_user["active"]:
-            abort(403)
-    except Exception as e:
-        return False
-
-    return True
-
-
-def token_required(f):
-    @wraps(f)
-    def decorated(*args, **kwargs):
-        token = None
-        if "Authorization" in request.headers:
-            token = request.headers["Authorization"].split(" ")[1]
-        if not token:
-            return {
-                "message": "Authentication token is missing!",
-                "data": None,
-                "error": "Unauthorized"
-            }, 401
-        try:
-            data = jwt.decode(token, current_app.config["SECRET_KEY"], algorithms=["HS256"])
-            current_user = User().get_by_id(data["user_id"])
-            if current_user is None:
-                return {
-                    "message": "Invalid authentication token!",
-                    "data": None,
-                    "error": "Unauthorized"
-                }, 401
-            if not current_user["active"]:
-                abort(403)
-        except Exception as e:
-            return {
-                "message": "Backend error",
-                "data": None,
-                "error": str(e)
-            }, 500
-
-        return f(current_user, *args, **kwargs)
-
-    return decorated
+def token_required(refresh: bool = False): 
+    def wrapper(fn):
+        @wraps(fn)
+        def decorator(*args, **kwargs):
+            token = None
+            if "Authorization" in request.headers:
+                token = request.headers["Authorization"].split()[1]
+            if not token:
+                raise Forbidden("No token provided")
+            try:
+                # jwt.decode also takes care of token expiration
+                decoded_token = jwt.decode(token, current_app.config["SECRET_KEY"], algorithms=["HS256"])
+                current_user = User().get_by_id(decoded_token["sub"])
+                if "type" not in decoded_token:
+                    decoded_token["type"] = "access"
+                if not refresh and decoded_token["type"] == "refresh":
+                    raise NotAcceptable("Cannot use refresh token as auth token")
+                elif refresh and decoded_token["type"] != "refresh":
+                    raise NotAcceptable("Cannot use auth token as refresh token")
+                if current_user is None:
+                    raise BadRequest("Broken token")
+                if not current_user["active"]:
+                    raise Unauthorized("User is disabled")
+            except jwt.ExpiredSignatureError:
+                raise Unauthorized("Token expired")
+            except jwt.InvalidTokenError:
+                raise BadRequest("Invalid token")
+            except Exception as e:
+                raise InternalServerError(str(e))
+            return fn(current_user, *args, **kwargs)
+        return decorator
+    return wrapper
