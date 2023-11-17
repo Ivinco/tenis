@@ -98,7 +98,6 @@ def refresh(user):
         now = datetime.now(timezone.utc)
         acccess_token_expires = now + app.config["JWT_ACCESS_TOKEN_EXPIRES"]
         access_token = create_token(user["_id"], app.config["SECRET_KEY"], 'access', acccess_token_expires)
-        print("3\n", file=sys.stderr)
         return jsonify(access_token=access_token)
     except Exception as e:
         raise InternalServerError("Failed to issue refresh token")
