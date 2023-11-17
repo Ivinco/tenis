@@ -23,8 +23,10 @@ def create_token(user_id, secret, token_type, expires):
     )
 
 def token_required(refresh: bool = False): 
-""" Note that refresh=True also changes @token_required behavior: it looks for refresh token
-    in cookie called 'refresh_token', not in Authorization header"""
+    """
+    Note that refresh=True also changes @token_required behavior: it looks for refresh token
+    in cookie called 'refresh_token', not in Authorization header
+    """
 
     def wrapper(fn):
         @wraps(fn)
