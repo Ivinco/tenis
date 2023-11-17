@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "tenis_backend"
-version = "0.0.2"
+version = "0.0.3"
 authors = [
     { name = "Valery Panov", email = "valery@ivinco.com" },
 ]
@@ -19,11 +19,12 @@ classifiers = [
 dependencies = [
     "build",
     "flask",
-    "flask-sock",
+    "flask_sock",
     "flask_cors",
     "pymongo >= 4.1",
-    "Werkzeug >= 3.0",
+    "Werkzeug >= 2.0",
     "PyJWT >= 1.6.4",
+    "uuid >= 1.3",
 ]
 [project.urls]
 Homepage = "https://github.com/Ivinco/tenis/backend"
