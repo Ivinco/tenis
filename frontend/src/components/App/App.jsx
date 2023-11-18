@@ -40,7 +40,7 @@ function App () {
       <BrowserRouter>
         <Routes>
           <Route path='/main' element={<MainPage />}/>
-          <Route path='*' element={<Navigate replace to='/main' />} />
+          {/*<Route path='*' element={<Navigate replace to='/main' />} />*/}
         </Routes>
 
       </BrowserRouter>
