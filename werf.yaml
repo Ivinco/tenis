@@ -36,10 +36,10 @@ git:
 shell:
   install:
   - cd /app
-  - yarn install
+  - npm install
   setup:
   - cd /app
-  - yarn run build
+  - npm run build
 
 ---
 image: frontend
