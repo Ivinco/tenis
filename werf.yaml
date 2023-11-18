@@ -30,15 +30,16 @@ git:
     install:
     - "package.json"
     - "package-lock.json"
+    - "yarn.lock"
     setup:
     - "**/*"
 shell:
   install:
   - cd /app
-  - npm install
+  - yarn install
   setup:
   - cd /app
-  - npm run build
+  - yarn run build
 
 ---
 image: frontend
