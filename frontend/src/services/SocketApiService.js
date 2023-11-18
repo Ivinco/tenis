@@ -1,10 +1,20 @@
 import io from "socket.io-client"
-import {PORT, URL} from "../utils/vars"
+import {BACKEND_SERVER} from "../utils/vars"
 
 class SocketApiService {
     static socket = null;
-    static createConnection() {
-        this.socket = io(`${URL}:${PORT}`)
+    static createConnection(token) {
+        this.socket = io(`${BACKEND_SERVER}/alerts`,{
+            extraHeaders:{
+                'Authorization': `Bearer ${token}`
+            }
+        }
+        )
+        // this.socket = io('http://localhost:8080', {
+        //     extraHeaders:{
+        //                 Authorization: `Bearer ${token}`
+        //             }
+        // })
     }
     static closeConnection() {
         if(this.socket){

@@ -7,7 +7,7 @@ import {openModal} from "../../store/reducers/modalReducer";
 
 const MainDisplay = () => {
     const isActiveSocket = useSelector(state => state.webSocket.isOpened)
-    const rawAlerts = useConnectSocket()
+    const rawAlerts = useConnectSocket(localStorage.getItem('token'))
 
     return (
         <div className={styles.mainDisplay}>

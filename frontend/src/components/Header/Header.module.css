@@ -116,17 +116,13 @@
     background-repeat: no-repeat;
     margin: 30px 45px 31px auto;
     border-radius: 50%;
-    border: 3px solid slategrey;
+    border: 3px solid #05F0D2;
     transition: transform 0.2s;
     position: relative;
 }
 .avatar:hover {
     transform: scale(1.1);
     cursor: pointer;
-}
-
-.avatar_unknown {
-    background-image: url("../../../public/images/avatar.svg");
 }
 
 

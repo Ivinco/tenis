@@ -14,8 +14,9 @@ import {
 export const useConnectSocket = () => {
     const dispatch = useDispatch()
     const alerts = useSelector(state => state.webSocket.alerts)
-    const connectSocket = () => {
-        SocketApiService.createConnection()
+    const token = localStorage.getItem('token');
+    const connectSocket = (token) => {
+        SocketApiService.createConnection(token)
 
         SocketApiService.socket.on('connect', () => {
             console.log("Websocket connected")
@@ -43,12 +44,12 @@ export const useConnectSocket = () => {
     }
 
     useEffect(() => {
-        connectSocket()
+        connectSocket(token)
         return () => {
             closeSocket()
         }
 
-    }, []);
+    }, [token]);
 
     return alerts
 }

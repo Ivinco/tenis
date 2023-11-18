@@ -6,7 +6,8 @@ const defaultAuth =  {
     user : {
         userId: null,
         userName: null,
-        userImage: null
+        userImage: null,
+        userEmail: null
     }
 
 }
