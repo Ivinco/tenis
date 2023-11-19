@@ -37,7 +37,7 @@ T.E.N.I.S. stands for Team Event Notificaton and Interoperability System!
 - Create Dockerfiles or build Frontend and Backend images in any convinient way
   - You can take `werf.yaml` as a reference, it shows every step of build process
   - Build your images, tag them appropriately and push to your registry
-  - Substitute `{{ .Values.werf.images.(frontend|backend) }}` in frontend and backend with your created images
+  - Substitute `{{ .Values.werf.images.(frontend|backend) }}` in frontend and backend deployments with your created images
 - Add `mongodb.env.INIT_PASSWORD` in n values.yaml. It should be added like that
 ```
 mongodb:
