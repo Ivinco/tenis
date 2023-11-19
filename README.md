@@ -27,6 +27,10 @@ T.E.N.I.S. stands for Team Event Notificaton and Interoperability System!
   ```
   $ werf converge --namespace <your-namespace> --repo <registry>/<project>
   ```
+### Notes
+For CI/CD purposes, WERF_SECRET_KEY variable should be added to the project variables and made available for use.
+
+
 ## Complicated way (helm)
 ### Prerequisites
 - helm
