@@ -2,6 +2,57 @@
 
 T.E.N.I.S. stands for Team Event Notificaton and Interoperability System!
 
+# Installation
+## Easy way (werf)
+### Prerequisites
+- [werf](werf.io)
+- Ready to use k8s cluster with configured kubeconfig
+- Registry (for manual deployment you should be logged in if your registry is protected with auth)
+- Registry secret (in this app it's called registry-secret, but you can alter it as you wish)
+### Procedure
+- Prepare the environment
+  - Add werf secret key (In repo root)
+  ```
+  $ werf helm secret generate-secret-key > .werf_secret_key
+  ```
+  - Add INIT_PASSWORD
+  ```
+  $ werf helm secret values edit .helm/secret-values.yaml
+  ```
+- Build and push images
+  ```
+  $ werf build --repo <registry>/<project>
+  ```
+- Converge
+  ```
+  $ werf converge --namespace <your-namespace> --repo <registry>/<project>
+  ```
+## Complicated way (helm)
+### Prerequisites
+- helm
+- Ready to use k8s cluster with configured kubeconfig
+- Registry (for manual deployment you should be logged in if your registry is protected with auth)
+- Registry secret (in this app it's called registry-secret, but you can alter it as you wish)
+### Procedure
+- Create Dockerfiles or build Frontend and Backend images in any convinient way
+  - You can take `werf.yaml` as a reference, it shows every step of build process
+  - Build your images, tag them appropriately and push to your registry
+  - Substitute `{{ .Values.werf.images.(frontend|backend) }}` in frontend and backend with your created images
+- Add `mongodb.env.INIT_PASSWORD` in n values.yaml. It should be added like that
+```
+mongodb:
+  env:
+    INIT_PASSWORD:
+      _default: <your default password here>
+      dev: <example of your password for werf.env=dev>
+```
+To understand more about what kind of password should be used, look [here](#
+How to generate new password for mongodb init user)
+- Add `env_url`. You can add it in values.yaml or directly with helm install command
+- Install chart (example)
+```
+$ helm -n <k8s-namespace> install <release-name> .helm --set werf.env=dev --set env_url="test.example.com"
+```
 # How images are built
 We use [werf](werf.io) to build, publish, and deploy everything to k8s.
 Images building procedure is defined in `werf.yaml` file.
