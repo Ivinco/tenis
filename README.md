@@ -38,7 +38,7 @@ T.E.N.I.S. stands for Team Event Notificaton and Interoperability System!
   - You can take `werf.yaml` as a reference, it shows every step of build process
   - Build your images, tag them appropriately and push to your registry
   - Substitute `{{ .Values.werf.images.(frontend|backend) }}` in frontend and backend deployments with your created images
-- Add `mongodb.env.INIT_PASSWORD` in n values.yaml. It should be added like that
+- Add `mongodb.env.INIT_PASSWORD` in `values.yaml`. It should be added like that
 ```
 mongodb:
   env:
@@ -47,7 +47,7 @@ mongodb:
       dev: <example of your password for werf.env=dev>
 ```
 To understand more about what kind of password should be used, look [here](#how-to-generate-new-password-for-mongodb-init-user)
-- Add `env_url`. You can add it in values.yaml or directly with helm install command
+- Add `env_url`. You can add it in `values.yaml` or directly with helm install command
 - Install chart (example)
 ```
 $ helm -n <k8s-namespace> install <release-name> .helm --set werf.env=dev --set env_url="test.example.com"
@@ -127,7 +127,7 @@ Deploy job looks simillar in both cases:
 > All the secrets like KUBE_CONFIG_BASE64_DATA,REGISTRY_SECRET_USER, REGISTRY_SECRET_PASSWORD are defined in the repo's secrets. You can find them in repo's settings'
 ## FAQ
 ### How to create new environment for personal testing
-Creating of a new environment is extremely easy. You need to define new job in ci-dev.yml (or you can make a copy of `.github/workflows/ci-dev.yml` file and define your own workflow with minor changes).
+Creating of a new environment is extremely easy. You need to define new job in `ci-dev.yml` (or you can make a copy of `.github/workflows/ci-dev.yml` file and define your own workflow with minor changes).
 For most of the cases it will be enough to change several variables in the converge.
 Here's the variables list:
 ```
@@ -212,7 +212,7 @@ Here's the hasing alghorithm (scrypt:32768:8:1), salt (wlKfg9o3d9jtl0AU) and has
 "scrypt:32768:8:1$wlKfg9o3d9jtl0AU$0aebc1e1d841a46b049a53052ac9c53ccd998975ce84b0dd98089029f072b360316a9c0283e0ef26aa313835b29bf5ad4e8c1674737953ffcc0c2647fe912d64"
 
 ```
-Passwords are stored encrypted in `.helm/secret-values.yaml`. You need to acquire WERF_SECRET_KEY in lastpass and add it to .werf_secret_key file in the root of the repo (it's in .gitignore, so it's safe) or export to variable WERF_SECRET_KEY locally.
+Passwords are stored encrypted in `.helm/secret-values.yaml`. You need to acquire WERF_SECRET_KEY in lastpass and add it to `.werf_secret_key` file in the root of the repo (it's in .gitignore, so it's safe) or export to variable WERF_SECRET_KEY locally.
 ```
 export WERF_SECRET_KEY=example-string-qwerty
 ```
