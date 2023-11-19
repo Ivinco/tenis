@@ -46,8 +46,7 @@ mongodb:
       _default: <your default password here>
       dev: <example of your password for werf.env=dev>
 ```
-To understand more about what kind of password should be used, look [here](#
-How to generate new password for mongodb init user)
+To understand more about what kind of password should be used, look [here](#how-to-generate-new-password-for-mongodb-init-user)
 - Add `env_url`. You can add it in values.yaml or directly with helm install command
 - Install chart (example)
 ```
