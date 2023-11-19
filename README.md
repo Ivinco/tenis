@@ -52,7 +52,9 @@ To understand more about what kind of password should be used, look [here](#how-
 ```
 $ helm -n <k8s-namespace> install <release-name> .helm --set werf.env=dev --set env_url="test.example.com"
 ```
-# How images are built
+
+# Deep dive
+## How images are built
 We use [werf](werf.io) to build, publish, and deploy everything to k8s.
 Images building procedure is defined in `werf.yaml` file.
 For example, backend is built like that:
@@ -83,7 +85,7 @@ shell:
 > Werf can also utilize ready Dockerfiles, but this way gives us more flexibility in the building process.
 
 Once definition is ready, images are build with `werf build`, see `ci-dev.yml`.
-# How it's deployed
+## How it's deployed
 We use Github Actions as a CI/CD tool.
 - Deploy to `dev` is happening on any push, opened PR to master, or manually.
     - `ci-dev.yml` workflow is responsible for Automatically depploying any changes to `tenis-dev` namespace.
@@ -91,10 +93,7 @@ We use Github Actions as a CI/CD tool.
 - Deploy to `prod` is happening on merge to master or manually,
     - `ci-prod.yml` workflow deploys the code to ns `tenis-prod`, available on url `tenis.k8s-test.ivinco.com`
 
-
-
-
-Deploy in both cases is happening due to such actions job:
+Deploy job looks simillar in both cases:
 ```
   converge:
     needs: render-and-lint
@@ -126,7 +125,8 @@ Deploy in both cases is happening due to such actions job:
 
 ```
 > All the secrets like KUBE_CONFIG_BASE64_DATA,REGISTRY_SECRET_USER, REGISTRY_SECRET_PASSWORD are defined in the repo's secrets. You can find them in repo's settings'
-## How to create new environment for personal testing
+## FAQ
+### How to create new environment for personal testing
 Creating of a new environment is extremely easy. You need to define new job in ci-dev.yml (or you can make a copy of `.github/workflows/ci-dev.yml` file and define your own workflow with minor changes).
 For most of the cases it will be enough to change several variables in the converge.
 Here's the variables list:
@@ -139,7 +139,7 @@ steps.converge.with.env: dev                              <===== environment id
 
 Once the deploy is complete, you can access your environment by the URL set in `WERF_SET_ENV_URL: "env_url=example.com"`
 
-### Example of CI changes:
+#### Example of CI changes:
 ```
   converge-updated:
     needs: render-and-lint
@@ -169,7 +169,7 @@ Once the deploy is complete, you can access your environment by the URL set in `
           WERF_NAMESPACE: tenis-andrew
           WERF_RELEASE: tenis-andrew
 ```
-### Example of how you can use env name to pass custom values to variables
+#### Example of how you can use env name to pass custom values to variables
 ```
 values.yaml
 mongodb:
@@ -197,10 +197,10 @@ containers:
 Basically, we look for `{{ .Values.werf.env }}` in `{{ .Values.mongodb.env.INIT_DB }}`. Once we find it - we take it's value. If nothing is found, we default to `{{ .Values.mongodb.env.INIT_DB._default }}`
 
 
-## How to understand what exactly is getting to the cluster
+### How to understand what exactly is getting to the cluster
 On step `render-and-lint` there's a step called `Render chart`, which contains all all the rendered resources with all the values substituted, except for secret values like passwords.
 
-## How to generate new password for mongodb init user
+### How to generate new password for mongodb init user
 Password should be hashed with werkzeug.security:
 ```
 $ python
@@ -227,7 +227,7 @@ mongodb:
 ```
 
 
-## Werf cheatsheet
+### Werf cheatsheet
 
 ```
 To build images manualy:
@@ -249,6 +249,6 @@ To deploy:
 $ werf converge --repo registry.example.ru/tenis
 ```
 
-# Misc
+## Misc
 - Registry cleanup is defined in `.github/workflows/cleanup.yml`
 - CodeQL checks are defined in `.github/workflows/codeql.yml`
