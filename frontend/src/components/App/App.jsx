@@ -9,31 +9,31 @@ import axios from "axios";
 import {sha256} from 'js-sha256'
 
 function App () {
-    const dispatch = useDispatch()
-
-    useEffect( () => {
-        async function checkAuth () {
-            if(localStorage.getItem('token')){
-                try {
-                    const refresh = await axios.get(`${BACKEND_SERVER}/refresh`, {withCredentials: true})
-                    console.log(refresh)
-                    localStorage.setItem('token', refresh.data.access_token)
-                    const fetchUser = await UserService.getUser()
-                    const user = {
-                        userName: fetchUser.data.user.name,
-                        userId: fetchUser.data.user._id,
-                        userEmail: fetchUser.data.user.email,
-                        userImage: `https://gravatar.com/avatar/${sha256(fetchUser.data.user.email)}?s=150`
-                    }
-                    dispatch(loginAction(user))
-                } catch (e) {
-                    console.log(`Error while refreshing token: ${e}`)
-                }
-
-            }
-        }
-        checkAuth()
-    }, []);
+    // const dispatch = useDispatch()
+    //
+    // useEffect( () => {
+    //     async function checkAuth () {
+    //         if(localStorage.getItem('token')){
+    //             try {
+    //                 const refresh = await axios.get(`${BACKEND_SERVER}/refresh`, {withCredentials: true})
+    //                 console.log(refresh)
+    //                 localStorage.setItem('token', refresh.data.access_token)
+    //                 const fetchUser = await UserService.getUser()
+    //                 const user = {
+    //                     userName: fetchUser.data.user.name,
+    //                     userId: fetchUser.data.user._id,
+    //                     userEmail: fetchUser.data.user.email,
+    //                     userImage: `https://gravatar.com/avatar/${sha256(fetchUser.data.user.email)}?s=150`
+    //                 }
+    //                 dispatch(loginAction(user))
+    //             } catch (e) {
+    //                 console.log(`Error while refreshing token: ${e}`)
+    //             }
+    //
+    //         }
+    //     }
+    //     checkAuth()
+    // }, []);
 
 
   return (
