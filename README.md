@@ -110,7 +110,7 @@ Deploy job looks simillar in both cases:
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
         with:
-          registry: registry.lev4enko.ru
+          registry: registry.ivinco.com
           username: ${{ secrets.REGISTRY_SECRET_USER }}
           password: ${{ secrets.REGISTRY_SECRET_PASSWORD }}
 
@@ -156,7 +156,7 @@ Once the deploy is complete, you can access your environment by the URL set in `
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
         with:
-          registry: registry.lev4enko.ru
+          registry: registry.ivinco.com
           username: ${{ secrets.REGISTRY_SECRET_USER }}
           password: ${{ secrets.REGISTRY_SECRET_PASSWORD }}
 

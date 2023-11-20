@@ -2,7 +2,7 @@ name: Deploy to prod
 
 env:
   WERF_SECRET_KEY: ${{ secrets.WERF_SECRET_KEY }}
-  WERF_REPO: registry.lev4enko.ru/tenis
+  WERF_REPO: registry.ivinco.com/tenis
 
 on:
   pull_request:
@@ -24,7 +24,7 @@ jobs:
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
         with:
-          registry: registry.lev4enko.ru
+          registry: registry.ivinco.com
           username: ${{ secrets.REGISTRY_SECRET_USER }}
           password: ${{ secrets.REGISTRY_SECRET_PASSWORD }}
 
@@ -48,7 +48,7 @@ jobs:
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
         with:
-          registry: registry.lev4enko.ru
+          registry: registry.ivinco.com
           username: ${{ secrets.REGISTRY_SECRET_USER }}
           password: ${{ secrets.REGISTRY_SECRET_PASSWORD }}
 
@@ -76,7 +76,7 @@ jobs:
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
         with:
-          registry: registry.lev4enko.ru
+          registry: registry.ivinco.com
           username: ${{ secrets.REGISTRY_SECRET_USER }}
           password: ${{ secrets.REGISTRY_SECRET_PASSWORD }}
 
