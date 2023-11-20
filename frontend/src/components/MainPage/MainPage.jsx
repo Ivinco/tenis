@@ -2,19 +2,19 @@ import styles from './MainPage.module.css'
 import Header from "../Header/Header";
 import SideBarMenu from "../SideBarMenu/SideBarMenu";
 import {useDispatch, useSelector} from "react-redux";
-import {switchSideBarState} from "../../store/reducers/sideBarReducer";
+import {switchSideBarState} from "../../store/reducers/hiddenMenuReducer";
 import {sideBarMenuItems} from "../../utils/vars";
 import {switchActiveHeaderMenuItem} from "../../store/reducers/headerMenuReducer";
 import MainDisplay from "../MainDisplay/MainDisplay";
 import Modal from "../Modal/Modal";
 import {useEffect} from "react";
-import {openModal, switchLoginModal} from "../../store/reducers/modalReducer";
+import { switchLoginModal} from "../../store/reducers/modalReducer";
 
 
 function MainPage(){
 
     const dispatch = useDispatch()
-    const isOpenedSideBar = useSelector(state => state.switchSideBar.isOpenedSideBar)
+    const isOpenedSideBar = useSelector(state => state.hiddenMenu.isOpenedSideBar)
     const isOpenedModal = useSelector(state => state.switchModal.isOpened)
     const modalContent = useSelector(state => state.switchModal.content)
     const isLoggedIn = useSelector(state => state.authReducer.isLogged)

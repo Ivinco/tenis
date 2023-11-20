@@ -23,11 +23,26 @@
     margin: auto;
 }
 
+.userInfoBody {
+    display: flex;
+    width: 100%;
+}
+
+.userInfoAvatar {
+    width: 150px;
+    height: 150px;
+    margin: auto;
+    background-repeat: no-repeat;
+    background-size: contain;
+    border: #05F0D2 2px solid;
+}
+
 .userInfoInfoBlock {
     display: flex;
     flex-direction: column;
     list-style: none;
     height: 35%;
+    width: 50%;
 }
 
 .userInfoItem {

@@ -1,0 +1,34 @@
+.errorMessageHeader {
+    display: flex;
+    height: 15%;
+    margin: 30px;
+    padding: 0 152px 15px 0;
+    border-bottom: grey 1px solid;
+}
+
+.errorMessageLogo {
+    width: 120px;
+    height: 100px;
+    background-image: url("../../../public/images/ivinco.svg");
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    margin: auto 0 auto 30px;
+}
+
+.errorMessageIcon {
+    display: flex;
+    width: 75px;
+    height: 75px;
+    background-image: url("../../../public/images/sad-face-2691.svg");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    margin: auto;
+}
+
+.errorMessageMessage {
+    text-align: center;
+    margin: 40px auto auto;
+    font-size: 2rem;
+}

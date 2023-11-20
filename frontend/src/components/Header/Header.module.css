@@ -1,3 +1,8 @@
+.header {
+    display: flex;
+    width: 100%;
+
+}
 .logo {
     width: 120px;
     height: 100px;
@@ -8,10 +13,48 @@
     margin: auto auto auto 45px;
 }
 
+.onDutyPortal {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 250px;
+    min-height: 50px;
+    background-color: white;
+    border: darkgrey 2px solid;
+    border-radius: 10px;
+    margin: auto auto 30px 0;
+    padding: 0 10px;
+    font-size: 1.5rem;
+}
+
+.onDutyPortalActive {
+    border: #05F0D2 2px solid;
+}
+
+.navbar {
+    display: flex;
+    margin: auto auto 30px auto;
+    width: 50%;
+}
+
+.itemsBlock {
+    display: flex;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.navItem {
+    display: flex;
+}
+
 .headerButton {
     min-width: 135px;
     min-height: 50px;
-    margin: auto auto 30px;
+    margin: auto auto;
     background-color: transparent;
     border: #05F0D2 2px solid;
     border-radius: 10px;
@@ -35,17 +78,35 @@
     color:  #01A2D8;
 }
 
-.scheduleButton {
-    margin-left: 0;
+.funcButton {
+    width: 50px;
+    height: 50px;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-color: transparent;
+    margin: auto 0 30px auto;
+    border: none;
+    filter: grayscale(100%);
 }
 
-.headerMenu {
-    display: flex;
-    list-style: none;
-    height: 100px;
-    padding: 0;
-    margin: auto;
-    justify-content: space-between;
+.funcButtonEnabled {
+    cursor: pointer;
+    transition: transform 0.4s;
+    border: #05F0D2 2px solid;
+    filter: none;
+}
+.funcButtonEnabled:hover {
+    transform: scale(1.2);
+}
+
+.refreshButton {
+    border: none;
+    background-image: url("../../../public/images/refresh-svgrepo-com.svg");
+}
+
+.filterButton {
+    background-image: url("../../../public/images/filter-svgrepo-com.svg");
 }
 
 .avatar {
@@ -55,17 +116,13 @@
     background-repeat: no-repeat;
     margin: 30px 45px 31px auto;
     border-radius: 50%;
-    border: 3px solid slategrey;
+    border: 3px solid #05F0D2;
     transition: transform 0.2s;
+    position: relative;
 }
-
 .avatar:hover {
     transform: scale(1.1);
     cursor: pointer;
-}
-
-.avatar_unknown {
-    background-image: url("../../../public/images/avatar.svg");
 }
 
 
@@ -74,6 +131,12 @@
         width: 80px;
         height: 66px;
         margin-left: 30px;
+    }
+
+    .onDutyPortal {
+        min-width: 160px;
+        min-height: 34px;
+        font-size: 1rem;
     }
     .avatar {
         width: 66px;
@@ -86,8 +149,10 @@
         min-width: 90px;
         min-height: 33px
     }
-    .headerMenu {
-        height: 66px;
+
+    .funcButton {
+        width: 34px;
+        height: 34px;
     }
 }
 
@@ -96,6 +161,11 @@
         width: 53px;
         height: 44px;
         margin-left: 20px;
+    }
+    .onDutyPortal {
+        min-width: 108px;
+        min-height: 12px;
+        font-size: 0.66rem;
     }
     .avatar {
         width: 44px;
@@ -108,7 +178,8 @@
         min-width: 60px;
         min-height: 22px
     }
-    .headerMenu {
-        height: 44px;
+    .funcButton {
+        width: 22px;
+        height: 22px;
     }
 }

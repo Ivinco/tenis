@@ -5,12 +5,14 @@ import {useEffect} from "react";
 import ReactDOM from 'react-dom'
 import AuthForm from "../AuthForm/AuthForm";
 import UserInfo from "../UserInfo/UserInfo";
+import ErrorMessage from "../ErrorMessage/ErrorMessage";
 
 const Modal = (content) => {
     const portalElement = document.getElementById("portal")
     const dispatch = useDispatch()
     const isOpenedModal = useSelector(state => state.switchModal.isOpened)
     const modalContent = useSelector(state => state.switchModal.content)
+    const modalMessage = useSelector(state => state.switchModal.customMessage)
 
     const onClose = () => {
         dispatch(closeModal())
@@ -39,7 +41,7 @@ const Modal = (content) => {
                     <button className={styles.closeButton}
                     onClick={(e) => onClose()}
                     />
-                    { modalContent === "LOGIN" ? <AuthForm/> : <UserInfo/>}
+                    { modalContent === "LOGIN" ? <AuthForm/> : modalContent === 'PROFILE' ? <UserInfo/> : <ErrorMessage message={modalMessage}/>}
                 </div>
             </div>
     ), portalElement)
