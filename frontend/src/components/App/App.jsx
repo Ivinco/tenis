@@ -17,8 +17,8 @@ function App () {
 
     useEffect( () => {
         async function checkAuth () {
-            dispatch(startLoadAction())
             if(localStorage.getItem('token')){
+                dispatch(startLoadAction())
                 try {
                     const refresh = await axios.get(`${BACKEND_SERVER}/refresh`, {withCredentials: true})
                     localStorage.setItem('token', refresh.data.access_token)
