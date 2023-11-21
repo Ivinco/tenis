@@ -12,7 +12,10 @@ from .user import User
 
 # App configuration parameters
 app = Flask(__name__)
-sock = Sock(app)
+sock = Sock(app, cors_allowed_origins=[
+                         "http://localhost:3000",
+                         re.compile(r"https?://([a-zA-Z0-9-]+\.)*ivinco\.com")
+                     ])
 CORS(app, supports_credentials=True)
 mongo_host = os.getenv('MONGO_HOST', 'localhost')  # Default to 'localhost' if not set
 mongo_dbname = os.getenv('MONGO_DBNAME', 'tenis')  # Default to 'database' if not set
