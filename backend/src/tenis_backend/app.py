@@ -9,6 +9,7 @@ from flask_sock import Sock
 from werkzeug.exceptions import Unauthorized, BadRequest, InternalServerError
 from .auth import token_required, create_token
 from .user import User
+import re
 
 # App configuration parameters
 app = Flask(__name__)
