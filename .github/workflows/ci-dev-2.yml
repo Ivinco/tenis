@@ -1,19 +1,14 @@
-name: Manual deploy to main dev and auto deploy when PR to dev is closed
+name: Manual deploy to dev-2
 
 env:
   WERF_SECRET_KEY: ${{ secrets.WERF_SECRET_KEY }}
   WERF_REPO: registry.ivinco.com/tenis
 
 on:
-  pull_request:
-    types: [closed]
-    branches:
-      - dev
   workflow_dispatch:
 
 jobs:
   build:
-    if: github.event.pull_request.merged == true
     runs-on: self-hosted
     steps:
       - name: Checkout code
@@ -88,6 +83,6 @@ jobs:
           kube-config-base64-data: ${{ secrets.KUBE_CONFIG_BASE64_DATA }}
           env: dev
         env:
-          WERF_SET_ENV_URL: "env_url=tenis-dev.k8s-test.ivinco.com"
-          WERF_NAMESPACE: tenis-dev
-          WERF_RELEASE: tenis-dev
+          WERF_SET_ENV_URL: "env_url=tenis-dev-2.k8s-test.ivinco.com"
+          WERF_NAMESPACE: tenis-dev-2
+          WERF_RELEASE: tenis-dev-2
