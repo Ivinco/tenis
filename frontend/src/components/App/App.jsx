@@ -9,6 +9,8 @@ import axios from "axios";
 import {sha256} from 'js-sha256'
 
 function App () {
+    //comment for commit
+
     const dispatch = useDispatch()
 
     useEffect( () => {
