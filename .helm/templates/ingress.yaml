@@ -25,18 +25,17 @@ spec:
               number: 80
         path: /
         pathType: Prefix
-#      - backend:
-#          service:
-#            name: {{ .Chart.Name }}-backend
-#            port:
-#              number: 8000
-#        path: /api(/|$)(.*)
-#        pathType: Prefix
+      - backend:
+          service:
+            name: {{ .Chart.Name }}-backend
+            port:
+              number: 8000
+        path: /api(/|$)(.*)
+        pathType: Prefix
   tls:
   - hosts:
     - {{ .Values.env_url }}
     secretName: {{ .Chart.Name }}-secret
-#comment for commit
 
 ---
 apiVersion: cert-manager.io/v1
