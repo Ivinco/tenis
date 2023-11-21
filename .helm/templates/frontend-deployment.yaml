@@ -28,7 +28,7 @@ spec:
         - /dev/stderr
         env:
         - name: SERVER
-          value: https://{{ .Values.env_url }}/api
+          value: https://api.{{ .Values.env_url }}
         ports:
         - name: http
           containerPort: 3000

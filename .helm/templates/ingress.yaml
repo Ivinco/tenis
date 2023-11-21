@@ -36,7 +36,6 @@ metadata:
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-prod
     kubernetes.io/ingress.class: "nginx"
-    nginx.ingress.kubernetes.io/rewrite-target: /$2
     nginx.ingress.kubernetes.io/enable-cors: "true"
     nginx.ingress.kubernetes.io/use-regex: "true"
     nginx.ingress.kubernetes.io/cors-allow-origin: "http://localhost:3000, https://*.ivinco.com"
@@ -46,7 +45,7 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-    - host: {{ .Values.env_url }}
+    - host: api.{{ .Values.env_url }}
       http:
         paths:
           - backend:
@@ -54,12 +53,12 @@ spec:
                 name: {{ .Chart.Name }}-backend
                 port:
                   number: 8000
-            path: /api(/|$)(.*)
+            path: /
             pathType: Prefix
   tls:
     - hosts:
-        - {{ .Values.env_url }}
-      secretName: {{ .Chart.Name }}-secret
+        - api.{{ .Values.env_url }}
+      secretName: {{ .Chart.Name }}-api-secret
 
 ---
 apiVersion: cert-manager.io/v1
@@ -74,6 +73,24 @@ spec:
     kind: ClusterIssuer
     name: letsencrypt-prod
   secretName: {{ .Chart.Name }}-secret
+  usages:
+    - digital signature
+    - key encipherment
+
+---
+
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: {{ .Chart.Name }}-api-certificate
+spec:
+  dnsNames:
+    - api.{{ .Values.env_url }}
+  issuerRef:
+    group: cert-manager.io
+    kind: ClusterIssuer
+    name: letsencrypt-prod
+  secretName: {{ .Chart.Name }}-api-secret
   usages:
     - digital signature
     - key encipherment
