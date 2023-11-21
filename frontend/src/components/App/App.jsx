@@ -29,6 +29,7 @@ function App () {
                     console.log('User DTO:')
                     console.log(user)
                     dispatch(loginAction(user))
+                    console.log('user logged in')
                 } catch (e) {
                     console.log(`Error while refreshing token: ${e}`)
                 }
