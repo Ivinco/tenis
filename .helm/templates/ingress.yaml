@@ -3,12 +3,12 @@ kind: Ingress
 metadata:
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-prod
-    kubernetes.io/ingress.class: "nginx"
-    nginx.ingress.kubernetes.io/rewrite-target: /$2
-    nginx.ingress.kubernetes.io/enable-cors: "true"
-    nginx.ingress.kubernetes.io/use-regex: "true"
-    custom.nginx.org/regex-insensitive-prefix: "true"
-    nginx.ingress.kubernetes.io/cors-allow-origin: "http://localhost:3000, https://*.ivinco.com"
+#    kubernetes.io/ingress.class: "nginx"
+#    nginx.ingress.kubernetes.io/rewrite-target: /$2
+#    nginx.ingress.kubernetes.io/enable-cors: "true"
+#    nginx.ingress.kubernetes.io/use-regex: "true"
+#    custom.nginx.org/regex-insensitive-prefix: "true"
+#    nginx.ingress.kubernetes.io/cors-allow-origin: "http://localhost:3000, https://*.ivinco.com"
   name: {{ .Chart.Name }}-ingress
   labels:
     component: frontend
@@ -25,13 +25,13 @@ spec:
               number: 80
         path: /
         pathType: Prefix
-      - backend:
-          service:
-            name: {{ .Chart.Name }}-backend
-            port:
-              number: 8000
-        path: /api(/|$)(.*)
-        pathType: Prefix
+#      - backend:
+#          service:
+#            name: {{ .Chart.Name }}-backend
+#            port:
+#              number: 8000
+#        path: /api(/|$)(.*)
+#        pathType: Prefix
   tls:
   - hosts:
     - {{ .Values.env_url }}
