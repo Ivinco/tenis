@@ -13,27 +13,20 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-  - host: {{ .Values.env_url }}
-    http:
-      paths:
-      - backend:
-          service:
-            name: {{ .Chart.Name }}-frontend
-            port:
-              number: 80
-        path: /
-        pathType: Prefix
-      - backend:
-          service:
-            name: {{ .Chart.Name }}-backend
-            port:
-              number: 8000
-        path: /api(/|$)(.*)
-        pathType: Prefix
+    - host: {{ .Values.env_url }}
+      http:
+        paths:
+          - backend:
+              service:
+                name: {{ .Chart.Name }}-frontend
+                port:
+                  number: 80
+            path: /
+            pathType: Prefix
   tls:
-  - hosts:
-    - {{ .Values.env_url }}
-    secretName: {{ .Chart.Name }}-secret
+    - hosts:
+        - {{ .Values.env_url }}
+      secretName: {{ .Chart.Name }}-secret
 
 
 ---
@@ -53,20 +46,20 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-  - host: {{ .Values.env_url }}
-    http:
-      paths:
-      - backend:
-          service:
-            name: {{ .Chart.Name }}-backend
-            port:
-              number: 8000
-        path: /api(/|$)(.*)
-        pathType: Prefix
+    - host: {{ .Values.env_url }}
+      http:
+        paths:
+          - backend:
+              service:
+                name: {{ .Chart.Name }}-backend
+                port:
+                  number: 8000
+            path: /api(/|$)(.*)
+            pathType: Prefix
   tls:
-  - hosts:
-    - {{ .Values.env_url }}
-    secretName: {{ .Chart.Name }}-secret
+    - hosts:
+        - {{ .Values.env_url }}
+      secretName: {{ .Chart.Name }}-secret
 
 ---
 apiVersion: cert-manager.io/v1
@@ -75,12 +68,12 @@ metadata:
   name: {{ .Chart.Name }}-certificate
 spec:
   dnsNames:
-  - {{ .Values.env_url }}
+    - {{ .Values.env_url }}
   issuerRef:
     group: cert-manager.io
     kind: ClusterIssuer
     name: letsencrypt-prod
   secretName: {{ .Chart.Name }}-secret
   usages:
-  - digital signature
-  - key encipherment
+    - digital signature
+    - key encipherment
