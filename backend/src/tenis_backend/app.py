@@ -48,8 +48,6 @@ def index():
 def whoami(user):
     """Sample method to demonstrate @token_required decorator"""
     resp = make_response(jsonify(user=user))
-
-    # return "You are authorized as %s\n" % (user['email']), 200
     return resp, 200
 
 

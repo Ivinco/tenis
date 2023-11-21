@@ -7,6 +7,7 @@ import UserService from "../../services/UserService";
 import {loginAction} from "../../store/reducers/authReducer";
 import axios from "axios";
 import {sha256} from 'js-sha256'
+import {closeModal} from "../../store/reducers/modalReducer";
 
 function App () {
     const dispatch = useDispatch()
@@ -18,18 +19,14 @@ function App () {
                     const refresh = await axios.get(`${BACKEND_SERVER}/refresh`, {withCredentials: true})
                     localStorage.setItem('token', refresh.data.access_token)
                     const fetchUser = await UserService.getUser()
-                    console.log('Response from whoami endpoint:')
-                    console.log(fetchUser)
                     const user = {
                         userName: fetchUser.data.user.name,
                         userId: fetchUser.data.user._id,
                         userEmail: fetchUser.data.user.email,
                         userImage: `https://gravatar.com/avatar/${sha256(fetchUser.data.user.email)}?s=150`
                     }
-                    console.log('User DTO:')
-                    console.log(user)
                     dispatch(loginAction(user))
-                    console.log('user logged in')
+                    dispatch(closeModal())
                 } catch (e) {
                     console.log(`Error while refreshing token: ${e}`)
                 }
