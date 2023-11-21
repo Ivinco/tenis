@@ -10,11 +10,6 @@ class SocketApiService {
             }
         }
         )
-        // this.socket = io('http://localhost:8080', {
-        //     extraHeaders:{
-        //                 Authorization: `Bearer ${token}`
-        //             }
-        // })
     }
     static closeConnection() {
         if(this.socket){

@@ -5,6 +5,7 @@ import {headerMenuReducer, headerMenuValuesReducer} from "./reducers/headerMenuR
 import {webSocketReducer} from "./reducers/webSocketReducer";
 import {authReducer} from "./reducers/authReducer";
 import {modalReducer} from "./reducers/modalReducer";
+import {loadingReducer} from "./reducers/loadingReducer";
 
 const rootReducer = combineReducers({
     hiddenMenu: hiddenMenuReducer,
@@ -13,7 +14,8 @@ const rootReducer = combineReducers({
     setHeaderMenuItemValue: headerMenuValuesReducer,
     webSocket: webSocketReducer,
     authReducer: authReducer,
-    switchModal: modalReducer
+    switchModal: modalReducer,
+    switchLoadingWindow: loadingReducer
 })
 
 export const store = createStore(rootReducer, composeWithDevTools())

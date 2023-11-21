@@ -3,7 +3,6 @@ project: tenis
 ---
 image: backend
 from: python:alpine3.17
-fromCacheVersion: 1
 docker:
   CMD: [ "/usr/local/bin/python3", "-m", "tenis_backend" ]
 git:
@@ -24,7 +23,6 @@ shell:
 ---
 image: frontend-build
 from: node:16.13-alpine3.15
-fromCacheVersion: 1
 git:
 - add: /frontend
   to: /app
@@ -45,7 +43,6 @@ shell:
 ---
 image: frontend
 from: nginx:1.22-alpine
-fromCacheVersion: 1
 import:
 - image: frontend-build
   add: /app/build
