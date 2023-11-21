@@ -13,7 +13,7 @@ from .user import User
 # App configuration parameters
 app = Flask(__name__)
 sock = Sock(app)
-CORS(app)
+CORS(app, supports_credentials=True)
 mongo_host = os.getenv('MONGO_HOST', 'localhost')  # Default to 'localhost' if not set
 mongo_dbname = os.getenv('MONGO_DBNAME', 'tenis')  # Default to 'database' if not set
 connection_string = f"mongodb://{mongo_host}/{mongo_dbname}"
