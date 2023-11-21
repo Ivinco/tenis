@@ -4,12 +4,10 @@ metadata:
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-prod
     kubernetes.io/ingress.class: "nginx"
-    nginx.ingress.kubernetes.io/rewrite-target: /$2
     nginx.ingress.kubernetes.io/enable-cors: "true"
     nginx.ingress.kubernetes.io/use-regex: "true"
-    custom.nginx.org/regex-insensitive-prefix: "true"
     nginx.ingress.kubernetes.io/cors-allow-origin: "http://localhost:3000, https://*.ivinco.com"
-  name: {{ .Chart.Name }}-ingress
+  name: {{ .Chart.Name }}-frontend-ingress
   labels:
     component: frontend
 spec:
@@ -25,13 +23,46 @@ spec:
               number: 80
         path: /
         pathType: Prefix
-#      - backend:
-#          service:
-#            name: {{ .Chart.Name }}-backend
-#            port:
-#              number: 8000
-#        path: /api(/|$)(.*)
-#        pathType: Prefix
+      - backend:
+          service:
+            name: {{ .Chart.Name }}-backend
+            port:
+              number: 8000
+        path: /api(/|$)(.*)
+        pathType: Prefix
+  tls:
+  - hosts:
+    - {{ .Values.env_url }}
+    secretName: {{ .Chart.Name }}-secret
+
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    kubernetes.io/ingress.class: "nginx"
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/cors-allow-origin: "http://localhost:3000, https://*.ivinco.com"
+  name: {{ .Chart.Name }}-api-ingress
+  labels:
+    component: frontend
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: {{ .Values.env_url }}
+    http:
+      paths:
+      - backend:
+          service:
+            name: {{ .Chart.Name }}-backend
+            port:
+              number: 8000
+        path: /api(/|$)(.*)
+        pathType: Prefix
   tls:
   - hosts:
     - {{ .Values.env_url }}
