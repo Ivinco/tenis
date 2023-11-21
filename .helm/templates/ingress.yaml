@@ -6,7 +6,6 @@ metadata:
     kubernetes.io/ingress.class: "nginx"
     nginx.ingress.kubernetes.io/enable-cors: "true"
     nginx.ingress.kubernetes.io/use-regex: "true"
-    custom.nginx.org/regex-insensitive-prefix: "true"
     nginx.ingress.kubernetes.io/cors-allow-origin: "http://localhost:3000, https://*.ivinco.com"
   name: {{ .Chart.Name }}-frontend-ingress
   labels:
@@ -24,6 +23,10 @@ spec:
               number: 80
         path: /
         pathType: Prefix
+  tls:
+  - hosts:
+    - {{ .Values.env_url }}
+    secretName: {{ .Chart.Name }}-secret
 
 
 ---
@@ -36,7 +39,6 @@ metadata:
     nginx.ingress.kubernetes.io/rewrite-target: /
     nginx.ingress.kubernetes.io/enable-cors: "true"
     nginx.ingress.kubernetes.io/use-regex: "true"
-    custom.nginx.org/regex-insensitive-prefix: "true"
     nginx.ingress.kubernetes.io/cors-allow-origin: "http://localhost:3000, https://*.ivinco.com"
   name: {{ .Chart.Name }}-api-ingress
   labels:
