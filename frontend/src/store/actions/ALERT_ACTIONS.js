@@ -1,0 +1,1 @@
+export const DETAILED_ALERT = 'DETAILED_ALERT'

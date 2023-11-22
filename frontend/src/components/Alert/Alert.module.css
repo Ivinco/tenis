@@ -1,19 +1,104 @@
 .alertBody {
+    width: 95%;
     display: flex;
     align-content: space-between;
     margin: 10px auto;
     border: #01A2D8 solid 3px;
     border-radius: 10px;
+
+}
+
+.projectName {
+    height: 40px;
+    width: 40px;
+    font-size: 2rem;
+    text-align: center;
+    margin: auto 10px;
+    border: 2px solid black;
+    border-radius: 10%;
+    padding: 10px;
+}
+
+.host {
+    display: flex;
+    height: 100%;
+    width: 10%;
+    align-items: center;
+    margin: auto 5px;
+    padding: 0 10px;
+    text-align: center;
+    font-size: 1.3rem;
+    border-left: slategrey solid 3px;
+    border-right: slategrey solid 3px;
+}
+
+.responsibleUser {
+    display: flex;
+    width: 60px;
+    height: 60px;
+    margin: 15px;
+    padding: 10px;
+    border-radius: 50%;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.responsibleUser:hover {
+    transform: scale(1.2);
+}
+
+.alertName {
+    height: 100%;
+    display: flex;
+    width: 20%;
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+    margin: auto 15px;
+    padding: 0 10px;
+    font-size: 1.5rem;
+    border-left: slategrey solid 3px;
+    border-right: slategrey solid 3px;
+}
+
+.alertTime {
+    display: flex;
+    height: 100%;
+    margin: 0 15px;
+    align-items: center;
+    font-size: 1.2rem;
+    text-align: center;
+    line-height: 2;
 }
 
 .message {
-    overflow: hidden;
-    white-space: nowrap;
+    display: flex;
+    height: 100%;
+    width: 52%;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
     text-overflow: ellipsis;
+    padding: 0 10px;
+    border-left: slategrey solid 3px;
+    border-right: slategrey solid 3px;
 }
 
-.custom {
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
+.info {
+    width: 60px;
+    height: 60px;
+    margin: auto 15px;
+    background-image: url("../../../public/images/attention.svg");
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.info:hover {
+    transform: scale(1.2);
 }
