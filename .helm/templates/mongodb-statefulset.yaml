@@ -19,7 +19,7 @@ spec:
       terminationGracePeriodSeconds: 10
       initContainers:
       - name: mongo-init
-        image: mongo:7.0-rc
+        image: {{ .Values.werf.image.mongodb }}
         command:
         - bash
         - "-c"
@@ -47,7 +47,7 @@ spec:
           value: {{ pluck .Values.werf.env .Values.mongodb.env.INIT_PASSWORD | first | default .Values.mongodb.env.INIT_PASSWORD._default }}
       containers:
       - name: mongo
-        image: mongo:7.0-rc
+        image: {{ .Values.werf.image.mongodb }}
         command:
         - mongod
         - "--bind_ip_all"
