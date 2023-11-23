@@ -45,6 +45,7 @@ const Alert = ({alert}, key) => {
             <div className={styles.alertName}> {alert.alertName}</div>
             <div className={styles.alertTime}>{processTimeStamp(alert.fired)}</div>
             <div className={styles.message}> {alert.msg}</div>
+            <div className={styles.refresh}/>
             <div className={styles.info}
             onClick={(e) => {
                 e.preventDefault()

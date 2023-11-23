@@ -42,12 +42,14 @@ export function processTimeStamp (unixdate) {
     return `${day}-${month}-${year} ${hours}:${minutes}:${seconds}`
 }
 
-export function processDuration (unixdate) {
-    const startDate = new Date(unixdate)
-    const currentDate = new Date()
-    const timeDelta = currentDate - startDate
-    const days = Math.floor(timeDelta / (1000 * 60 * 60 * 24))
-    const hours = Math.floor(timeDelta / (1000 * 60 * 60))
-    const minutes = Math.floor(timeDelta / (1000 * 60))
+export function processDuration(unixdate) {
+    const startDate = new Date(unixdate);
+    const currentDate = new Date();
+    const timeDelta = currentDate - startDate;
+
+    const days = Math.floor(timeDelta / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((timeDelta % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((timeDelta % (1000 * 60 * 60)) / (1000 * 60));
+
     return `${days}d ${hours}h ${minutes}m`
 }

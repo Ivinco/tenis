@@ -1,10 +1,31 @@
-import React from 'react';
+import React, {useState} from 'react';
 import styles from './AlertsDetails.module.css'
 import {useSelector} from "react-redux";
 import {processDuration} from "../../utils/utils";
 
 const AlertsDetails = () => {
     const alert = useSelector(state => state.setAlertReducer.alert)
+    const [commentFormIsOpened, setCommentFormIsOpened] = useState(false)
+    const [commentFormContent, setCommentFormContent] = useState('')
+
+    const onCommentClick = () => {
+        setCommentFormIsOpened(!commentFormIsOpened)
+    }
+
+    const onSendCommentClick = () => {
+        setCommentFormIsOpened(false)
+        document.getElementById('commentArea').value = ''
+        setCommentFormContent('')
+        alert.alert.comment = commentFormContent
+    }
+
+    const handleEnterKey = (e) => {
+        if (e.keyCode === 13) {
+            e.preventDefault()
+            onSendCommentClick()
+        }
+    }
+
     let fontColor
     switch (alert.alert.severity.toUpperCase()) {
         case "WARNING":
@@ -51,10 +72,32 @@ const AlertsDetails = () => {
                     </li>
                     <li className={styles.alertInfoItem}>
                         <p className={styles.alertInfoKey}>Comments: </p>
-                        <div className={styles.alertCommentButton}/>
+                        <div className={styles.alertCommentButton} onClick={(e) => {
+                            e.preventDefault()
+                            onCommentClick()
+                        }}/>
                         <p className={styles.alertInfoValue}>{alert.alert.comment}</p>
                     </li>
                 </ul>
+                <div className={commentFormIsOpened ? styles.commentBlock : styles.disabledBlock}>
+                    <textarea className={styles.alertCommentInput}
+                              style={{ display: commentFormIsOpened ? "flex" : "none"}}
+                              maxLength="100"
+                              id="commentArea"
+                              onChange={(e) => setCommentFormContent(e.target.value)}
+                              onKeyDown={handleEnterKey}
+                    />
+                    <button className={commentFormContent ? styles.alertCommentSend: styles.alertCommentSendDisabled}
+                            style={{ display: commentFormIsOpened ? "flex" : "none"}}
+                            onClick={(e) => {
+                        e.preventDefault()
+                        onSendCommentClick()
+                    }}
+                    disabled={!commentFormContent}
+                    >
+                        Comment
+                    </button>
+                </div>
                 {
                     alert.alert.customField ?
                         <ul className={styles.alertCommonInfo}>

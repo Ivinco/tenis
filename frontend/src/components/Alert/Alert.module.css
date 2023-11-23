@@ -104,6 +104,23 @@
     transform: scale(1.2);
 }
 
+.refresh {
+    width: 60px;
+    height: 60px;
+    margin: auto 15px;
+    background-image: url("../../../public/images/refresh-svgrepo-com.svg");
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.refresh:hover {
+    transform: scale(1.2);
+}
+
+
 @media screen and (max-width: 1650px){
     .alertBody {
         margin: 6px auto;

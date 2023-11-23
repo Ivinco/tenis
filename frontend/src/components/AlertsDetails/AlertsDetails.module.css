@@ -79,7 +79,70 @@
     margin-left: 15px;
     text-decoration: none;
     color: cornflowerblue;
+    transition: transform 0.2s;
 }
+
+.alertInfoLink:hover {
+    transform: scale(1.1);
+}
+
+.commentBlock{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    margin: 24px;
+    width: 90%;
+    height: 250px;
+    opacity: 1;
+    transition: height 0.2s, opacity 0.3s;
+}
+
+.disabledBlock {
+    height: 0;
+    opacity: 0;
+    transition: height 0.2s, opacity 0.3s;
+}
+
+.alertCommentInput {
+    width: 80%;
+    margin: auto;
+    height: 100px;
+    overflow: auto;
+    resize: none;
+    font-size: 1.5rem;
+}
+
+.alertCommentSend {
+    display: flex;
+    margin: 15px auto;
+    width: 45%;
+    justify-content: center;
+    font-size: 1.5rem;
+    padding: 21px;
+    background-color: #e1fafa;
+    border: 3px #e1fafa solid;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.alertCommentSend:hover {
+    transform: scale(1.1);
+}
+
+.alertCommentSendDisabled {
+    display: flex;
+    margin: 15px auto;
+    width: 45%;
+    justify-content: center;
+    font-size: 1.5rem;
+    padding: 21px;
+    background-color: #989898;
+    border: 3px #989898 solid;
+    border-radius: 20px;
+}
+
+
 
 @media screen and (max-width: 1650px) {
 
@@ -117,6 +180,25 @@
         font-size: 1.4rem;
         margin-left: 10px;
     }
+
+    .commentBlock{
+        margin: 16px;
+        width: 90%;
+        height: 160px;
+    }
+
+    .alertCommentInput {
+        height: 66px;
+        font-size: 1rem;
+    }
+
+    .alertCommentSend {
+        margin: 10px auto;
+        font-size: 1rem;
+        padding: 17px;
+        border-radius: 14px;
+    }
+
 }
 
 @media screen and (max-width: 1150px) {
@@ -153,5 +235,22 @@
     .alertInfoLink {
         font-size: 0.8rem;
         margin-left: 6px;
+    }
+
+    .commentBlock{
+        margin: 10px;
+        height: 100px;
+    }
+
+    .alertCommentInput {
+        height: 44px;
+        font-size: 0.7rem;
+    }
+
+    .alertCommentSend {
+        margin: 6px auto;
+        font-size: 0.7rem;
+        padding: 12px;
+        border-radius: 10px;
     }
 }
