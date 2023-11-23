@@ -8,6 +8,7 @@ const Header = () => {
     const dispatch = useDispatch()
     const isLogged = useSelector(state => state.authReducer.isLogged)
     const userInfo = useSelector(state => state.authReducer.user)
+    const alerts = useSelector(state => state.webSocket.alerts)
 
     const onAvatarClick = (e) => {
         e.preventDefault()
@@ -27,6 +28,20 @@ const Header = () => {
                 <div className={styles.logo}></div>
                 <div className={`${styles.onDutyPortal} ${isLogged ? styles.onDutyPortalActive : null}`}>
                     {isLogged ? " On call: Vasya Pupkin" : null}
+                </div>
+                <div className={styles.alertsCount}
+                style={{ borderColor: !isLogged ? "grey" : null}}
+                >
+                    {
+                        isLogged
+                        ?
+                            <>
+                            <p className={styles.alertsNumber}>{alerts.length}</p>
+                            <p className={styles.alertsCountTitle}>Total alerts fired</p>
+                            </>
+                        : null
+                    }
+
                 </div>
                 <nav className={styles.navbar}>
                     <ul className={styles.itemsBlock}>

@@ -4,11 +4,12 @@ import Alert from "../Alert/Alert";
 import {useDispatch, useSelector} from "react-redux";
 import {useConnectSocket} from "../../hooks/useConnectSocket";
 import {openModal} from "../../store/reducers/modalReducer";
+import {alertReducer, setAlertsNumber} from "../../store/reducers/alertReducer";
 
 const MainDisplay = () => {
+    useConnectSocket(localStorage.getItem('token'))
     const isActiveSocket = useSelector(state => state.webSocket.isOpened)
-    const rawAlerts = useConnectSocket(localStorage.getItem('token'))
-
+    const rawAlerts = useSelector(state => state.webSocket.alerts)
     return (
         <div className={styles.mainDisplay}>
             {isActiveSocket ? (

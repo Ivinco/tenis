@@ -13,7 +13,6 @@ import {
 
 export const useConnectSocket = () => {
     const dispatch = useDispatch()
-    const alerts = useSelector(state => state.webSocket.alerts)
     const token = localStorage.getItem('token');
     const connectSocket = (token) => {
         SocketApiService.createConnection(token)
@@ -50,6 +49,4 @@ export const useConnectSocket = () => {
         }
 
     }, [token]);
-
-    return alerts
 }
