@@ -9,7 +9,7 @@ on:
 
 jobs:
   build:
-    runs-on: self-hosted
+    runs-on: k8s
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -34,7 +34,7 @@ jobs:
 
   render-and-lint:
     needs: build
-    runs-on: self-hosted
+    runs-on: k8s
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -61,7 +61,7 @@ jobs:
 
   converge:
     needs: render-and-lint
-    runs-on: self-hosted
+    runs-on: k8s
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
