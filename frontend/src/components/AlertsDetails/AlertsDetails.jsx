@@ -49,13 +49,18 @@ const AlertsDetails = () => {
                         <p className={styles.alertInfoKey}>Alert Details: </p>
                         <p className={styles.alertInfoValue}>{alert.alert.msg}</p>
                     </li>
+                    <li className={styles.alertInfoItem}>
+                        <p className={styles.alertInfoKey}>Comments: </p>
+                        <div className={styles.alertCommentButton}/>
+                        <p className={styles.alertInfoValue}>{alert.alert.comment}</p>
+                    </li>
                 </ul>
                 {
                     alert.alert.customField ?
                         <ul className={styles.alertCommonInfo}>
                             {Object.keys(alert.alert.customField).map((key) => (
                                 <li className={styles.alertInfoItem}>
-                                    <p className={styles.alertInfoKey}>{key} </p>
+                                    <p className={styles.alertInfoKey}>{key}: </p>
                                     {alert.alert.customField[key].startsWith("https://") ? (
                                         <a
                                             className={styles.alertInfoLink}

@@ -80,6 +80,7 @@
     width: 52%;
     align-items: center;
     justify-content: center;
+    font-size: 1.2rem;
     text-align: center;
     text-overflow: ellipsis;
     padding: 0 10px;
@@ -101,4 +102,116 @@
 
 .info:hover {
     transform: scale(1.2);
+}
+
+@media screen and (max-width: 1650px){
+    .alertBody {
+        margin: 6px auto;
+    }
+
+    .projectName {
+        height: 27px;
+        width: 27px;
+        font-size: 1.4rem;
+        margin: auto 6px;
+        padding: 6px;
+    }
+
+    .host {
+        margin: auto 3px;
+        padding: 0 6px;
+        font-size: 0.8rem;
+        border-left: slategrey solid 2px;
+        border-right: slategrey solid 2px;
+    }
+
+    .responsibleUser {
+        width: 40px;
+        height: 40px;
+        margin: 10px;
+        padding: 6px;
+    }
+
+    .alertName {
+        margin: auto 10px;
+        padding: 0 6px;
+        font-size: 1rem;
+        border-left: slategrey solid 2px;
+        border-right: slategrey solid 2px;
+    }
+
+    .alertTime {
+        margin: 0 10px;
+        font-size: 0.8rem;
+        line-height: 1.4;
+    }
+
+    .message {
+        padding: 0 6px;
+        border-left: slategrey solid 2px;
+        border-right: slategrey solid 2px;
+        font-size: 0.8rem;
+    }
+
+    .info {
+        width: 40px;
+        height: 40px;
+        margin: auto 10px;
+    }
+}
+
+@media screen and (max-width: 1150px){
+    .alertBody {
+        margin: 4px auto;
+    }
+
+    .projectName {
+        height: 18px;
+        width: 18px;
+        font-size: 1rem;
+        margin: auto 4px;
+        padding: 4px;
+    }
+
+    .host {
+        margin: auto 2px;
+        padding: 0 4px;
+        font-size: 0.5rem;
+        border-left: slategrey solid 1px;
+        border-right: slategrey solid 1px;
+    }
+
+    .responsibleUser {
+        width: 27px;
+        height: 27px;
+        margin: 6px;
+        padding: 4px;
+    }
+
+    .alertName {
+        margin: auto 6px;
+        padding: 0 4px;
+        font-size: 0.7rem;
+        border-left: slategrey solid 1px;
+        border-right: slategrey solid 1px;
+    }
+
+    .alertTime {
+        margin: 0 6px;
+        font-size: 0.6rem;
+        line-height: 1;
+    }
+
+    .message {
+        padding: 0 4px;
+        border-left: slategrey solid 1px;
+        border-right: slategrey solid 1px;
+        font-size: 0.6rem;
+    }
+
+    .info {
+        width: 27px;
+        height: 27px;
+        margin: auto 6px;
+    }
 }
