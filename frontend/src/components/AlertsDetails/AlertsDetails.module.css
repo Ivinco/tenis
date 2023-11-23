@@ -1,0 +1,256 @@
+.alertHeader {
+    display: flex;
+    height: 15%;
+    margin: 30px;
+    padding: 0 152px 15px 0;
+    border-bottom: grey 1px solid;
+}
+
+.alertLogo {
+    width: 120px;
+    height: 100px;
+    background-image: url("../../../public/images/ivinco.svg");
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    margin: auto 0 auto 30px;
+}
+
+.alertTitle {
+    display: flex;
+    text-align: center;
+    font-size: 2.5rem;
+    margin: auto;
+}
+
+.alertDetailsBody {
+    display: flex;
+    flex-direction: column;
+    margin: 0 30px 30px;
+    overflow: scroll;
+
+}
+
+.alertCommonInfo {
+    display: flex;
+    flex-direction: column;
+    list-style: none;
+    padding: 0;
+}
+
+.alertInfoItem {
+    display: flex;
+    align-items: baseline;
+}
+
+.alertInfoKey {
+    display: flex;
+    font-style: oblique;
+    font-size: 1.75rem;
+    margin: auto 10px;
+}
+
+.alertInfoValue {
+    display: flex;
+    font-size: 2rem;
+    margin-left: 15px;
+    max-width: 70%;
+}
+
+.alertCommentButton {
+    height: 30px;
+    width: 30px;
+    margin: auto 0;
+    background-image: url("../../../public/images/notes.svg");
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.alertCommentButton:hover {
+    transform: scale(1.2);
+}
+
+.alertInfoLink {
+    display: flex;
+    font-size: 2rem;
+    margin-left: 15px;
+    text-decoration: none;
+    color: cornflowerblue;
+    transition: transform 0.2s;
+}
+
+.alertInfoLink:hover {
+    transform: scale(1.1);
+}
+
+.commentBlock{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    margin: 24px;
+    width: 90%;
+    height: 250px;
+    opacity: 1;
+    transition: height 0.2s, opacity 0.3s;
+}
+
+.disabledBlock {
+    height: 0;
+    opacity: 0;
+    transition: height 0.2s, opacity 0.3s;
+}
+
+.alertCommentInput {
+    width: 80%;
+    margin: auto;
+    height: 100px;
+    overflow: auto;
+    resize: none;
+    font-size: 1.5rem;
+}
+
+.alertCommentSend {
+    display: flex;
+    margin: 15px auto;
+    width: 45%;
+    justify-content: center;
+    font-size: 1.5rem;
+    padding: 21px;
+    background-color: #e1fafa;
+    border: 3px #e1fafa solid;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.alertCommentSend:hover {
+    transform: scale(1.1);
+}
+
+.alertCommentSendDisabled {
+    display: flex;
+    margin: 15px auto;
+    width: 45%;
+    justify-content: center;
+    font-size: 1.5rem;
+    padding: 21px;
+    background-color: #989898;
+    border: 3px #989898 solid;
+    border-radius: 20px;
+}
+
+
+
+@media screen and (max-width: 1650px) {
+
+    .alertHeader {
+        height: 15%;
+        margin: 20px;
+        padding: 0 101px 10px 0;
+    }
+
+    .alertLogo {
+        width: 80px;
+        height: 66px;
+        margin: auto 0 auto 20px;
+    }
+
+    .alertTitle {
+        font-size: 1.6rem;
+    }
+
+    .alertDetailsBody {
+        margin: 0 20px 20px;
+    }
+
+    .alertInfoKey {
+        font-size: 1.2rem;
+        margin: auto 7px;
+    }
+
+    .alertInfoValue {
+        font-size: 1.4rem;
+        margin-left: 10px;
+    }
+
+    .alertInfoLink {
+        font-size: 1.4rem;
+        margin-left: 10px;
+    }
+
+    .commentBlock{
+        margin: 16px;
+        width: 90%;
+        height: 160px;
+    }
+
+    .alertCommentInput {
+        height: 66px;
+        font-size: 1rem;
+    }
+
+    .alertCommentSend {
+        margin: 10px auto;
+        font-size: 1rem;
+        padding: 17px;
+        border-radius: 14px;
+    }
+
+}
+
+@media screen and (max-width: 1150px) {
+    .alertHeader {
+        height: 15%;
+        margin: 14px;
+        padding: 0 67px 6px 0;
+    }
+
+    .alertLogo {
+        width: 54px;
+        height: 44px;
+        margin: auto 0 auto 14px;
+    }
+
+    .alertTitle {
+        font-size: 1rem;
+    }
+
+    .alertDetailsBody {
+        margin: 0 14px 14px;
+    }
+
+    .alertInfoKey {
+        font-size: 0.6rem;
+        margin: auto 5px;
+    }
+
+    .alertInfoValue {
+        font-size: 0.8rem;
+        margin-left: 6px;
+    }
+
+    .alertInfoLink {
+        font-size: 0.8rem;
+        margin-left: 6px;
+    }
+
+    .commentBlock{
+        margin: 10px;
+        height: 100px;
+    }
+
+    .alertCommentInput {
+        height: 44px;
+        font-size: 0.7rem;
+    }
+
+    .alertCommentSend {
+        margin: 6px auto;
+        font-size: 0.7rem;
+        padding: 12px;
+        border-radius: 10px;
+    }
+}

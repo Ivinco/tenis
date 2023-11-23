@@ -1,19 +1,234 @@
 .alertBody {
+    width: 95%;
     display: flex;
     align-content: space-between;
     margin: 10px auto;
     border: #01A2D8 solid 3px;
     border-radius: 10px;
+
+}
+
+.projectName {
+    height: 40px;
+    width: 40px;
+    font-size: 2rem;
+    text-align: center;
+    margin: auto 10px;
+    border: 2px solid black;
+    border-radius: 10%;
+    padding: 10px;
+}
+
+.host {
+    display: flex;
+    height: 100%;
+    width: 10%;
+    align-items: center;
+    margin: auto 5px;
+    padding: 0 10px;
+    text-align: center;
+    font-size: 1.3rem;
+    border-left: slategrey solid 3px;
+    border-right: slategrey solid 3px;
+}
+
+.responsibleUser {
+    display: flex;
+    width: 60px;
+    height: 60px;
+    margin: 15px;
+    padding: 10px;
+    border-radius: 50%;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.responsibleUser:hover {
+    transform: scale(1.2);
+}
+
+.alertName {
+    height: 100%;
+    display: flex;
+    width: 20%;
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+    margin: auto 15px;
+    padding: 0 10px;
+    font-size: 1.5rem;
+    border-left: slategrey solid 3px;
+    border-right: slategrey solid 3px;
+}
+
+.alertTime {
+    display: flex;
+    height: 100%;
+    margin: 0 15px;
+    align-items: center;
+    font-size: 1.2rem;
+    text-align: center;
+    line-height: 2;
 }
 
 .message {
-    overflow: hidden;
-    white-space: nowrap;
+    display: flex;
+    height: 100%;
+    width: 52%;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    text-align: center;
     text-overflow: ellipsis;
+    padding: 0 10px;
+    border-left: slategrey solid 3px;
+    border-right: slategrey solid 3px;
 }
 
-.custom {
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
+.info {
+    width: 60px;
+    height: 60px;
+    margin: auto 15px;
+    background-image: url("../../../public/images/attention.svg");
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.info:hover {
+    transform: scale(1.2);
+}
+
+.refresh {
+    width: 60px;
+    height: 60px;
+    margin: auto 15px;
+    background-image: url("../../../public/images/refresh-svgrepo-com.svg");
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.refresh:hover {
+    transform: scale(1.2);
+}
+
+
+@media screen and (max-width: 1650px){
+    .alertBody {
+        margin: 6px auto;
+    }
+
+    .projectName {
+        height: 27px;
+        width: 27px;
+        font-size: 1.4rem;
+        margin: auto 6px;
+        padding: 6px;
+    }
+
+    .host {
+        margin: auto 3px;
+        padding: 0 6px;
+        font-size: 0.8rem;
+        border-left: slategrey solid 2px;
+        border-right: slategrey solid 2px;
+    }
+
+    .responsibleUser {
+        width: 40px;
+        height: 40px;
+        margin: 10px;
+        padding: 6px;
+    }
+
+    .alertName {
+        margin: auto 10px;
+        padding: 0 6px;
+        font-size: 1rem;
+        border-left: slategrey solid 2px;
+        border-right: slategrey solid 2px;
+    }
+
+    .alertTime {
+        margin: 0 10px;
+        font-size: 0.8rem;
+        line-height: 1.4;
+    }
+
+    .message {
+        padding: 0 6px;
+        border-left: slategrey solid 2px;
+        border-right: slategrey solid 2px;
+        font-size: 0.8rem;
+    }
+
+    .info {
+        width: 40px;
+        height: 40px;
+        margin: auto 10px;
+    }
+}
+
+@media screen and (max-width: 1150px){
+    .alertBody {
+        margin: 4px auto;
+    }
+
+    .projectName {
+        height: 18px;
+        width: 18px;
+        font-size: 1rem;
+        margin: auto 4px;
+        padding: 4px;
+    }
+
+    .host {
+        margin: auto 2px;
+        padding: 0 4px;
+        font-size: 0.5rem;
+        border-left: slategrey solid 1px;
+        border-right: slategrey solid 1px;
+    }
+
+    .responsibleUser {
+        width: 27px;
+        height: 27px;
+        margin: 6px;
+        padding: 4px;
+    }
+
+    .alertName {
+        margin: auto 6px;
+        padding: 0 4px;
+        font-size: 0.7rem;
+        border-left: slategrey solid 1px;
+        border-right: slategrey solid 1px;
+    }
+
+    .alertTime {
+        margin: 0 6px;
+        font-size: 0.6rem;
+        line-height: 1;
+    }
+
+    .message {
+        padding: 0 4px;
+        border-left: slategrey solid 1px;
+        border-right: slategrey solid 1px;
+        font-size: 0.6rem;
+    }
+
+    .info {
+        width: 27px;
+        height: 27px;
+        margin: auto 6px;
+    }
 }
