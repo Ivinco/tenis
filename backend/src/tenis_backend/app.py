@@ -120,7 +120,7 @@ def refresh(user):
 # Websocket channels
 #
 @socketio.on('connect')
-@token_required_ws
+# @token_required_ws
 def handle_message(data):
     print('Client concected')
     json =  [
