@@ -34,7 +34,7 @@ export const useConnectSocket = () => {
         SocketApiService.socket.on ('update', (data) => {
             dispatch(addAlerts(JSON.parse(data)))
         })
-        SocketApiService.socket.on('resolved', (data) => {
+        SocketApiService.socket.on('resolve', (data) => {
             dispatch(removeAlerts(JSON.parse(data)))
         })
     }
