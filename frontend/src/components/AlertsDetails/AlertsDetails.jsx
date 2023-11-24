@@ -99,7 +99,7 @@ const AlertsDetails = () => {
                     </button>
                 </div>
                 {
-                    alert.alert.customField ?
+                    alert.alert.customFields ?
                         <ul className={styles.alertCommonInfo}>
                             {Object.keys(alert.alert.customField).map((key) => (
                                 <li className={styles.alertInfoItem}>
