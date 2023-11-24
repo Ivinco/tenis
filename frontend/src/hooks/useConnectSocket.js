@@ -28,13 +28,13 @@ export const useConnectSocket = () => {
             dispatch(resetAlerts())
         })
 
-        SocketApiService.socket.on ('alerts', (data) => {
+        SocketApiService.socket.on ('init', (data) => {
             dispatch(setAlerts(JSON.parse(data)))
         })
-        SocketApiService.socket.on ('new alerts', (data) => {
+        SocketApiService.socket.on ('update', (data) => {
             dispatch(addAlerts(JSON.parse(data)))
         })
-        SocketApiService.socket.on('resolved alerts', (data) => {
+        SocketApiService.socket.on('resolved', (data) => {
             dispatch(removeAlerts(JSON.parse(data)))
         })
     }
