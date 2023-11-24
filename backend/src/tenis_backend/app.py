@@ -120,9 +120,10 @@ def refresh(user):
 # Websocket channels
 #
 @socketio.on('connect')
-@token_required_ws
+# @token_required_ws
 def handle_message(data):
-    json = """ [
+    print('Client concected')
+    json =  [
                 {
                     "id": "u0ToONntLn2m4NA2",
                     "project": "Ivinco",
@@ -140,5 +141,6 @@ def handle_message(data):
                         "grafanaLink": "https://grafana.sgdctroy.net/d/vYIh9K9Mzss/redis?orgId=1&refresh=30s"
                     }
                 }
-               ]"""
+               ]
     emit('init', json, json=True)
+    print("message sent")
