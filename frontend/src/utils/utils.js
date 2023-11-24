@@ -31,8 +31,9 @@ export const utcTimeZone = () => {
     console.log('UTC Time Zone')
 }
 
-export function processTimeStamp (unixdate) {
-    const dateObject = new Date(unixdate)
+export function processTimeStamp (unixDateString) {
+    const unixTime = parseInt(unixDateString, 10)
+    const dateObject = new Date(unixTime*1000)
     const year = dateObject.getFullYear()
     const month = dateObject.getMonth()
     const day = dateObject.getDay()
