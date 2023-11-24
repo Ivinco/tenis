@@ -14,7 +14,7 @@ from .user import User
 # Global vars init
 app = Flask(__name__)
 CORS(app, supports_credentials=True)
-socketio = SocketIO(app, cors_allowed_origins="https://*.ivinco.com")
+socketio = SocketIO(app, cors_allowed_origins="https://tenis-dev.k8s-test.ivinco.com")
 
 # App configuration parameters
 mongo_host = os.getenv('MONGO_HOST', 'localhost')  # Default to 'localhost' if not set
