@@ -43,8 +43,9 @@ export function processTimeStamp (unixDateString) {
     return `${day}-${month}-${year} ${hours}:${minutes}:${seconds}`
 }
 
-export function processDuration(unixdate) {
-    const startDate = new Date(unixdate);
+export function processDuration(unixDateString) {
+    const unixTime = parseInt(unixDateString, 10)
+    const startDate = new Date(unixTime*1000);
     const currentDate = new Date();
     const timeDelta = currentDate - startDate;
 
