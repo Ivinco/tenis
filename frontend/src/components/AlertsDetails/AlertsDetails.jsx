@@ -104,18 +104,18 @@ const AlertsDetails = () => {
                             {Object.keys(alert.alert.customFields).map((key) => (
                                 <li className={styles.alertInfoItem}>
                                     <p className={styles.alertInfoKey}>{key}: </p>
-                                    {alert.alert.customField[key].startsWith("https://") ? (
+                                    {alert.alert.customFields[key].startsWith("https://") ? (
                                         <a
                                             className={styles.alertInfoLink}
-                                            href={alert.alert.customField[key]}
+                                            href={alert.alert.customFields[key]}
                                             target="_blank"
                                             rel="noopener noreferrer"
                                         >
-                                            {alert.alert.customField[key].split('/')[2]}
+                                            {alert.alert.customFields[key].split('/')[2]}
                                         </a>
                                     ) : (
                                         <p className={styles.alertInfoValue}>
-                                            {alert.alert.customField[key]}
+                                            {alert.alert.customFields[key]}
                                         </p>
                                     )}
                                 </li>
