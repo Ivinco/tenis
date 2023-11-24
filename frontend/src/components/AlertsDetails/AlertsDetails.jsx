@@ -101,7 +101,7 @@ const AlertsDetails = () => {
                 {
                     alert.alert.customFields ?
                         <ul className={styles.alertCommonInfo}>
-                            {Object.keys(alert.alert.customField).map((key) => (
+                            {Object.keys(alert.alert.customFields).map((key) => (
                                 <li className={styles.alertInfoItem}>
                                     <p className={styles.alertInfoKey}>{key}: </p>
                                     {alert.alert.customField[key].startsWith("https://") ? (
