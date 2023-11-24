@@ -121,7 +121,12 @@ def refresh(user):
 #
 @socketio.on('connect')
 def test_connect(auth):
+    print("Connected")
     emit('my response', {'data': 'Connected'})
+
+@socketio.on('disconnect')
+def disconnect():
+    print('Disconnected')
 # @token_required_ws
 # def handle_message(data):
 #     json = """ [
