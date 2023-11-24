@@ -4,4 +4,4 @@ from .app import app, socketio
 port = app.config['LISTEN_PORT']
 host = app.config['LISTEN_HOST']
 if __name__ == '__main__':
-    socketio.run(app, host=host, port=int(port))
+    socketio.run(app, host=host, port=int(port), allow_unsafe_werkzeug=True)
