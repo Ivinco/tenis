@@ -120,27 +120,27 @@ def refresh(user):
 # Websocket channels
 #
 @socketio.on('connect')
+def test_connect(auth):
+    emit('my response', {'data': 'Connected'})
 # @token_required_ws
-def handle_message(data):
-    print('Client concected')
-    json =  [
-                {
-                    "id": "u0ToONntLn2m4NA2",
-                    "project": "Ivinco",
-                    "host": "crawl-farm-vm-worker12",
-                    "fired": "1622686004",
-                    "alertName": "Host is unavailable",
-                    "severity": "CRITICAL",
-                    "msg": "kubelet on crawl-farm-vm-worker2.sgdctroy.net(192.168.5.219) got more than 100 errors per 5min",
-                    "responsibleUser": "",
-                    "comment": "",
-                    "isScheduled": "false",
-                    "customFields": {
-                        "FixInstructions": "https://wiki.ivinco.com/prj/intranet#mnu",
-                        "labels": "label 3, label 1, label 7, label 7",
-                        "grafanaLink": "https://grafana.sgdctroy.net/d/vYIh9K9Mzss/redis?orgId=1&refresh=30s"
-                    }
-                }
-               ]
-    emit('init', json, json=True)
-    print("message sent")
+# def handle_message(data):
+#     json = """ [
+#                 {
+#                     "id": "u0ToONntLn2m4NA2",
+#                     "project": "Ivinco",
+#                     "host": "crawl-farm-vm-worker12",
+#                     "fired": "1622686004",
+#                     "alertName": "Host is unavailable",
+#                     "severity": "CRITICAL",
+#                     "msg": "kubelet on crawl-farm-vm-worker2.sgdctroy.net(192.168.5.219) got more than 100 errors per 5min",
+#                     "responsibleUser": "",
+#                     "comment": "",
+#                     "isScheduled": "false",
+#                     "customFields": {
+#                         "FixInstructions": "https://wiki.ivinco.com/prj/intranet#mnu",
+#                         "labels": "label 3, label 1, label 7, label 7",
+#                         "grafanaLink": "https://grafana.sgdctroy.net/d/vYIh9K9Mzss/redis?orgId=1&refresh=30s"
+#                     }
+#                 }
+#                ]"""
+#     emit('init', json, json=True)
