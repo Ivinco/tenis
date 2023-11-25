@@ -139,6 +139,85 @@ def handle_message(data):
                         "labels": "label 3, label 1, label 7, label 7",
                         "grafanaLink": "https://grafana.sgdctroy.net/d/vYIh9K9Mzss/redis?orgId=1&refresh=30s"
                     }
+                },
+                {
+                    "id": "u0ToONntLn2m4NA3",
+                    "project": "Boardreader",
+                    "host": "crawl-farm-vm-worker13",
+                    "fired": "1622686004",
+                    "alertName": "Host is unavailable",
+                    "severity": "WARNING",
+                    "msg": "kubelet on crawl-farm-vm-worker2.sgdctroy.net(192.168.5.219) got more than 100 errors per 5min",
+                    "responsibleUser": "",
+                    "comment": "",
+                    "isScheduled": "false",
+                    "customFields": {
+                        "FixInstructions": "https://wiki.ivinco.com/prj/intranet#mnu",
+                        "labels": "label 3, label 1, label 7, label 7",
+                        "Text field": "Some other text field"
+                    }
+                },
+                {
+                    "id": "u0ToONntLn2m4NA4",
+                    "project": "Boardreader",
+                    "host": "crawl-farm-vm-worker14",
+                    "fired": "1622686004",
+                    "alertName": "Host is unavailable",
+                    "severity": "INFO",
+                    "msg": "kubelet on crawl-farm-vm-worker2.sgdctroy.net(192.168.5.219) got more than 100 errors per 5min",
+                    "responsibleUser": "",
+                    "comment": "",
+                    "isScheduled": "false",
+                    "customFields": {}
+                },
+                {
+                    "id": "u0ToONntLn2m4NA5",
+                    "project": "Ivinco",
+                    "host": "crawl-farm-vm-worker15",
+                    "fired": "1622686004",
+                    "alertName": "Host is unavailable",
+                    "severity": "EMERGENCY",
+                    "msg": "kubelet on crawl-farm-vm-worker2.sgdctroy.net(192.168.5.219) got more than 100 errors per 5min",
+                    "responsibleUser": "",
+                    "comment": "",
+                    "isScheduled": "false",
+                    "customFields": {
+                        "FixInstructions": "https://wiki.ivinco.com/prj/intranet#mnu",
+                        "labels": "label 3, label 1, label 7, label 7",
+                        "grafanaLink": "https://grafana.sgdctroy.net/d/vYIh9K9Mzss/redis?orgId=1&refresh=30s"
+                    }
+                },
+                {
+                    "id": "u0ToONntLn2m4NA6",
+                    "project": "Ivinco",
+                    "host": "crawl-farm-vm-worker16",
+                    "fired": "1622686004",
+                    "alertName": "Host is unavailable",
+                    "severity": "CRITICAL",
+                    "msg": "kubelet on crawl-farm-vm-worker2.sgdctroy.net(192.168.5.219) got more than 100 errors per 5min",
+                    "responsibleUser": "",
+                    "comment": "",
+                    "isScheduled": "false",
+                    "customFields": {
+                        "FixInstructions": "https://wiki.ivinco.com/prj/intranet#mnu",
+                        "labels": "label 3, label 1, label 7, label 7",
+                        "grafanaLink": "https://grafana.sgdctroy.net/d/vYIh9K9Mzss/redis?orgId=1&refresh=30s"
+                    }
+                },
+                {
+                    "id": "u0ToONntLn2m4NA7",
+                    "project": "Ivinco",
+                    "host": "crawl-farm-vm-worker17",
+                    "fired": "1622686004",
+                    "alertName": "Host is unavailable",
+                    "severity": "WARNING",
+                    "msg": "kubelet on crawl-farm-vm-worker2.sgdctroy.net(192.168.5.219) got more than 100 errors per 5min",
+                    "responsibleUser": "",
+                    "comment": "",
+                    "isScheduled": "false",
+                    "customFields": {
+                        "FixInstructions": "https://wiki.ivinco.com/prj/intranet#mnu",
+                    }
                 }
                ]"""
     emit('init', json, json=True)
