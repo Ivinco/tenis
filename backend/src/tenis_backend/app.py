@@ -216,7 +216,7 @@ def handle_message(data):
                     "comment": "",
                     "isScheduled": "false",
                     "customFields": {
-                        "FixInstructions": "https://wiki.ivinco.com/prj/intranet#mnu",
+                        "FixInstructions": "https://wiki.ivinco.com/prj/intranet#mnu"
                     }
                 }
                ]"""
