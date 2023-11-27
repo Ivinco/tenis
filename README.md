@@ -91,8 +91,11 @@ shell:
 Once definition is ready, images are build with `werf build`, see `ci-dev.yml`.
 ## How it's deployed
 We use Github Actions as a CI/CD tool.
-- Deploy to `dev` is happening on any push, opened PR to master, or manually.
+- Deploy to `dev` is happening on once PR to 'dev' branch is closed or manualy.
     - `ci-dev.yml` workflow is responsible for Automatically depploying any changes to `tenis-dev` namespace.
+
+- Deploy to `dev-2` is happening manualy.
+    - `ci-dev-2.yml` workflow is responsible for Automatically depploying any changes to `tenis-dev-2` namespace.
 
 - Deploy to `prod` is happening on merge to master or manually,
     - `ci-prod.yml` workflow deploys the code to ns `tenis-prod`, available on url `tenis.k8s-test.ivinco.com`
