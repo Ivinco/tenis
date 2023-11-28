@@ -1,6 +1,6 @@
 import {
     ADD_ALERTS,
-    CHANGE_ALERTS,
+    UPDATE_ALERTS,
     CLOSE_SOCKET,
     OPEN_SOCKET,
     REMOVE_ALERTS, RESET_ALERTS,
@@ -30,12 +30,17 @@ export const webSocketReducer = (state = defaultState, action) => {
                 ...state,
                 alerts: state.alerts.filter((alert) => !idsToRemove.includes(alert.id)),
             };
-        case CHANGE_ALERTS:
-            const newAlerts = state.alerts.map((alert) => {
-                const changedAlert = action.payload.find((newAlert) => newAlert.id === alert.id)
-                return changedAlert ? changedAlert : alert
-        })
-            return {...state, alerts: newAlerts};
+        case UPDATE_ALERTS:
+            const newAlerts = [...state.alerts]
+            action.payload.map((alert) => {
+                const index = newAlerts.findIndex((item) => item.id === alert.id)
+                if (index != -1) {
+                    newAlerts[index] = alert
+                } else {
+                    newAlerts.push(alert)
+                }
+            })
+            return {...state, alerts: newAlerts}
         case RESET_ALERTS:
             return {...state, alerts: []}
         default:
@@ -59,6 +64,11 @@ export const addAlerts = (alerts) => ({
 })
 export const removeAlerts = (alerts) => ({
     type: REMOVE_ALERTS,
+    payload: alerts
+})
+
+export const updateAlerts = (alerts) => ({
+    type: UPDATE_ALERTS,
     payload: alerts
 })
 export const resetAlerts = () => ({
