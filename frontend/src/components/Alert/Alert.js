@@ -1,26 +1,27 @@
 import React from 'react';
 import styles from './Alert.module.css'
 import {processTimeStamp} from "../../utils/utils";
-import {useDispatch} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {setDetailedAlert} from "../../store/reducers/alertReducer";
 import {switchAlertDetailsModal} from "../../store/reducers/modalReducer";
 
-const Alert = ({alert}, key) => {
+const Alert = ({alert}) => {
     const dispatch = useDispatch()
+    const isInspectMode = useSelector(state => state.setHeaderMenuItemValue.inspectMode)
     let alertBackground
     let fontColor
     switch (alert.severity.toUpperCase()){
         case 'WARNING':
-            alertBackground = '#DBBE3B'
+            alertBackground = '#FEFFC1'
             fontColor = 'black'
             break
         case 'CRITICAL':
-            alertBackground = '#802C06'
-            fontColor = 'white'
+            alertBackground = '#FFBBBA'
+            fontColor = 'black'
             break
         case 'EMERGENCY':
-            alertBackground = '#6E2D92'
-            fontColor = 'white'
+            alertBackground = '#f67d7a'
+            fontColor = 'black'
             break
         default:
             alertBackground = '#858585'
@@ -34,19 +35,19 @@ const Alert = ({alert}, key) => {
     }
 
     return (
-        <div className={styles.alertBody} key={key}
+        <div className={styles.alertBody} key={alert.id}
         style={{ backgroundColor: alertBackground, color: fontColor}}
         >
-            <div className={styles.projectName}>{alert.project[0].toUpperCase()}</div>
-            <div className={styles.host}>{alert.host}</div>
-            <div className={styles.responsibleUser}
+            <div className={`${isInspectMode ? styles.projectName : styles.projectName_small}`}>{alert.project[0].toUpperCase()}</div>
+            <div className={`${isInspectMode ? styles.host : styles.host_small}`}>{alert.host}</div>
+            <div className={`${isInspectMode ? styles.responsibleUser : styles.responsibleUser_small}`}
                  style={{backgroundImage: `url(${alert.responsibleUser ? process.env.PUBLIC_URL + "/images/stop-sign.svg" : process.env.PUBLIC_URL + "/images/stop-sign.svg"})`}}
             />
-            <div className={styles.alertName}> {alert.alertName}</div>
-            <div className={styles.alertTime}>{processTimeStamp(alert.fired)}</div>
-            <div className={styles.message}> {alert.msg}</div>
-            <div className={styles.refresh}/>
-            <div className={styles.info}
+            <div className={`${isInspectMode ? styles.alertName : styles.alertName_small}`}> {alert.alertName}</div>
+            <div className={`${isInspectMode ? styles.alertTime : styles.alertTime_small}`}>{processTimeStamp(alert.fired)}</div>
+            <div className={`${isInspectMode ? styles.message : styles.message_small}`}> {alert.msg}</div>
+            <div className={`${isInspectMode ? styles.refresh : styles.refresh_small}`}/>
+            <div className={`${isInspectMode ? styles.info : styles.info_small}`}
             onClick={(e) => {
                 e.preventDefault()
                 handleInfoButton()

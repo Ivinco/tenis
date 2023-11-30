@@ -7,7 +7,7 @@ import {
     openWebSocket,
     removeAlerts,
     resetAlerts,
-    setAlerts
+    setAlerts, updateAlerts
 } from "../store/reducers/webSocketReducer";
 
 
@@ -32,7 +32,7 @@ export const useConnectSocket = () => {
             dispatch(setAlerts(JSON.parse(data)))
         })
         SocketApiService.socket.on ('update', (data) => {
-            dispatch(addAlerts(JSON.parse(data)))
+            dispatch(updateAlerts(JSON.parse(data)))
         })
         SocketApiService.socket.on('resolve', (data) => {
             dispatch(removeAlerts(JSON.parse(data)))

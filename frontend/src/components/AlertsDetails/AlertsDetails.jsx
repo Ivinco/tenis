@@ -32,10 +32,10 @@ const AlertsDetails = () => {
             fontColor = '#DBBE3B'
             break
         case "CRITICAL":
-            fontColor = '#802C06'
+            fontColor = '#d34d07'
             break
         case "EMERGENCY":
-            fontColor = '#6E2D92'
+            fontColor = '#9a0404'
             break
         default:
             fontColor = '#858585'
