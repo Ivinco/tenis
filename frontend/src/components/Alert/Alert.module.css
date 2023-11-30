@@ -4,7 +4,7 @@
     display: flex;
     align-content: space-between;
     margin: 10px auto;
-    border: #01A2D8 solid 3px;
+    border: #a0fafa solid 3px;
     border-radius: 10px;
 
 }
@@ -37,7 +37,7 @@
     display: flex;
     width: 60px;
     height: 60px;
-    margin: 15px;
+    margin: auto;
     padding: 10px;
     border-radius: 50%;
     background-size: contain;
@@ -146,7 +146,6 @@
     .responsibleUser {
         width: 40px;
         height: 40px;
-        margin: 10px;
         padding: 6px;
     }
 
@@ -169,6 +168,12 @@
         border-left: slategrey solid 2px;
         border-right: slategrey solid 2px;
         font-size: 0.8rem;
+    }
+
+    .refresh {
+        width: 40px;
+        height: 40px;
+        margin: auto 10px;
     }
 
     .info {
@@ -225,6 +230,12 @@
         border-left: slategrey solid 1px;
         border-right: slategrey solid 1px;
         font-size: 0.6rem;
+    }
+
+    .refresh {
+        width: 26px;
+        height: 26px;
+        margin: auto 6px;
     }
 
     .info {

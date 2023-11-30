@@ -1,5 +1,5 @@
 import styles from './MainDisplay.module.css'
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import ReactDOM from 'react-dom';
 import { FixedSizeList as List } from 'react-window';
 import AutoSizer from "react-virtualized-auto-sizer";
@@ -11,6 +11,28 @@ export default function MainDisplay() {
     useConnectSocket(localStorage.getItem('token'))
     const isActiveSocket = useSelector(state => state.webSocket.isOpened)
     const rawAlerts = useSelector(state => state.webSocket.alerts)
+
+    const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+    useEffect(() => {
+        const handleResize = () => {
+            setWindowWidth(window.innerWidth);
+        };
+
+        window.addEventListener('resize', handleResize);
+
+        return () => {
+            window.removeEventListener('resize', handleResize);
+        };
+    }, []);
+
+    let rowHeight
+    if(windowWidth > 1650){
+        rowHeight = 95
+    } else if (1150 < windowWidth && windowWidth <= 1650) {
+        rowHeight = 60
+    } else {
+        rowHeight = 47
+    }
 
     const Row = ({ index, style }) => (
         <div style={style}>Row {index}</div>
@@ -31,7 +53,7 @@ export default function MainDisplay() {
                         className="List"
                         height={height}
                         itemCount={rawAlerts.length}
-                        itemSize={125}
+                        itemSize={rowHeight}
                         width={width}
                     >
                         {alertRaw}

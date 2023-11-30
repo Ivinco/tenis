@@ -1,18 +1,18 @@
 .menuSpace {
     display: flex;
     width: 100%;
-    max-height: 162px;
+    height: 162px;
     background-color: #e1fafa;
     margin: 0 0 20px 0;
     padding: 0;
     overflow: visible;
     opacity: 1;
-    transition: max-height 0.2s ease-in-out, opacity 0.3s ease-in-out;
+    transition: height 0.2s ease-in-out, opacity 0.3s ease-in-out;
 }
 
 .menuClosed {
     opacity: 0;
-    max-height: 0;
+    height: 0;
     overflow: hidden;
 }
 
@@ -25,14 +25,20 @@
     justify-content: space-between;
 }
 
-/*@media screen and (max-width: 1650px) {*/
-/*    .menuSpace {*/
-/*        max-height: 108px;*/
-/*    }*/
-/*}*/
+@media screen and (max-width: 1650px) {
+    .menuSpace {
+        max-height: 108px;
+    }
+    .filterMenu {
+        height: 57px;
+    }
+}
 
-/*@media screen and (max-width: 1150px) {*/
-/*    .menuSpace {*/
-/*        max-height: 72px;*/
-/*    }*/
-/*}*/
+@media screen and (max-width: 1150px) {
+    .menuSpace {
+        max-height: 72px;
+    }
+    .filterMenu {
+        height: 30px;
+    }
+}
