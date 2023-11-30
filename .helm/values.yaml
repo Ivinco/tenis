@@ -55,16 +55,3 @@ mongodb:
       _default: "Admin"
     INIT_USER_EMAIL:
       _default: "sys@ivinco.com"
-    PROJECT_KEY_1:
-      _default: "BR-"
-    PROJECT_VALUE_1:
-      _default: "ivinco.atlassian.net"
-    PROJECT_KEY_2:
-      _default: "TT-"
-    PROJECT_VALUE_2:
-      _default: "ivinco.atlassian.net"
-    PROJECT_KEY_3:
-      _default: "SG-"
-    PROJECT_VALUE_3:
-      _default: "socialgist.ivinco.net"
-
