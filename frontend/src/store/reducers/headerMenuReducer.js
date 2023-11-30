@@ -2,7 +2,7 @@ import {
     SET_GROUPING_VALUE,
     SET_PROJECT_VALUE,
     SET_TIMEZONE_VALUE,
-    SWITCH_ACTIVE_HEADER_MENU_ITEM
+    SWITCH_ACTIVE_HEADER_MENU_ITEM, SWITCH_INSPECT_MODE
 } from "../actions/HEADER_MENU_ACTIONS";
 
 const defaultActiveHeaderMenuItem = {
@@ -12,7 +12,8 @@ const defaultActiveHeaderMenuItem = {
 const defaultHeaderMenuValues = {
     project: 'All',
     grouping: 'Disabled',
-    tz: 'Browser'
+    tz: 'Browser',
+    inspectMode: true
 }
 
 
@@ -33,6 +34,8 @@ export const headerMenuValuesReducer = (state = defaultHeaderMenuValues, action)
             return {...state, grouping: action.payload}
         case SET_TIMEZONE_VALUE:
             return {...state, tz: action.payload}
+        case SWITCH_INSPECT_MODE:
+            return {...state, inspectMode: !state.inspectMode}
         default:
             return state
     }
@@ -56,4 +59,8 @@ export const setGroupingMenuValue = (isGrouped) => ({
 export const setTimeZoneValue = (timeZone) => ({
     type: SET_TIMEZONE_VALUE,
     payload: timeZone
+})
+
+export const switchInspectMode = () => ({
+    type: SWITCH_INSPECT_MODE
 })

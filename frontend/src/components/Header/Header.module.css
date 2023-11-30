@@ -122,12 +122,18 @@
 
 .funcButtonEnabled {
     cursor: pointer;
-    transition: transform 0.4s;
+    transition: transform 0.2s;
     border: #05F0D2 2px solid;
     filter: none;
 }
 .funcButtonEnabled:hover {
     transform: scale(1.2);
+}
+
+.inspectButton {
+    border: none;
+    border-radius: 7px;
+    background-image: url("../../../public/images/resize-button.svg");
 }
 
 .refreshButton {
@@ -262,5 +268,9 @@
     .alertsCountTitle {
         font-size: 0.5rem;
         margin: 4px auto 0;
+    }
+
+    .inspectButton {
+        display: none;
     }
 }

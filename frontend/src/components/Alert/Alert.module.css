@@ -3,8 +3,8 @@
     height: 90%;
     display: flex;
     align-content: space-between;
-    margin: 10px auto;
-    border: #a0fafa solid 3px;
+    margin: auto;
+    border: #cccccc solid 3px;
     border-radius: 10px;
 
 }
@@ -20,6 +20,17 @@
     padding: 10px;
 }
 
+.projectName_small {
+    height: 18px;
+    width: 18px;
+    font-size: 1rem;
+    margin: auto 4px;
+    padding: 4px;
+    text-align: center;
+    border: 2px solid black;
+    border-radius: 10%;
+}
+
 .host {
     display: flex;
     height: 100%;
@@ -31,6 +42,18 @@
     font-size: 1.3rem;
     border-left: slategrey solid 3px;
     border-right: slategrey solid 3px;
+}
+
+.host_small {
+    display: flex;
+    height: 100%;
+    width: 10%;
+    align-items: center;
+    margin: auto 2px;
+    padding: 0 4px;
+    font-size: 0.6rem;
+    border-left: slategrey solid 1px;
+    border-right: slategrey solid 1px;
 }
 
 .responsibleUser {
@@ -51,6 +74,24 @@
     transform: scale(1.2);
 }
 
+.responsibleUser_small {
+    display: flex;
+    width: 27px;
+    height: 27px;
+    margin: 6px;
+    padding: 4px;
+    border-radius: 50%;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.responsibleUser_small:hover {
+    transform: scale(1.2);
+}
+
 .alertName {
     height: 100%;
     display: flex;
@@ -65,6 +106,20 @@
     border-right: slategrey solid 3px;
 }
 
+.alertName_small {
+    height: 100%;
+    display: flex;
+    width: 20%;
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+    margin: auto 6px;
+    padding: 0 4px;
+    font-size: 0.8rem;
+    border-left: slategrey solid 1px;
+    border-right: slategrey solid 1px;
+}
+
 .alertTime {
     display: flex;
     height: 100%;
@@ -73,6 +128,16 @@
     font-size: 1.2rem;
     text-align: center;
     line-height: 2;
+}
+
+.alertTime_small {
+    display: flex;
+    height: 100%;
+    margin: 0 6px;
+    font-size: 0.7rem;
+    line-height: 1;
+    align-items: center;
+    text-align: center;
 }
 
 .message {
@@ -89,11 +154,25 @@
     border-right: slategrey solid 3px;
 }
 
+.message_small {
+    display: flex;
+    height: 100%;
+    width: 52%;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    text-overflow: ellipsis;
+    padding: 0 4px;
+    border-left: slategrey solid 1px;
+    border-right: slategrey solid 1px;
+    font-size: 0.7rem;
+}
+
 .info {
     width: 60px;
     height: 60px;
     margin: auto 15px;
-    background-image: url("../../../public/images/attention.svg");
+    background-image: url("../../../public/images/comment-dots.svg");
     background-size: contain;
     background-position: center;
     background-repeat: no-repeat;
@@ -102,6 +181,22 @@
 }
 
 .info:hover {
+    transform: scale(1.2);
+}
+
+.info_small {
+    width: 27px;
+    height: 27px;
+    margin: auto 6px;
+    background-image: url("../../../public/images/comment-dots.svg");
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.info_small:hover {
     transform: scale(1.2);
 }
 
@@ -118,6 +213,22 @@
 }
 
 .refresh:hover {
+    transform: scale(1.2);
+}
+
+.refresh_small {
+    width: 26px;
+    height: 26px;
+    margin: auto 6px;
+    background-image: url("../../../public/images/refresh-svgrepo-com.svg");
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.refresh_small:hover {
     transform: scale(1.2);
 }
 

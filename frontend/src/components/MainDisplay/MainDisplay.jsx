@@ -11,6 +11,7 @@ export default function MainDisplay() {
     useConnectSocket(localStorage.getItem('token'))
     const isActiveSocket = useSelector(state => state.webSocket.isOpened)
     const rawAlerts = useSelector(state => state.webSocket.alerts)
+    const isInspectMode = useSelector(state => state.setHeaderMenuItemValue.inspectMode)
 
     const [windowWidth, setWindowWidth] = useState(window.innerWidth);
     useEffect(() => {
@@ -26,9 +27,9 @@ export default function MainDisplay() {
     }, []);
 
     let rowHeight
-    if(windowWidth > 1650){
+    if(windowWidth > 1650 && isInspectMode){
         rowHeight = 95
-    } else if (1150 < windowWidth && windowWidth <= 1650) {
+    } else if ((1150 < windowWidth && windowWidth <= 1650) && isInspectMode) {
         rowHeight = 60
     } else {
         rowHeight = 47
