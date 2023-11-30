@@ -5,13 +5,13 @@ class SocketApiService {
     static socket = null;
     static createConnection(token) {
         // This is test endpoint for web socket server hosted on local host
-        this.socket = io ("localhost:8080")
-        // this.socket = io(`${BACKEND_SERVER}`,{
-        //     extraHeaders:{
-        //         'Authorization': `Bearer ${token}`
-        //     }
-        // }
-        //)
+        // this.socket = io ("localhost:8080")
+        this.socket = io(`${BACKEND_SERVER}`,{
+            extraHeaders:{
+                'Authorization': `Bearer ${token}`
+            }
+        }
+        )
     }
     static closeConnection() {
         if(this.socket){
