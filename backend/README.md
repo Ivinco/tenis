@@ -20,7 +20,12 @@ db.users.insertOne({
   name: 'Admin',
   email: 'sys@ivinco.com',
   password: 'pbkdf2:sha256:260000$IRLzDvGK1yPx6f1R$f9caf10a1c5d0931c3962fc19316c68f37377804a24b70d6b7a857303394d5d7',
-  active: true
+  active: true,
+  commentReplaceRules: {
+    BR-: 'ivinco.atlasian.net',
+    TT-: 'ivinco.atlasian.net',
+    SG-: 'socialgist.atlasian.net'
+  }
 })
 ```
 - finally, [re]start backend service:
