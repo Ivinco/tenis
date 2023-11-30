@@ -31,7 +31,7 @@ spec:
             sleep 2
           done
           mongosh $INIT_DB --eval 'if (db.getCollectionNames().includes("users") === false) {db.createCollection("users", { capped: true, size: 5242880, max: 5000 });}'
-          mongosh $INIT_DB --eval 'if (db.users.findOne({ name: "$INIT_USER_NAME" }) === null) {db.users.insertOne({ name: "$INIT_USER_NAME", email: "$INIT_USER_EMAIL", password: "$INIT_PASSWORD", active: true, commentReplaceRules: {"$PROJECT_KEY_1": "$PROJECT_VALUE_1", "$PROJECT_KEY_2": "$PROJECT_VALUE_2", "$PROJECT_KEY_3": "$PROJECT_VALUE_3"} });}'
+          mongosh $INIT_DB --eval 'if (db.users.findOne({ name: "$INIT_USER_NAME" }) === null) {db.users.insertOne({ name: "$INIT_USER_NAME", email: "$INIT_USER_EMAIL", password: "$INIT_PASSWORD", active: true });}'
           mongod --shutdown
         volumeMounts:
         - name: mongo-persistent-storage
@@ -45,18 +45,6 @@ spec:
           value: {{ pluck .Values.werf.env .Values.mongodb.env.INIT_USER_EMAIL | first | default .Values.mongodb.env.INIT_USER_EMAIL._default }}
         - name: INIT_PASSWORD
           value: {{ pluck .Values.werf.env .Values.mongodb.env.INIT_PASSWORD | first | default .Values.mongodb.env.INIT_PASSWORD._default }}
-        - name: PROJECT_KEY_1
-          value: {{ pluck .Values.werf.env .Values.mongodb.env.PROJECT_KEY_1 | first | default .Values.mongodb.env.PROJECT_KEY_1._default }}
-        - name: PROJECT_VALUE_1
-          value: {{ pluck .Values.werf.env .Values.mongodb.env.PROJECT_KEY_1 | first | default .Values.mongodb.env.PROJECT_VALUE_1._default }}
-        - name: PROJECT_KEY_2
-          value: {{ pluck .Values.werf.env .Values.mongodb.env.PROJECT_KEY_2 | first | default .Values.mongodb.env.PROJECT_KEY_2._default }}
-        - name: PROJECT_VALUE_2
-          value: {{ pluck .Values.werf.env .Values.mongodb.env.PROJECT_VALUE_2 | first | default .Values.mongodb.env.PROJECT_VALUE_2._default }}
-        - name: PROJECT_KEY_3
-          value: {{ pluck .Values.werf.env .Values.mongodb.env.PROJECT_KEY_3 | first | default .Values.mongodb.env.PROJECT_KEY_3._default }}
-        - name: PROJECT_VALUE_3
-          value: {{ pluck .Values.werf.env .Values.mongodb.env.PROJECT_VALUE_3 | first | default .Values.mongodb.env.PROJECT_VALUE_3._default }}
       containers:
       - name: mongo
         image: {{ .Values.werf.image.mongodb }}
