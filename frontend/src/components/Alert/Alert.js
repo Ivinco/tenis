@@ -5,7 +5,7 @@ import {useDispatch} from "react-redux";
 import {setDetailedAlert} from "../../store/reducers/alertReducer";
 import {switchAlertDetailsModal} from "../../store/reducers/modalReducer";
 
-const Alert = ({alert}, key) => {
+const Alert = ({alert}) => {
     const dispatch = useDispatch()
     let alertBackground
     let fontColor
@@ -34,7 +34,7 @@ const Alert = ({alert}, key) => {
     }
 
     return (
-        <div className={styles.alertBody} key={key}
+        <div className={styles.alertBody} key={alert.id}
         style={{ backgroundColor: alertBackground, color: fontColor}}
         >
             <div className={styles.projectName}>{alert.project[0].toUpperCase()}</div>
