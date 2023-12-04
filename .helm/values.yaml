@@ -55,3 +55,12 @@ mongodb:
       _default: "Admin"
     INIT_USER_EMAIL:
       _default: "sys@ivinco.com"
+
+jira:
+- prefix: "TT-"
+  site: "ivinco.atlasian.net"
+- prefix: "BR-"
+  site: "ivinco.atlasian.net"
+- prefix: "SG-"
+  site: "socialgist.atlasian.net"
+
