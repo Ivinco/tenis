@@ -1,22 +1,38 @@
-import React, {useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import styles from './AlertsDetails.module.css'
 import {useSelector} from "react-redux";
-import {processDuration} from "../../utils/utils";
+import {processAlertComment, processDuration} from "../../utils/utils";
 
 const AlertsDetails = () => {
     const alert = useSelector(state => state.setAlertReducer.alert)
     const [commentFormIsOpened, setCommentFormIsOpened] = useState(false)
     const [commentFormContent, setCommentFormContent] = useState('')
+    const user = useSelector( state => state.authReducer.user)
+    const textareaRef = useRef(null)
 
     const onCommentClick = () => {
         setCommentFormIsOpened(!commentFormIsOpened)
     }
 
+    useEffect(() => {
+        if (commentFormIsOpened && textareaRef.current) {
+            textareaRef.current.focus();
+        }
+    }, [commentFormIsOpened]);
+
     const onSendCommentClick = () => {
         setCommentFormIsOpened(false)
         document.getElementById('commentArea').value = ''
         setCommentFormContent('')
-        alert.alert.comment = commentFormContent
+        const processedString = commentFormContent.split(/\s+/).map(word => processAlertComment(word, user.usersCommentReplaceRules))
+        alert.alert.comment = (
+            <>
+                {processedString.map((element, index) => (
+                    <React.Fragment key={index}>{element} </React.Fragment>
+                ))}
+            </>
+        )
+        console.log(alert.alert.comment)
     }
 
     const handleEnterKey = (e) => {
@@ -84,6 +100,7 @@ const AlertsDetails = () => {
                               style={{ display: commentFormIsOpened ? "flex" : "none"}}
                               maxLength="100"
                               id="commentArea"
+                              ref={textareaRef}
                               onChange={(e) => setCommentFormContent(e.target.value)}
                               onKeyDown={handleEnterKey}
                     />

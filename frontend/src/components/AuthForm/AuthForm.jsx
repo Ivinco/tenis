@@ -24,7 +24,8 @@ const AuthForm = () => {
                                         userName: response.data.user.name,
                                         userId: response.data.user._id,
                                         userEmail: response.data.user.email,
-                                        userImage: `https://gravatar.com/avatar/${sha256(response.data.user.email)}?s=150`
+                                        userImage: `https://gravatar.com/avatar/${sha256(response.data.user.email)}?s=150`,
+                                        usersCommentReplaceRules: response.data.user.commentReplaceRules
                                     }
                     dispatch(loginAction(user))
                     dispatch(closeModal())
