@@ -27,6 +27,7 @@ spec:
         - |
           until nc -z tenis-mongodb 27017
           do
+              echo "MongoDB is not ready"
               sleep 1
           done
       containers:
