@@ -55,3 +55,17 @@ export function processDuration(unixDateString) {
 
     return `${days}d ${hours}h ${minutes}m`
 }
+
+export function processAlertComment (word, commentReplaceRules) {
+    const links = []
+    for (const [key, value] of Object.entries(commentReplaceRules)){
+        const regex = new RegExp(`${key}\\d{1,7}`, "i")
+        if (word.match(regex)){
+            console.log('matched!!!')
+            return (
+                <a style={{display: "contents"}} target="_blank" rel="noopener noreferrer" href={`https://${value}/browse/${word}`}> {word} </a>
+            )
+        }
+    }
+    return word
+}

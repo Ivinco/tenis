@@ -35,7 +35,7 @@ const Alert = ({alert}) => {
     }
 
     return (
-        <div className={styles.alertBody} key={alert.id}
+        <div className={`${isInspectMode ? styles.alertBody : styles.alertBody_small}`} key={alert.id}
         style={{ backgroundColor: alertBackground, color: fontColor}}
         >
             <div className={`${isInspectMode ? styles.projectName : styles.projectName_small}`}>{alert.project[0].toUpperCase()}</div>
