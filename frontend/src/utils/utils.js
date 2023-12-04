@@ -60,10 +60,11 @@ export function processAlertComment (word, commentReplaceRules) {
     const links = []
     for (const [key, value] of Object.entries(commentReplaceRules)){
         const regex = new RegExp(key, "i")
+        const match = word.match(regex)
         if (word.match(regex)){
-            console.log('matched!!!')
+            const link = value.replace(/\$1/g, match[0])
             return (
-                <a style={{display: "contents"}} target="_blank" rel="noopener noreferrer" href={`${value}${word}`}> {word} </a>
+                <a style={{display: "contents"}} target="_blank" rel="noopener noreferrer" href={link}> {word} </a>
             )
         }
     }
