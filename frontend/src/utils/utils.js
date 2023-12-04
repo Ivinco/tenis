@@ -59,11 +59,11 @@ export function processDuration(unixDateString) {
 export function processAlertComment (word, commentReplaceRules) {
     const links = []
     for (const [key, value] of Object.entries(commentReplaceRules)){
-        const regex = new RegExp(`${key}\\d{1,7}`, "i")
+        const regex = new RegExp(key, "i")
         if (word.match(regex)){
             console.log('matched!!!')
             return (
-                <a style={{display: "contents"}} target="_blank" rel="noopener noreferrer" href={`https://${value}/browse/${word}`}> {word} </a>
+                <a style={{display: "contents"}} target="_blank" rel="noopener noreferrer" href={`${value}${word}`}> {word} </a>
             )
         }
     }
