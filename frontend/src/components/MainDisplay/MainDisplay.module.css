@@ -8,9 +8,8 @@
 .groupWrapper {
     display: flex;
     width: 100%;
-    margin: 10px auto
+    margin: 0 auto 10px
 }
-
 .groupWrapper_small {
-    margin: 2px auto;
+    margin: 0 auto 4px;
 }

@@ -1,14 +1,13 @@
 import styles from './MainDisplay.module.css'
 import React, {useEffect, useState} from 'react';
-import ReactDOM from 'react-dom';
 import { FixedSizeList as List } from 'react-window';
 import AutoSizer from "react-virtualized-auto-sizer";
 import {useConnectSocket} from "../../hooks/useConnectSocket";
 import Alert from "../Alert/Alert";
 import {useDispatch, useSelector} from "react-redux";
-import alert from "../Alert/Alert";
 import {setAlertsNumber} from "../../store/reducers/alertReducer";
 import AlertGroup from "../AlertGroup/AlertGroup";
+import {groupByField} from "../../utils/utils";
 
 export default function MainDisplay() {
     useConnectSocket(localStorage.getItem('token'))
@@ -17,10 +16,12 @@ export default function MainDisplay() {
     const rawAlerts = useSelector(state => state.webSocket.alerts)
     const isInspectMode = useSelector(state => state.setHeaderMenuItemValue.inspectMode)
     const activeProject = useSelector(state => state.setHeaderMenuItemValue.project)
-    const totalAlertsToDisplay = useSelector(state => state.setAlertReducer.alertsNumber)
+    const isGrouped = useSelector(state => state.setHeaderMenuItemValue.grouping)
     const [windowWidth, setWindowWidth] = useState(window.innerWidth)
     let alertsToDisplay
     let rowHeight
+
+    //Track screen width for dynamic scaling for alert height in virtual list
     useEffect(() => {
         const handleResize = () => {
             setWindowWidth(window.innerWidth);
@@ -42,6 +43,7 @@ export default function MainDisplay() {
     }
 
 
+    //Here we filter all alerts by project and display only related ones
     switch (activeProject){
         case "All":
                 alertsToDisplay = [...rawAlerts]
@@ -49,39 +51,118 @@ export default function MainDisplay() {
         default:
             alertsToDisplay = rawAlerts.filter((alert) => alert.project === activeProject)
     }
+    //Define ungrouped alerts which will be displayed in virtual list
+    let ungroupedAlerts = alertsToDisplay
     dispatch(setAlertsNumber(alertsToDisplay.length))
 
-    const alertRaw = ({index, style}) => (
+    //This block defines grouping functionality
+    const alertGroups = []
+    if (isGrouped === "Enabled"){
+        //Here we are grouping alerts by Hostname
+        const groupsByHost = groupByField(alertsToDisplay, 'host')
+        //Process alerts grouped by name
+        groupsByHost.forEach( group => {
+            //Calculate severity level. Defined by the highest level in group
+            let severityValue = 0
+            let severity = ""
+            group.forEach(alert => {
+                let level = 0
+                switch (alert.severity){
+                    case "EMERGENCY":
+                         level = 3
+                        break
+                    case "CRITICAL":
+                        level = 2
+                        break
+                    case "WARNING":
+                        level = 1
+                        break
+                    default:
+                        level = 0
+                }
+                if (level > severityValue){
+                    severityValue = level
+                }
+            })
+            switch (severityValue) {
+                case 3:
+                    severity = "EMERGENCY"
+                    break
+                case 2:
+                    severity = "CRITICAL"
+                    break
+                case 1:
+                    severity = 'WARNING'
+                    break
+                default:
+                    severity = "INFO"
+            }
+            //Make group object by hostname factor
+            const hostGroup = {
+                id: group[0].host,
+                project: group[0].project,
+                groupFactor: `Host: ${group[0].host}`,
+                alerts: group,
+                severity: severity
+            }
+            //Push group to common groups array
+            alertGroups.push(hostGroup)
+        })
+
+        //Remove grouped alerts from ungrouped array
+        const groupedAlertIds = new Set();
+        alertGroups.forEach(group => {
+            group.alerts.forEach(alert => {
+                groupedAlertIds.add(alert.id);
+            });
+        });
+        ungroupedAlerts = alertsToDisplay.filter(alert => !groupedAlertIds.has(alert.id));
+    }
+
+
+    //Define row for virtual list of ungrouped alerts
+    const alertRow = ({index, style}) => (
         <div style={style}>
-            <Alert alert={alertsToDisplay[index]}/>
+            <Alert alert={ungroupedAlerts[index]}/>
         </div>
     )
 
-    console.log(totalAlertsToDisplay)
+
 
     return (
         <div className={styles.mainDisplay}>
-            <div className={`${styles.groupWrapper} ${isInspectMode ? null : styles.groupWrapper_small}`} style={{height: rowHeight}}>
-                <AlertGroup />
-            </div>
-
             {isActiveSocket ?
+                <>
+                    { alertGroups.length > 0
+                        ?
+                        alertGroups.map(group => (
+                            <div className={
+                                `${styles.groupWrapper} 
+                                ${isInspectMode ? null : styles.groupWrapper_small}`
+                            } key={group.id} >
+                                <AlertGroup group={group} alertHeight={rowHeight}/>
+                            </div>
+                        ))
+
+                        : <></>
+                    }
                 <AutoSizer>
                 {({height, width}) => (
                     <List
                         className="List"
                         height={height}
-                        itemCount={alertsToDisplay.length}
+                        itemCount={ungroupedAlerts.length}
                         itemSize={rowHeight}
                         width={width}
                     >
-                        {alertRaw}
+                        {alertRow}
                     </List>
                 )}
             </AutoSizer>
-            : (
+                </>
+            :
             <div style={{textAlign: 'center', fontSize: '2rem', marginTop: '20px'}}>NO CONNECTION</div>
-            )}
+            }
         </div>
     )
 }

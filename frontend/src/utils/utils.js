@@ -1,36 +1,3 @@
-
-export const boardreaderProjectFunction = () => {
-    console.log("Boardreader project alerts")
-}
-
-export const ivincoProjectFunction = () => {
-    console.log("Ivinco project alerts")
-}
-
-export const allProjectsFunction = () => {
-    console.log('All projects alerts')
-}
-
-export const groupedAlertsFunction = () => {
-    console.log('Grouped alerts')
-}
-
-export const ungroupedAlertsFunction = () => {
-    console.log('Ungrouped alerts')
-}
-
-export const browserTimeZone = () => {
-    console.log('Browser Time Zone')
-}
-
-export const dataCenterTimeZone = () => {
-    console.log('Data Center Time Zone')
-}
-
-export const utcTimeZone = () => {
-    console.log('UTC Time Zone')
-}
-
 export function processTimeStamp (unixDateString) {
     const unixTime = parseInt(unixDateString, 10)
     const dateObject = new Date(unixTime*1000)
@@ -69,4 +36,14 @@ export function processAlertComment (word, commentReplaceRules) {
         }
     }
     return word
+}
+
+export function groupByField(alerts, fieldName){
+    const groupedByField = alerts.reduce((acc, item) => {
+        acc[item[fieldName]] = acc[item[fieldName]] || []
+        acc[item[fieldName]].push(item)
+        return acc
+    }, {})
+
+    return Object.values(groupedByField).filter(group => group.length > 1)
 }
