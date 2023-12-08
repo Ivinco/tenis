@@ -61,7 +61,7 @@
     align-items: center;
     margin: auto 2px;
     padding: 0 4px;
-    font-size: 0.6rem;
+    font-size: 0.9rem;
     border-left: slategrey solid 1px;
     border-right: slategrey solid 1px;
 }
@@ -112,8 +112,14 @@
     margin: auto 15px;
     padding: 0 10px;
     font-size: 1.5rem;
+    overflow: hidden;
     border-left: slategrey solid 3px;
     border-right: slategrey solid 3px;
+}
+
+.textFields {
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .alertName_small {
@@ -125,7 +131,7 @@
     justify-content: center;
     margin: auto 6px;
     padding: 0 4px;
-    font-size: 0.8rem;
+    font-size: 1rem;
     border-left: slategrey solid 1px;
     border-right: slategrey solid 1px;
 }
@@ -133,6 +139,7 @@
 .alertTime {
     display: flex;
     height: 100%;
+    width: 7%;
     margin: 0 15px;
     align-items: center;
     font-size: 1.2rem;
@@ -143,8 +150,9 @@
 .alertTime_small {
     display: flex;
     height: 100%;
+    width: 7%;
     margin: 0 6px;
-    font-size: 0.7rem;
+    font-size: 0.9rem;
     line-height: 1;
     align-items: center;
     text-align: center;
@@ -175,7 +183,7 @@
     padding: 0 4px;
     border-left: slategrey solid 1px;
     border-right: slategrey solid 1px;
-    font-size: 0.7rem;
+    font-size: 0.9rem;
 }
 
 .info {

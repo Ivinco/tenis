@@ -9,7 +9,7 @@ const Header = () => {
     const dispatch = useDispatch()
     const isLogged = useSelector(state => state.authReducer.isLogged)
     const userInfo = useSelector(state => state.authReducer.user)
-    const alerts = useSelector(state => state.webSocket.alerts)
+    const alerts = useSelector(state => state.setAlertReducer.alertsNumber)
     const isInspectMode = useSelector(state => state.setHeaderMenuItemValue.inspectMode)
 
     const onAvatarClick = (e) => {
@@ -42,7 +42,7 @@ const Header = () => {
                         isLogged
                         ?
                             <>
-                            <p className={styles.alertsNumber}>{alerts.length}</p>
+                            <p className={styles.alertsNumber}>{alerts}</p>
                             <p className={styles.alertsCountTitle}>Total alerts fired</p>
                             </>
                         : null
