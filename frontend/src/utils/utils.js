@@ -1,13 +1,13 @@
 export function processTimeStamp (unixDateString) {
-    const unixTime = parseInt(unixDateString, 10)
-    const dateObject = new Date(unixTime*1000)
-    const year = dateObject.getFullYear()
-    const month = dateObject.getMonth()
-    const day = dateObject.getDay()
-    const hours = dateObject.getHours()
-    const minutes = dateObject.getMinutes()
-    const seconds = dateObject.getSeconds()
-    return `${day}-${month}-${year} ${hours}:${minutes}:${seconds}`
+    const unixTime = parseInt(unixDateString, 10);
+    const dateObject = new Date(unixTime * 1000);
+    const year = dateObject.getFullYear();
+    const month = dateObject.getMonth() + 1;
+    const day = dateObject.getDate();
+    const hours = dateObject.getHours();
+    const minutes = dateObject.getMinutes();
+    const seconds = dateObject.getSeconds();
+    return `${day}-${month}-${year} ${hours}h:${minutes}m`;
 }
 
 export function processDuration(unixDateString) {

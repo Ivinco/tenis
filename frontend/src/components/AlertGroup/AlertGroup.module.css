@@ -8,16 +8,16 @@
 .groupBody {
     width: 99%;
     height: 99%;
-    margin: auto;
+    margin: 0 auto 6px;
     display: flex;
     border: #8a8a8a solid 3px;
     border-radius: 10px;
-    background-color: #aaf5d8;
     cursor: pointer;
 }
 
 .groupBody_small {
     border: #8a8a8a solid 1px;
+    margin: 0 auto 2px;
 }
 
 .projectName {
@@ -61,7 +61,7 @@
     align-items: center;
     justify-content: center;
     margin: auto 2px auto 0;
-    font-size: 0.8rem;
+    font-size: 1.1rem;
     border-left: slategrey solid 1px;
     border-right: slategrey solid 1px;
 }
@@ -124,7 +124,7 @@
     justify-content: center;
     margin: auto 0;
     padding: 0 4px;
-    font-size: 0.8rem;
+    font-size: 1rem;
     border-right: slategrey solid 1px;
 }
 .description {
@@ -150,18 +150,102 @@
     text-align: center;
     text-overflow: ellipsis;
     padding: 0 4px;
-    font-size: 0.7rem;
+    font-size: 0.9rem;
     border-left: slategrey solid 1px;
 }
 
 .alertBlock {
     display: flex;
     flex-direction: column;
-    opacity: 1;
-    transition: opacity 0.2s;
 }
 
 .alertBlockHidden {
     display: none;
-    opacity: 0;
 }
+
+.alertGroup {
+    border-color: #01a2d8;
+}
+
+@media screen and (max-width: 1650px) {
+
+    .groupBody {
+        border: #8a8a8a solid 2px;
+        border-radius: 7px;
+    }
+
+    .projectName {
+        height: 27px;
+        width: 27px;
+        font-size: 1.4rem;
+        margin: auto 6px;
+    }
+
+    .alertsNumber {
+        margin: auto 3px auto 0;
+        font-size: 1.2rem;
+        border-left: slategrey solid 2px;
+        border-right: slategrey solid 2px;
+    }
+
+    .groupResponsibleUser {
+        width: 27px;
+        height: 27px;
+        padding: 6px;
+    }
+
+    .groupAttribute {
+        padding: 0 6px;
+        font-size: 1rem;
+        border-right: slategrey solid 2px;
+    }
+
+    .description {
+        font-size: 0.8rem;
+        padding: 0 6px;
+        border-left: slategrey solid 2px;
+
+    }
+}
+
+@media screen and (max-width: 1150px) {
+
+    .groupBody {
+        border: #8a8a8a solid 1px;
+        border-radius: 5px;
+    }
+
+    .projectName {
+        height: 18px;
+        width: 18px;
+        font-size: 1rem;
+        margin: auto 4px;
+    }
+
+    .alertsNumber {
+        margin: auto 2px auto 0;
+        font-size: 0.8rem;
+        border-left: slategrey solid 1px;
+        border-right: slategrey solid 1px;
+    }
+
+    .groupResponsibleUser {
+        width: 18px;
+        height: 16px;
+        padding: 4px;
+    }
+
+    .groupAttribute {
+        padding: 0 4px;
+        font-size: 0.8rem;
+        border-right: slategrey solid 1px;
+    }
+
+    .description {
+        font-size: 0.6rem;
+        padding: 0 4px;
+        border-left: slategrey solid 1px;
+
+    }
+}
+

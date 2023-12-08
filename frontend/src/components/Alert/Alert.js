@@ -39,13 +39,19 @@ const Alert = ({alert}) => {
         style={{ backgroundColor: alertBackground, color: fontColor}}
         >
             <div className={`${isInspectMode ? styles.projectName : styles.projectName_small}`}>{alert.project[0].toUpperCase()}</div>
-            <div className={`${isInspectMode ? styles.host : styles.host_small}`}>{alert.host}</div>
+            <div className={`${isInspectMode ? styles.host : styles.host_small}`}>
+                <p className={styles.textFields}>{alert.host}</p>
+            </div>
             <div className={`${isInspectMode ? styles.responsibleUser : styles.responsibleUser_small}`}
                  style={{backgroundImage: `url(${alert.responsibleUser ? process.env.PUBLIC_URL + "/images/stop-sign.svg" : process.env.PUBLIC_URL + "/images/stop-sign.svg"})`}}
             />
-            <div className={`${isInspectMode ? styles.alertName : styles.alertName_small}`}> {alert.alertName}</div>
+            <div className={`${isInspectMode ? styles.alertName : styles.alertName_small}`}>
+                <p className={styles.textFields}>{alert.alertName}</p>
+            </div>
             <div className={`${isInspectMode ? styles.alertTime : styles.alertTime_small}`}>{processTimeStamp(alert.fired)}</div>
-            <div className={`${isInspectMode ? styles.message : styles.message_small}`}> {alert.msg}</div>
+            <div className={`${isInspectMode ? styles.message : styles.message_small}`}>
+                <p className={styles.textFields}>{alert.msg}</p>
+            </div>
             <div className={`${isInspectMode ? styles.refresh : styles.refresh_small}`}/>
             <div className={`${isInspectMode ? styles.info : styles.info_small}`}
             onClick={(e) => {
