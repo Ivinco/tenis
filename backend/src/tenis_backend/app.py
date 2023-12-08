@@ -128,7 +128,7 @@ def handle_message(data):
                     "project": "Ivinco",
                     "host": "crawl-farm-vm-worker12",
                     "fired": "1622686004",
-                    "alertName": "Host is unavailable",
+                    "alertName": "CPU k8s requests within crawl-farm-vm-worker",
                     "severity": "CRITICAL",
                     "msg": "kubelet on crawl-farm-vm-worker2.sgdctroy.net(192.168.5.219) got more than 100 errors per 5min",
                     "responsibleUser": "",
@@ -141,9 +141,77 @@ def handle_message(data):
                     }
                 },
                 {
-                    "id": "u0ToONntLn2m4NA3",
+                    "id": "u0ToONntLn2m4nA2",
+                    "project": "Ivinco",
+                    "host": "crawl-farm-vm-worker12",
+                    "fired": "1622686004",
+                    "alertName": "Sphinx maxed out",
+                    "severity": "WARNING",
+                    "msg": "2 maxed out events for the last 1 hour (all nodes counted)",
+                    "responsibleUser": "",
+                    "comment": "",
+                    "isScheduled": "false",
+                    "customFields": {
+                        "FixInstructions": "https://wiki.ivinco.com/prj/intranet#mnu",
+                        "labels": "label 3, label 1, label 7, label 7",
+                        "grafanaLink": "https://grafana.sgdctroy.net/d/vYIh9K9Mzss/redis?orgId=1&refresh=30s"
+                    }
+                },
+                {
+                    "id": "u0ToONntLn3m4NA2",
+                    "project": "Ivinco",
+                    "host": "crawl-farm-vm-worker12",
+                    "fired": "1622686004",
+                    "alertName": "Zabbix unavailable items",
+                    "severity": "INFO",
+                    "msg": "3 unsupported items: stats,230410 Disk:/dev/sdb:Read:Bytes/sec,230411 Disk:/dev/sdb:Write:Bytes/sec",
+                    "responsibleUser": "",
+                    "comment": "",
+                    "isScheduled": "false",
+                    "customFields": {
+                        "FixInstructions": "https://wiki.ivinco.com/prj/intranet#mnu",
+                        "labels": "label 3, label 1, label 7, label 7",
+                        "grafanaLink": "https://grafana.sgdctroy.net/d/vYIh9K9Mzss/redis?orgId=1&refresh=30s"
+                    }
+                },
+                {
+                    "id": "u0ToONnTLn2m4NA3",
                     "project": "Boardreader",
                     "host": "crawl-farm-vm-worker13",
+                    "fired": "1622686004",
+                    "alertName": "Host is unavailable",
+                    "severity": "WARNING",
+                    "msg": "kubelet on crawl-farm-vm-worker2.sgdctroy.net(192.168.5.219) got more than 100 errors per 5min",
+                    "responsibleUser": "",
+                    "comment": "",
+                    "isScheduled": "false",
+                    "customFields": {
+                        "FixInstructions": "https://wiki.ivinco.com/prj/intranet#mnu",
+                        "labels": "label 3, label 1, label 7, label 7",
+                        "Text field": "Some other text field"
+                    }
+                },
+                {
+                    "id": "u0ToONntLn2m7NA3",
+                    "project": "Boardreader",
+                    "host": "crawl-farm-vm-worker23",
+                    "fired": "1622686004",
+                    "alertName": "Host is unavailable",
+                    "severity": "WARNING",
+                    "msg": "kubelet on crawl-farm-vm-worker2.sgdctroy.net(192.168.5.219) got more than 100 errors per 5min",
+                    "responsibleUser": "",
+                    "comment": "",
+                    "isScheduled": "false",
+                    "customFields": {
+                        "FixInstructions": "https://wiki.ivinco.com/prj/intranet#mnu",
+                        "labels": "label 3, label 1, label 7, label 7",
+                        "Text field": "Some other text field"
+                    }
+                },
+                {
+                    "id": "u0ToJNntLn2m4NA3",
+                    "project": "Boardreader",
+                    "host": "crawl-farm-vm-worker12",
                     "fired": "1622686004",
                     "alertName": "Host is unavailable",
                     "severity": "WARNING",
@@ -162,7 +230,7 @@ def handle_message(data):
                     "project": "Boardreader",
                     "host": "crawl-farm-vm-worker14",
                     "fired": "1622686004",
-                    "alertName": "Host is unavailable",
+                    "alertName": "Free disk space",
                     "severity": "INFO",
                     "msg": "kubelet on crawl-farm-vm-worker2.sgdctroy.net(192.168.5.219) got more than 100 errors per 5min",
                     "responsibleUser": "",
@@ -175,7 +243,24 @@ def handle_message(data):
                     "project": "Ivinco",
                     "host": "crawl-farm-vm-worker15",
                     "fired": "1622686004",
-                    "alertName": "Host is unavailable",
+                    "alertName": "Free disk space",
+                    "severity": "EMERGENCY",
+                    "msg": "kubelet on crawl-farm-vm-worker2.sgdctroy.net(192.168.5.219) got more than 100 errors per 5min",
+                    "responsibleUser": "",
+                    "comment": "",
+                    "isScheduled": "false",
+                    "customFields": {
+                        "FixInstructions": "https://wiki.ivinco.com/prj/intranet#mnu",
+                        "labels": "label 3, label 1, label 7, label 7",
+                        "grafanaLink": "https://grafana.sgdctroy.net/d/vYIh9K9Mzss/redis?orgId=1&refresh=30s"
+                    }
+                },
+                {
+                    "id": "u0ToONntLn2z4Na5",
+                    "project": "Ivinco",
+                    "host": "crawl-farm-vm-worker25",
+                    "fired": "1622686004",
+                    "alertName": "Number of PQ exceptions for the last 3 hours - misc group",
                     "severity": "EMERGENCY",
                     "msg": "kubelet on crawl-farm-vm-worker2.sgdctroy.net(192.168.5.219) got more than 100 errors per 5min",
                     "responsibleUser": "",
@@ -192,7 +277,7 @@ def handle_message(data):
                     "project": "Ivinco",
                     "host": "crawl-farm-vm-worker16",
                     "fired": "1622686004",
-                    "alertName": "Host is unavailable",
+                    "alertName": "Number of API exceptions for the last 3 hours - unnamed group",
                     "severity": "CRITICAL",
                     "msg": "kubelet on crawl-farm-vm-worker2.sgdctroy.net(192.168.5.219) got more than 100 errors per 5min",
                     "responsibleUser": "",
@@ -209,7 +294,7 @@ def handle_message(data):
                     "project": "Ivinco",
                     "host": "crawl-farm-vm-worker17",
                     "fired": "1622686004",
-                    "alertName": "Host is unavailable",
+                    "alertName": "Sphinx crash snapshots",
                     "severity": "WARNING",
                     "msg": "kubelet on crawl-farm-vm-worker2.sgdctroy.net(192.168.5.219) got more than 100 errors per 5min",
                     "responsibleUser": "",
