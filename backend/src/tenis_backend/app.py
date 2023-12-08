@@ -210,7 +210,7 @@ def handle_message(data):
                 },
                 {
                     "id": "u0ToJNntLn2m4NA3",
-                    "project": "Boardreader",
+                    "project": "Ivinco",
                     "host": "crawl-farm-vm-worker12",
                     "fired": "1622686004",
                     "alertName": "Host is unavailable",
