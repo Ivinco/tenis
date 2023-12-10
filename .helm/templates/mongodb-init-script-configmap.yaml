@@ -31,4 +31,6 @@ data:
         }
       });
     }'
+
+    mongosh $INIT_DB --eval 'db.current.createIndex({ project: 1, host: 1, alertName: 1 }, { unique: true })'
     mongod --shutdown
