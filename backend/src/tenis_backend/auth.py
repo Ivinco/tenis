@@ -93,5 +93,5 @@ def token_required_ws(fn):
         except Exception:
             # On any auth error we disconnect
             disconnect()
-        return fn(*args, **kwargs)
+        return fn(current_user, *args, **kwargs)
     return decorator
