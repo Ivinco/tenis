@@ -225,7 +225,7 @@ def refresh(user):
 #
 @socketio.on('connect')
 @token_required_ws
-def user_connect(data):
+def user_connect(user, data):
     alerts = []
     try:
         col = app.db['current']
