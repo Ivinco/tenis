@@ -5,13 +5,31 @@ from time import sleep
 # JSON schema to validate input file against
 schema = {
     "definitions": {
+        "custom_field_definition": {
+            "properties": {
+                "fixInstructions": { "type": "string" },
+                "labels": { "type": "string" }, # XXX: change to array
+                "grafanaLink": { "type": "string" }
+            },
+            #"anyOf": [ "fixInstructions", "labels", "grafanaLink" ],
+            #"additionalProperties": False
+        },
         "alert_definition": {
             "properties": {
-                "name": { "type": "string" },
+                "project": { "type": "string" },
                 "host": { "type": "string" },
-                "triggered": { "type": "integer" }
+                "fired": { "type": "integer" },
+                "alertName": { "type": "string" },
+                "severity": { "type": "string" },
+                "msg": { "type": "string" },
+                "responsibleUser": { "type": "string" },
+                "comment": { "type": "string" },
+                "isScheduled": { "type": "boolean" },
+                "customFields": { "type": "object", "$ref": "#/definitions/custom_field_definition" }
             },
-            "required": [ "name", "host", "triggered" ],
+            "required": [
+                "project", "host", "fired", "alertName", "severity", "msg", "responsibleUser", "comment", "isScheduled"
+            ],
             "additionalProperties": False
         }
     },
