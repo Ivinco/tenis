@@ -229,7 +229,7 @@ def user_connect(data):
     alerts = []
     try:
         col = app.db['current']
-        for alert in collection.find({}):
+        for alert in col.find({}):
             alerts.append(alert)
     except pymongo.errors.PyMongoError as e:
         pass # can't do anything here if Mongo query fails
