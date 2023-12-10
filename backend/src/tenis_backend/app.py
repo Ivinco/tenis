@@ -34,16 +34,36 @@ app.config['JWT_REFRESH_TOKEN_EXPIRES'] = timedelta(days=30)
 # JSON schema to validate inbound JSON
 schema = {
     "definitions": {
+        "custom_field_definition": {
+            "properties": {
+                "fixInstructions": { "type": "string" },
+                "labels": { "type": "string" }, # XXX: change to array
+                "grafanaLink": { "type": "string" }
+            },
+            # XXX: fix the validation
+            #"anyOf": [ "fixInstructions", "labels", "grafanaLink" ],
+            #"additionalProperties": False
+        },
         "alert_definition": {
             "properties": {
-                "name": { "type": "string" },
+                "project": { "type": "string" },
                 "host": { "type": "string" },
-                "triggered": { "type": "integer" }
+                "fired": { "type": "integer" },
+                "alertName": { "type": "string" },
+                "severity": { "type": "string" },
+                "msg": { "type": "string" },
+                "responsibleUser": { "type": "string" },
+                "comment": { "type": "string" },
+                "isScheduled": { "type": "boolean" },
+                "customFields": { "type": "object", "$ref": "#/definitions/custom_field_definition" }
             },
-            "required": [ "name", "host", "triggered" ],
+            "required": [
+                "project", "host", "fired", "alertName", "severity", "msg", "responsibleUser", "comment", "isScheduled"
+            ],
             "additionalProperties": False
         }
     },
+
 
     "type": "object", # this is for the root element
     "oneOf" : [{"required": ["new"]}, {"required": ["resolved"]}, {"required": ["new", "resolved"]} ],
@@ -142,13 +162,41 @@ def inbound():
     except jsonschema.exceptions.ValidationError as e:
         raise BadRequest(e.message)
 
+
+    alerts_collection = app.db['current']
+    #XXX: history_collection = app.db['history']
     if 'new' in data:
-        # XXX: process new alerts - add to the database, send broadcast event to all connected clients
+        print(data['new'])
+        try:
+            alerts_collection.insert_many(data['new'])
+            # XXX: update history_collection here
+        except pymongo.errors.PyMongoError as e:
+            raise InternalServerError(e)
+        try:
+            # Send broadcast event to all connected clients
+            socketio.emit('update', data['new'], json=True);
+        except Exception:
+            # Don't blame the reporter if backend failed to update clients
+            pass
         return 'OK', 200
 
     if 'resolved' in data:
-        # XXX: process new alerts - add to the database, send broadcast event to all connected clients
+        try:
+            for alert in data['resolved']:
+                query = { "alertName": alert["alertName"], "host": alert["host"] }
+                alerts_collection.delete_one(query)
+                # XXX: update history_collection here
+        except pymongo.errors.PyMongoError as e:
+            raise InternalServerError(e)
+        try:
+            socketio.emit('resolve', data['resolved'], json=True);
+        except Exception:
+            # Again, Don't blame the reporter if backend failed to update clients
+            pass
         return 'OK', 200
+
+    # not reached
+    raise InternalServerError('Bug in JSON validation schema')
 
 
 # We are using the `refresh=True` options in jwt_required to only allow
@@ -177,235 +225,12 @@ def refresh(user):
 #
 @socketio.on('connect')
 @token_required_ws
-def handle_message(data):
-    json = """ [
-                {
-                    "id": "u0ToONntLn2m4NA2",
-                    "project": "Ivinco",
-                    "host": "crawl-farm-vm-worker12",
-                    "fired": "1622686004",
-                    "alertName": "CPU k8s requests within crawl-farm-vm-worker",
-                    "severity": "CRITICAL",
-                    "msg": "kubelet on crawl-farm-vm-worker2.sgdctroy.net(192.168.5.219) got more than 100 errors per 5min",
-                    "responsibleUser": "",
-                    "comment": "",
-                    "isScheduled": "false",
-                    "customFields": {
-                        "FixInstructions": "https://wiki.ivinco.com/prj/intranet#mnu",
-                        "labels": "label 3, label 1, label 7, label 7",
-                        "grafanaLink": "https://grafana.sgdctroy.net/d/vYIh9K9Mzss/redis?orgId=1&refresh=30s"
-                    }
-                },
-                {
-                    "id": "u0ToONntLn2m4nA2",
-                    "project": "Ivinco",
-                    "host": "crawl-farm-vm-worker12",
-                    "fired": "1622686004",
-                    "alertName": "Sphinx maxed out",
-                    "severity": "WARNING",
-                    "msg": "2 maxed out events for the last 1 hour (all nodes counted)",
-                    "responsibleUser": "",
-                    "comment": "",
-                    "isScheduled": "false",
-                    "customFields": {
-                        "FixInstructions": "https://wiki.ivinco.com/prj/intranet#mnu",
-                        "labels": "label 3, label 1, label 7, label 7",
-                        "grafanaLink": "https://grafana.sgdctroy.net/d/vYIh9K9Mzss/redis?orgId=1&refresh=30s"
-                    }
-                },
-                {
-                    "id": "u0ToONntLn3m4NA2",
-                    "project": "Ivinco",
-                    "host": "crawl-farm-vm-worker12",
-                    "fired": "1622686004",
-                    "alertName": "Zabbix unavailable items",
-                    "severity": "INFO",
-                    "msg": "3 unsupported items: stats,230410 Disk:/dev/sdb:Read:Bytes/sec,230411 Disk:/dev/sdb:Write:Bytes/sec",
-                    "responsibleUser": "",
-                    "comment": "",
-                    "isScheduled": "false",
-                    "customFields": {
-                        "FixInstructions": "https://wiki.ivinco.com/prj/intranet#mnu",
-                        "labels": "label 3, label 1, label 7, label 7",
-                        "grafanaLink": "https://grafana.sgdctroy.net/d/vYIh9K9Mzss/redis?orgId=1&refresh=30s"
-                    }
-                },
-                {
-                    "id": "u0ToONnTLn2m4NA3",
-                    "project": "Boardreader",
-                    "host": "crawl-farm-vm-worker13",
-                    "fired": "1622686004",
-                    "alertName": "Host is unavailable",
-                    "severity": "CRITICAL",
-                    "msg": "kubelet on crawl-farm-vm-worker2.sgdctroy.net(192.168.5.219) got more than 100 errors per 5min",
-                    "responsibleUser": "",
-                    "comment": "",
-                    "isScheduled": "false",
-                    "customFields": {
-                        "FixInstructions": "https://wiki.ivinco.com/prj/intranet#mnu",
-                        "labels": "label 3, label 1, label 7, label 7",
-                        "Text field": "Some other text field"
-                    }
-                },
-                {
-                    "id": "u0ToONntLn2m7NA3",
-                    "project": "Boardreader",
-                    "host": "crawl-farm-vm-worker23",
-                    "fired": "1622686004",
-                    "alertName": "Host is unavailable",
-                    "severity": "CRITICAL",
-                    "msg": "kubelet on crawl-farm-vm-worker2.sgdctroy.net(192.168.5.219) got more than 100 errors per 5min",
-                    "responsibleUser": "",
-                    "comment": "",
-                    "isScheduled": "false",
-                    "customFields": {
-                        "FixInstructions": "https://wiki.ivinco.com/prj/intranet#mnu",
-                        "labels": "label 3, label 1, label 7, label 7",
-                        "Text field": "Some other text field"
-                    }
-                },
-                {
-                    "id": "u0ToJNntLn2m4NA3",
-                    "project": "Ivinco",
-                    "host": "crawl-farm-vm-worker12",
-                    "fired": "1622686004",
-                    "alertName": "Host is unavailable",
-                    "severity": "WARNING",
-                    "msg": "kubelet on crawl-farm-vm-worker2.sgdctroy.net(192.168.5.219) got more than 100 errors per 5min",
-                    "responsibleUser": "",
-                    "comment": "",
-                    "isScheduled": "false",
-                    "customFields": {
-                        "FixInstructions": "https://wiki.ivinco.com/prj/intranet#mnu",
-                        "labels": "label 3, label 1, label 7, label 7",
-                        "Text field": "Some other text field"
-                    }
-                },
-                {
-                    "id": "u0ToONntLn2m4NA4",
-                    "project": "Boardreader",
-                    "host": "crawl-farm-vm-worker14",
-                    "fired": "1622686004",
-                    "alertName": "Free disk space",
-                    "severity": "WARNING",
-                    "msg": "kubelet on crawl-farm-vm-worker2.sgdctroy.net(192.168.5.219) got more than 100 errors per 5min",
-                    "responsibleUser": "",
-                    "comment": "",
-                    "isScheduled": "false",
-                    "customFields": {}
-                },
-                {
-                    "id": "u0ToONetLn2m4NA4",
-                    "project": "Boardreader",
-                    "host": "crawl-farm-vm-worker44",
-                    "fired": "1622686004",
-                    "alertName": "Free disk space",
-                    "severity": "WARNING",
-                    "msg": "kubelet on crawl-farm-vm-worker2.sgdctroy.net(192.168.5.219) got more than 100 errors per 5min",
-                    "responsibleUser": "",
-                    "comment": "",
-                    "isScheduled": "false",
-                    "customFields": {}
-                },
-                {
-                    "id": "u0ToONntLn2m4NA5",
-                    "project": "Ivinco",
-                    "host": "crawl-farm-vm-worker15",
-                    "fired": "1622686004",
-                    "alertName": "Free disk space",
-                    "severity": "WARNING",
-                    "msg": "kubelet on crawl-farm-vm-worker2.sgdctroy.net(192.168.5.219) got more than 100 errors per 5min",
-                    "responsibleUser": "",
-                    "comment": "",
-                    "isScheduled": "false",
-                    "customFields": {
-                        "FixInstructions": "https://wiki.ivinco.com/prj/intranet#mnu",
-                        "labels": "label 3, label 1, label 7, label 7",
-                        "grafanaLink": "https://grafana.sgdctroy.net/d/vYIh9K9Mzss/redis?orgId=1&refresh=30s"
-                    }
-                },
-                {
-                    "id": "u2ToONntLn2m4NA5",
-                    "project": "Ivinco",
-                    "host": "crawl-farm-vm-worker55",
-                    "fired": "1622686004",
-                    "alertName": "Free disk space",
-                    "severity": "WARNING",
-                    "msg": "kubelet on crawl-farm-vm-worker2.sgdctroy.net(192.168.5.219) got more than 100 errors per 5min",
-                    "responsibleUser": "",
-                    "comment": "",
-                    "isScheduled": "false",
-                    "customFields": {
-                        "FixInstructions": "https://wiki.ivinco.com/prj/intranet#mnu",
-                        "labels": "label 3, label 1, label 7, label 7",
-                        "grafanaLink": "https://grafana.sgdctroy.net/d/vYIh9K9Mzss/redis?orgId=1&refresh=30s"
-                    }
-                },
-                {
-                    "id": "u0ToONntLn2z4Na5",
-                    "project": "Ivinco",
-                    "host": "crawl-farm-vm-worker25",
-                    "fired": "1622686004",
-                    "alertName": "Number of PQ exceptions for the last 3 hours - misc group",
-                    "severity": "EMERGENCY",
-                    "msg": "kubelet on crawl-farm-vm-worker2.sgdctroy.net(192.168.5.219) got more than 100 errors per 5min",
-                    "responsibleUser": "",
-                    "comment": "",
-                    "isScheduled": "false",
-                    "customFields": {
-                        "FixInstructions": "https://wiki.ivinco.com/prj/intranet#mnu",
-                        "labels": "label 3, label 1, label 7, label 7",
-                        "grafanaLink": "https://grafana.sgdctroy.net/d/vYIh9K9Mzss/redis?orgId=1&refresh=30s"
-                    }
-                },
-                {
-                    "id": "u0ToONntLn2m4NA6",
-                    "project": "Ivinco",
-                    "host": "crawl-farm-vm-worker16",
-                    "fired": "1622686004",
-                    "alertName": "Number of API exceptions for the last 3 hours - unnamed group",
-                    "severity": "CRITICAL",
-                    "msg": "kubelet on crawl-farm-vm-worker2.sgdctroy.net(192.168.5.219) got more than 100 errors per 5min",
-                    "responsibleUser": "",
-                    "comment": "",
-                    "isScheduled": "false",
-                    "customFields": {
-                        "FixInstructions": "https://wiki.ivinco.com/prj/intranet#mnu",
-                        "labels": "label 3, label 1, label 7, label 7",
-                        "grafanaLink": "https://grafana.sgdctroy.net/d/vYIh9K9Mzss/redis?orgId=1&refresh=30s"
-                    }
-                },
-                {
-                    "id": "u0ToONntLn2m4NA6",
-                    "project": "Ivinco",
-                    "host": "crawl-farm-vm-worker66",
-                    "fired": "1622686004",
-                    "alertName": "K8s.cat services errors",
-                    "severity": "INFO",
-                    "msg": "kubelet on crawl-farm-vm-worker2.sgdctroy.net(192.168.5.219) got more than 100 errors per 5min",
-                    "responsibleUser": "",
-                    "comment": "",
-                    "isScheduled": "false",
-                    "customFields": {
-                        "FixInstructions": "https://wiki.ivinco.com/prj/intranet#mnu",
-                        "labels": "label 3, label 1, label 7, label 7",
-                        "grafanaLink": "https://grafana.sgdctroy.net/d/vYIh9K9Mzss/redis?orgId=1&refresh=30s"
-                    }
-                },
-                {
-                    "id": "u0ToONntLn2m4NA7",
-                    "project": "Ivinco",
-                    "host": "crawl-farm-vm-worker17",
-                    "fired": "1622686004",
-                    "alertName": "Sphinx crash snapshots",
-                    "severity": "WARNING",
-                    "msg": "kubelet on crawl-farm-vm-worker2.sgdctroy.net(192.168.5.219) got more than 100 errors per 5min",
-                    "responsibleUser": "",
-                    "comment": "",
-                    "isScheduled": "false",
-                    "customFields": {
-                        "FixInstructions": "https://wiki.ivinco.com/prj/intranet#mnu"
-                    }
-                }
-               ]"""
-    emit('init', json, json=True)
+def user_connect(data):
+    alerts = []
+    try:
+        col = app.db['current']
+        for alert in collection.find({}):
+            alerts.append(alert)
+    except pymongo.errors.PyMongoError as e:
+        pass # can't do anything here if Mongo query fails
+    emit('init', jsonify(alerts), json=True)
