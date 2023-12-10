@@ -1,6 +1,6 @@
 import os, atexit, jsonschema, jwt
 from datetime import datetime, timezone, timedelta
-from pymongo import MongoClient
+import pymongo
 from flask import Flask, request, jsonify, make_response
 from flask_cors import CORS
 from flask_socketio import SocketIO, emit, send
@@ -18,7 +18,7 @@ socketio = SocketIO(app, cors_allowed_origins="*")
 mongo_host = os.getenv('MONGO_HOST', 'localhost')  # Default to 'localhost' if not set
 mongo_dbname = os.getenv('MONGO_DBNAME', 'tenis')  # Default to 'database' if not set
 connection_string = f"mongodb://{mongo_host}/{mongo_dbname}"
-app.mongodb_client = MongoClient(connection_string)
+app.mongodb_client = pymongo.MongoClient(connection_string)
 app.db = app.mongodb_client[mongo_dbname]
 app.config['SECRET_KEY'] = os.getenv('SECRET', 'big-tenis')
 app.config['LISTEN_PORT'] = os.getenv('LISTEN_PORT', '8000')
