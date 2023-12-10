@@ -1,0 +1,6 @@
+{"alerts": [
+        {"name": "Disk space on penis01", "host": "penis01", "triggered": 1702218435 },
+        {"name": "Disk space on penis02", "host": "penis02", "triggered": 1702218440 },
+        {"name": "Disk space on penis03", "host": "penis03", "triggered": 1702218457 }
+    ]
+}
