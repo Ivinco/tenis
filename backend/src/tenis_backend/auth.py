@@ -86,6 +86,7 @@ def token_required_ws(fn):
     @wraps(fn)
     def decorator(*args, **kwargs):
         token = None
+        current_user = None
         if "Authorization" in request.headers:
             token = request.headers["Authorization"].split()[1]
         try:

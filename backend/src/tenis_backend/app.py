@@ -3,8 +3,9 @@ from datetime import datetime, timezone, timedelta
 import pymongo
 from flask import Flask, request, jsonify, make_response
 from flask_cors import CORS
-from flask_socketio import SocketIO, emit, send
+from flask_socketio import SocketIO, emit, send, disconnect
 from werkzeug.exceptions import Unauthorized, BadRequest, InternalServerError
+import json
 from .auth import create_token, token_required, token_required_ws
 from .user import User
 
@@ -87,6 +88,10 @@ def cleanup_on_shutdown():
     app.mongodb_client.close()
 atexit.register(cleanup_on_shutdown)
 
+
+def parse_json(data):
+    """ Parse Mongo's OIDs """
+    return json.dumps(data, default=str)
 
 #
 # API handles
@@ -225,12 +230,12 @@ def refresh(user):
 #
 @socketio.on('connect')
 @token_required_ws
-def user_connect(user, data):
+def on_connect(user = None, data = None):
     alerts = []
     try:
         col = app.db['current']
         for alert in col.find({}):
             alerts.append(alert)
     except pymongo.errors.PyMongoError as e:
-        pass # can't do anything here if Mongo query fails
-    emit('init', jsonify(alerts), json=True)
+        disconnect() # can't do anything here if Mongo query fails
+    emit('init', parse_json(alerts), json=True)
