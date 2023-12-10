@@ -1,6 +1,4 @@
-import os
-import jwt
-import atexit
+import os, atexit, jsonschema, jwt
 from datetime import datetime, timezone, timedelta
 from pymongo import MongoClient
 from flask import Flask, request, jsonify, make_response
@@ -25,12 +23,44 @@ app.db = app.mongodb_client[mongo_dbname]
 app.config['SECRET_KEY'] = os.getenv('SECRET', 'big-tenis')
 app.config['LISTEN_PORT'] = os.getenv('LISTEN_PORT', '8000')
 app.config['LISTEN_HOST'] = os.getenv('LISTEN_HOST', '0.0.0.0')
+app.config['API_TOKEN'] = os.getenv('API_TOKEN', 'asdfg')
 #
 # This can be useful for testing
 #app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(minutes=1)
 #app.config['JWT_REFRESH_TOKEN_EXPIRES'] = timedelta(minutes=5)
 app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=1)
 app.config['JWT_REFRESH_TOKEN_EXPIRES'] = timedelta(days=30)
+
+# JSON schema to validate inbound JSON
+schema = {
+    "definitions": {
+        "alert_definition": {
+            "properties": {
+                "name": { "type": "string" },
+                "host": { "type": "string" },
+                "triggered": { "type": "integer" }
+            },
+            "required": [ "name", "host", "triggered" ],
+            "additionalProperties": False
+        }
+    },
+
+    "type": "object", # this is for the root element
+    "oneOf" : [{"required": ["new"]}, {"required": ["resolved"]}, {"required": ["new", "resolved"]} ],
+    "properties": {
+        "new": {
+            "type": "array",
+            "maxItems": 10000,
+            "items": { "$ref": "#/definitions/alert_definition" }
+        },
+        "resolved": {
+            "type": "array",
+            "maxItems": 10000,
+            "items": { "$ref": "#/definitions/alert_definition" }
+        },
+    },
+    "additionalProperties": False
+}
 
 def cleanup_on_shutdown():
     """Properly close MongoDB connection on shutdown"""
@@ -93,6 +123,32 @@ def login():
         return resp, 200
     except Exception as e:
         raise InternalServerError("Failed to create JWT token")
+
+
+@app.route('/in', methods=['POST'])
+def inbound():
+    """ Inbound API calls to inject alerts and updates """
+    # This is separate from the frontend auth - just standard API token check
+    try:
+        token = request.headers['X-Tenis-Token']
+    except Exception:
+        raise Unauthorized("Missing API token")
+    if token != app.config['API_TOKEN']:
+        raise Unauthorized("Invalid API token")
+
+    try:
+        data = request.json
+        jsonschema.validate(instance=data, schema=schema)
+    except jsonschema.exceptions.ValidationError as e:
+        raise BadRequest(e.message)
+
+    if 'new' in data:
+        # XXX: process new alerts - add to the database, send broadcast event to all connected clients
+        return 'OK', 200
+
+    if 'resolved' in data:
+        # XXX: process new alerts - add to the database, send broadcast event to all connected clients
+        return 'OK', 200
 
 
 # We are using the `refresh=True` options in jwt_required to only allow
