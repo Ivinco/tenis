@@ -68,7 +68,7 @@ export const alertsToGroup = (alertsGroup) => {
     const groupedAlertIds = new Set()
     alertsGroup.forEach(group => {
         group.alerts.forEach(alert => {
-            groupedAlertIds.add(alert.id)
+            groupedAlertIds.add(alert._id)
         })
     })
     return groupedAlertIds

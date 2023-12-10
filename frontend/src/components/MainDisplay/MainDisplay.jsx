@@ -65,68 +65,13 @@ export default function MainDisplay() {
         const hostnameGroups = hostNameGroups(groupsByHost)
         hostnameGroups.forEach(group => alertGroups.push(group))
 
-        // groupsByHost.forEach( group => {
-        //     //Calculate severity level. Defined by the highest level in group
-        //     let severityValue = 0
-        //     let severity = ""
-        //     group.forEach(alert => {
-        //         let level = 0
-        //         switch (alert.severity){
-        //             case "EMERGENCY":
-        //                  level = 3
-        //                 break
-        //             case "CRITICAL":
-        //                 level = 2
-        //                 break
-        //             case "WARNING":
-        //                 level = 1
-        //                 break
-        //             default:
-        //                 level = 0
-        //         }
-        //         if (level > severityValue){
-        //             severityValue = level
-        //         }
-        //     })
-        //     switch (severityValue) {
-        //         case 3:
-        //             severity = "EMERGENCY"
-        //             break
-        //         case 2:
-        //             severity = "CRITICAL"
-        //             break
-        //         case 1:
-        //             severity = 'WARNING'
-        //             break
-        //         default:
-        //             severity = "INFO"
-        //     }
-        //     //Make group object by hostname factor
-        //     const hostGroup = {
-        //         id: group[0].host,
-        //         project: group[0].project,
-        //         groupFactor: `Host: ${group[0].host}`,
-        //         alerts: group,
-        //         severity: severity
-        //     }
-        //     //Push group to common groups array
-        //     alertGroups.push(hostGroup)
-        // })
-
-        //Remove grouped alerts from ungrouped array
-        // const groupedAlertIds = new Set();
-        // alertGroups.forEach(group => {
-        //     group.alerts.forEach(alert => {
-        //         groupedAlertIds.add(alert.id);
-        //     });
-        // });
         const hostnameAlerts = alertsToGroup(alertGroups)
-        ungroupedAlerts = alertsToDisplay.filter(alert => !hostnameAlerts.has(alert.id));
+        ungroupedAlerts = alertsToDisplay.filter(alert => !hostnameAlerts.has(alert._id));
         const groupsByAlertName = groupByField(ungroupedAlerts, 'alertName')
         const alertnameGroups = alertNameGroups(groupsByAlertName)
         alertnameGroups.forEach(group => alertGroups.push(group))
         const alertnameAlerts = alertsToGroup(alertGroups)
-        ungroupedAlerts = ungroupedAlerts.filter(alert => !alertnameAlerts.has(alert.id))
+        ungroupedAlerts = ungroupedAlerts.filter(alert => !alertnameAlerts.has(alert._id))
     }
 
 
