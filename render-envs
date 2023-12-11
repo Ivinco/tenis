@@ -1,0 +1,3 @@
+export WERF_SET_MONGO_IMAGE=werf.image.mongodb=qwe
+export WERF_SET_WERF_ENV=werf.env=dev
+export WERF_SET_MONGODB_ENV_INIT_PASSWORD=mongodb.env.INIT_PASSWORD.dev="qwe"

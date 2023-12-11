@@ -24,9 +24,9 @@ data:
         password: "$INIT_PASSWORD",
         active: true,
         commentReplaceRules: {
-        {{- $length := len .Values.jira -}}
-        {{- range $index, $element := .Values.jira }}
-          {{ $element.prefix | quote }}: {{ $element.site | quote }}{{ if ne (add1 $index) $length }},{{ end }}
+        {{- $length := len .Values.usersCommentReplaceRules -}}
+        {{- range $index, $element := .Values.usersCommentReplaceRules }}
+          {{ $element.prefix | quote }}: {{ printf "%s$1" $element.site | quote }}{{ if ne (add1 $index) $length }},{{ end }}
         {{- end }}
         }
       });
