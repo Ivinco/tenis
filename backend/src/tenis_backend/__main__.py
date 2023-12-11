@@ -1,6 +1,7 @@
 from os import getenv
-from .app import app
+from .app import app, socketio
 
-port = getenv('LISTEN_PORT', '8000')
+port = app.config['LISTEN_PORT']
+host = app.config['LISTEN_HOST']
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=int(port))
+    socketio.run(app, host=host, port=int(port), allow_unsafe_werkzeug=True)

@@ -4,7 +4,9 @@ import {BACKEND_SERVER} from "../utils/vars"
 class SocketApiService {
     static socket = null;
     static createConnection(token) {
-        this.socket = io(`${BACKEND_SERVER}/alerts`,{
+        // This is test endpoint for web socket server hosted on local host
+        // this.socket = io ("localhost:8080")
+        this.socket = io(`${BACKEND_SERVER}`,{
             extraHeaders:{
                 'Authorization': `Bearer ${token}`
             }

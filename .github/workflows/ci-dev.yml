@@ -2,7 +2,7 @@ name: Manual deploy to main dev and auto deploy when PR to dev is closed
 
 env:
   WERF_SECRET_KEY: ${{ secrets.WERF_SECRET_KEY }}
-  WERF_REPO: registry.ivinco.com/tenis
+  WERF_REPO: docker-registry.ivinco.com/tenis
 
 on:
   pull_request:
@@ -24,7 +24,7 @@ jobs:
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
         with:
-          registry: registry.ivinco.com
+          registry: docker-registry.ivinco.com
           username: ${{ secrets.REGISTRY_SECRET_USER }}
           password: ${{ secrets.REGISTRY_SECRET_PASSWORD }}
 
@@ -47,7 +47,7 @@ jobs:
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
         with:
-          registry: registry.ivinco.com
+          registry: docker-registry.ivinco.com
           username: ${{ secrets.REGISTRY_SECRET_USER }}
           password: ${{ secrets.REGISTRY_SECRET_PASSWORD }}
 
@@ -75,7 +75,7 @@ jobs:
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
         with:
-          registry: registry.ivinco.com
+          registry: docker-registry.ivinco.com
           username: ${{ secrets.REGISTRY_SECRET_USER }}
           password: ${{ secrets.REGISTRY_SECRET_PASSWORD }}
 

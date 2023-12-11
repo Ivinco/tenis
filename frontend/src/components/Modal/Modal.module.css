@@ -16,7 +16,8 @@
     position: relative;
     margin: 52px auto auto auto;
     width: 848px;
-    height: 530px;
+    max-width: 70%;
+    min-height: 530px;
     max-height: 90vh;
     border: 1px solid #C8D8C5;
     background-color: white;

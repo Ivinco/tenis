@@ -1,0 +1,36 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Chart.Name }}-mongodb-init
+  labels:
+    app: {{ .Chart.Name }}-mongodb
+data:
+  init-script.sh: |-
+    mongod --fork --logpath /var/log/mongod.log --bind_ip_all
+    set -e
+    until mongosh --eval "print(\"Connection established, mongodb should be up\")"; do
+      echo waiting for mongo
+      sleep 2
+    done
+
+    mongosh $INIT_DB --eval 'if (db.getCollectionNames().includes("users") === false) {
+      db.createCollection("users", { capped: true, size: 5242880, max: 5000 });
+    }'
+
+    mongosh $INIT_DB --eval 'if (db.users.findOne({ name: "$INIT_USER_NAME" }) === null) {
+      db.users.insertOne({
+        name: "$INIT_USER_NAME",
+        email: "$INIT_USER_EMAIL",
+        password: "$INIT_PASSWORD",
+        active: true,
+        commentReplaceRules: {
+        {{- $length := len .Values.jira -}}
+        {{- range $index, $element := .Values.jira }}
+          {{ $element.prefix | quote }}: {{ $element.site | quote }}{{ if ne (add1 $index) $length }},{{ end }}
+        {{- end }}
+        }
+      });
+    }'
+
+    mongosh $INIT_DB --eval 'db.current.createIndex({ project: 1, host: 1, alertName: 1 }, { unique: true })'
+    mongod --shutdown

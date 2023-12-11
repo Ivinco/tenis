@@ -7,13 +7,12 @@ import {
     openWebSocket,
     removeAlerts,
     resetAlerts,
-    setAlerts
+    setAlerts, updateAlerts
 } from "../store/reducers/webSocketReducer";
 
 
 export const useConnectSocket = () => {
     const dispatch = useDispatch()
-    const alerts = useSelector(state => state.webSocket.alerts)
     const token = localStorage.getItem('token');
     const connectSocket = (token) => {
         SocketApiService.createConnection(token)
@@ -29,13 +28,13 @@ export const useConnectSocket = () => {
             dispatch(resetAlerts())
         })
 
-        SocketApiService.socket.on ('alerts', (data) => {
+        SocketApiService.socket.on ('init', (data) => {
             dispatch(setAlerts(JSON.parse(data)))
         })
-        SocketApiService.socket.on ('new alerts', (data) => {
-            dispatch(addAlerts(JSON.parse(data)))
+        SocketApiService.socket.on ('update', (data) => {
+            dispatch(updateAlerts(JSON.parse(data)))
         })
-        SocketApiService.socket.on('resolved alerts', (data) => {
+        SocketApiService.socket.on('resolve', (data) => {
             dispatch(removeAlerts(JSON.parse(data)))
         })
     }
@@ -50,6 +49,4 @@ export const useConnectSocket = () => {
         }
 
     }, [token]);
-
-    return alerts
 }

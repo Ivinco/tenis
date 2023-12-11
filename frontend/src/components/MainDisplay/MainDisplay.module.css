@@ -4,3 +4,12 @@
     width: 100%;
     overflow-y: scroll;
 }
+
+.groupWrapper {
+    display: flex;
+    width: 100%;
+    margin: 0 auto;
+}
+.groupWrapper_small {
+    margin: 0 auto 4px;
+}

@@ -19,21 +19,12 @@ spec:
       terminationGracePeriodSeconds: 10
       initContainers:
       - name: mongo-init
-        image: mongo:7.0-rc
-        command:
-        - bash
-        - "-c"
-        - |
-          mongod --fork --logpath /var/log/mongod.log --bind_ip_all
-          set -e
-          until mongosh --eval "print(\"Connection established, mongodb should be up\")"; do
-            echo waiting for mongo
-            sleep 2
-          done
-          mongosh $INIT_DB --eval 'if (db.getCollectionNames().includes("users") === false) {db.createCollection("users", { capped: true, size: 5242880, max: 5000 });}'
-          mongosh $INIT_DB --eval 'if (db.users.findOne({ name: "$INIT_USER_NAME" }) === null) {db.users.insertOne({ name: "$INIT_USER_NAME", email: "$INIT_USER_EMAIL", password: "$INIT_PASSWORD", active: true });}'
-          mongod --shutdown
+        image: {{ .Values.werf.image.mongodb }}
+        command: ["/bin/sh", "/tmp/init-script.sh"]
         volumeMounts:
+        - name: {{ .Chart.Name }}-mongodb-init
+          mountPath: /tmp/init-script.sh
+          subPath: init-script.sh
         - name: mongo-persistent-storage
           mountPath: /data/db
         env:
@@ -47,7 +38,7 @@ spec:
           value: {{ pluck .Values.werf.env .Values.mongodb.env.INIT_PASSWORD | first | default .Values.mongodb.env.INIT_PASSWORD._default }}
       containers:
       - name: mongo
-        image: mongo:7.0-rc
+        image: {{ .Values.werf.image.mongodb }}
         command:
         - mongod
         - "--bind_ip_all"
@@ -58,6 +49,11 @@ spec:
           mountPath: /data/db
         resources:
           {{- toYaml .Values.mongodb.resources | nindent 10 }}
+      volumes:
+      - name: {{ .Chart.Name }}-mongodb-init
+        configMap:
+          name: {{ .Chart.Name }}-mongodb-init
+          defaultMode: 0777
   volumeClaimTemplates:
   - metadata:
       name: mongo-persistent-storage
