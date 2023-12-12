@@ -67,7 +67,9 @@ export default function MainDisplay() {
 
         const hostnameAlerts = alertsToGroup(alertGroups)
         ungroupedAlerts = alertsToDisplay.filter(alert => !hostnameAlerts.has(alert._id));
+        //Here we are grouping alerts by Alert Name
         const groupsByAlertName = groupByField(ungroupedAlerts, 'alertName')
+        //Process alerts grouped by Alert Name
         const alertnameGroups = alertNameGroups(groupsByAlertName)
         alertnameGroups.forEach(group => alertGroups.push(group))
         const alertnameAlerts = alertsToGroup(alertGroups)
