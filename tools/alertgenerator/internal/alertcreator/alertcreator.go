@@ -1,8 +1,8 @@
 package alertcreator
 
 import (
-	"alertgenerator/internal/configs"
 	"fmt"
+	"github.com/Ivinco/tenis.git/internal/configs"
 	"math/rand"
 	"time"
 )
