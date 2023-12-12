@@ -1,8 +1,8 @@
 package filewriter
 
 import (
-	"alertgenerator/internal/alertcreator"
 	"encoding/json"
+	"github.com/Ivinco/tenis.git/internal/alertcreator"
 	"os"
 )
 

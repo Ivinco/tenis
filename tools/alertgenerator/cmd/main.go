@@ -1,11 +1,11 @@
 package main
 
 import (
-	"alertgenerator/internal/alertcreator"
-	"alertgenerator/internal/configs"
-	"alertgenerator/internal/filewriter"
 	"encoding/json"
 	"fmt"
+	"github.com/Ivinco/tenis.git/internal/alertcreator"
+	"github.com/Ivinco/tenis.git/internal/configs"
+	"github.com/Ivinco/tenis.git/internal/filewriter"
 	"log"
 )
 
