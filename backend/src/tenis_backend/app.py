@@ -36,14 +36,7 @@ app.config['JWT_REFRESH_TOKEN_EXPIRES'] = timedelta(days=30)
 schema = {
     "definitions": {
         "custom_field_definition": {
-            "properties": {
-                "fixInstructions": { "type": "string" },
-                "labels": { "type": "string" }, # XXX: change to array
-                "grafanaLink": { "type": "string" }
-            },
-            # XXX: fix the validation
-            #"anyOf": [ "fixInstructions", "labels", "grafanaLink" ],
-            #"additionalProperties": False
+            "additionalProperties": True,
         },
         "alert_definition": {
             "properties": {
@@ -58,8 +51,9 @@ schema = {
                 "isScheduled": { "type": "boolean" },
                 "customFields": { "type": "object", "$ref": "#/definitions/custom_field_definition" }
             },
-            "required": [
-                "project", "host", "fired", "alertName", "severity", "msg", "responsibleUser", "comment", "isScheduled"
+            "anyOf": [
+                {"required": [ "project", "host", "fired", "alertName", "severity", "msg", "responsibleUser", "comment", "isScheduled" ]},
+                {"required": [ "project", "host", "fired", "alertName", "severity", "msg", "responsibleUser", "comment", "isScheduled", "customFields" ]}
             ],
             "additionalProperties": False
         }
@@ -67,14 +61,14 @@ schema = {
 
 
     "type": "object", # this is for the root element
-    "oneOf" : [{"required": ["new"]}, {"required": ["resolved"]}, {"required": ["new", "resolved"]} ],
+    "oneOf": [ {"required": ["update"]}, {"required": ["resolve"]}, {"required": ["update", "resolve"]} ],
     "properties": {
-        "new": {
+        "update": {
             "type": "array",
             "maxItems": 10000,
             "items": { "$ref": "#/definitions/alert_definition" }
         },
-        "resolved": {
+        "resolve": {
             "type": "array",
             "maxItems": 10000,
             "items": { "$ref": "#/definitions/alert_definition" }
@@ -169,32 +163,31 @@ def inbound():
 
 
     alerts_collection = app.db['current']
-    #XXX: history_collection = app.db['history']
-    if 'new' in data:
-        print(data['new'])
+    #TODO: history_collection = app.db['history']
+    if 'update' in data:
         try:
-            alerts_collection.insert_many(data['new'])
-            # XXX: update history_collection here
+            alerts_collection.insert_many(data['update'])
+            # TODO: update history_collection here
         except pymongo.errors.PyMongoError as e:
             raise InternalServerError(e)
         try:
             # Send broadcast event to all connected clients
-            socketio.emit('update', data['new'], json=True);
+            socketio.emit('update', parse_json(data['update']));
         except Exception:
             # Don't blame the reporter if backend failed to update clients
             pass
         return 'OK', 200
 
-    if 'resolved' in data:
+    if 'resolve' in data:
         try:
-            for alert in data['resolved']:
+            for alert in data['resolve']:
                 query = { "alertName": alert["alertName"], "host": alert["host"] }
                 alerts_collection.delete_one(query)
-                # XXX: update history_collection here
+                # TODO: update history_collection here
         except pymongo.errors.PyMongoError as e:
             raise InternalServerError(e)
         try:
-            socketio.emit('resolve', data['resolved'], json=True);
+            socketio.emit('resolve', parse_json(data['resolve']));
         except Exception:
             # Again, Don't blame the reporter if backend failed to update clients
             pass
@@ -238,4 +231,4 @@ def on_connect(user = None, data = None):
             alerts.append(alert)
     except pymongo.errors.PyMongoError as e:
         disconnect() # can't do anything here if Mongo query fails
-    emit('init', parse_json(alerts), json=True)
+    emit('init', parse_json(alerts))
