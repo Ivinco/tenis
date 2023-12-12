@@ -34,7 +34,7 @@ schema = {
     "properties": {
         "alerts": {
             "type": "array",
-            "maxItems": 20,
+            "maxItems": 10000,
             "items": { "$ref": "#/definitions/alert_definition" }
         }
     },
