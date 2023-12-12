@@ -6,13 +6,7 @@ from time import sleep
 schema = {
     "definitions": {
         "custom_field_definition": {
-            "properties": {
-                "fixInstructions": { "type": "string" },
-                "labels": { "type": "string" }, # XXX: change to array
-                "grafanaLink": { "type": "string" }
-            },
-            #"anyOf": [ "fixInstructions", "labels", "grafanaLink" ],
-            #"additionalProperties": False
+            "additionalProperties": True
         },
         "alert_definition": {
             "properties": {
@@ -27,8 +21,9 @@ schema = {
                 "isScheduled": { "type": "boolean" },
                 "customFields": { "type": "object", "$ref": "#/definitions/custom_field_definition" }
             },
-            "required": [
-                "project", "host", "fired", "alertName", "severity", "msg", "responsibleUser", "comment", "isScheduled"
+            "anyOf": [
+                {"required": [ "project", "host", "fired", "alertName", "severity", "msg", "responsibleUser", "comment", "isScheduled" ]},
+                {"required": [ "project", "host", "fired", "alertName", "severity", "msg", "responsibleUser", "comment", "isScheduled", "customFields" ]}
             ],
             "additionalProperties": False
         }
@@ -144,16 +139,16 @@ def main():
                     resolved = old_alerts - new_alerts
     
                     if new:
-                        data = make_json(new, 'new')
+                        data = make_json(new, 'update')
                         print("Got new alerts: " + repr(data))
                         res = s.post(url, json=data)
-                        print(f"Sent the alerts to %s, got %d response" % (url, res.status_code))
+                        print(f"Sent the alerts to %s, got %d code, response: %s" % (url, res.status_code, res.text))
     
                     if resolved:
-                        data = make_json(resolved, 'resolved')
+                        data = make_json(resolved, 'resolve')
                         print("Revolved alert: " + repr(data))
                         res = s.post(url, json=data)
-                        print(f"Sent the resolved list to %s, got %d response" % (url, res.status_code))
+                        print(f"Sent the resolved list to %s, got %d code, response: %s" % (url, res.status_code, res.text))
 
             except jsonschema.exceptions.ValidationError as e:
                 print("JSON schema validation failed: %s" % (e.message))
