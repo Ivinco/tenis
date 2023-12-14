@@ -45,7 +45,7 @@ export default function MainDisplay() {
         rowHeight = 47
     }
 
-    if (foundAlerts.length > 0){
+    if (foundAlerts){
         alertList = [...foundAlerts]
     } else {
         alertList = [...rawAlerts]

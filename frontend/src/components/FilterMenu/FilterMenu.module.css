@@ -107,6 +107,26 @@ input[type="search"]::-webkit-search-cancel-button {
     .filterMenu {
         height: 57px;
     }
+    .menuItem {
+        min-width: 167px;
+        margin: auto 27px 0;
+    }
+    .searchField {
+        min-height: 33px;
+        width: 280px;
+        font-size: 1rem;
+        padding: 0 6px;
+
+    }
+    .searchButton {
+        height: 33px;
+        width: 33px;
+        border: none;
+    }
+    .resetSearchButton {
+        height: 20px;
+        width: 20px;
+    }
 }
 
 @media screen and (max-width: 1150px) {
@@ -115,5 +135,26 @@ input[type="search"]::-webkit-search-cancel-button {
     }
     .filterMenu {
         height: 30px;
+    }
+
+    .menuItem {
+        min-width: 111px;
+        margin: auto 18px 0;
+    }
+    .searchField {
+        min-height: 22px;
+        width: 186px;
+        font-size: 0.8rem;
+        padding: 0 4px;
+
+    }
+    .searchButton {
+        height: 22px;
+        width: 22px;
+        border: none;
+    }
+    .resetSearchButton {
+        height: 14px;
+        width: 14px;
     }
 }

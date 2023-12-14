@@ -28,7 +28,8 @@ const FilterMenu = () => {
     }
 
     const resetAction = () => {
-        dispatch(setFoundAlerts([]))
+        dispatch(setFoundAlerts(null))
+        setSearchPhrase('')
     }
     return (
         <>

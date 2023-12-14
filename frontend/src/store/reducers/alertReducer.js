@@ -14,7 +14,7 @@ alert: {
     customField: {}
     },
     alertsNumber: 0,
-    foundAlerts: []
+    foundAlerts: null
 }
 
 export const alertReducer = (state = defaultdAlert, action) => {

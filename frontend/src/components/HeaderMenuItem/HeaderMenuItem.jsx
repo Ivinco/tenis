@@ -24,7 +24,6 @@ function HeaderMenuItem({item}) {
     }
 
     return (
-        // <li key={key} >
         <>
             <button className={activeHeaderMenuItem === item.name ? `${styles.menuHeader} ${styles.menuHeader_active}`: styles.menuHeader} onClick={() => itemOnClickHandler(item.name)}>
                 {`${item.name}: ${activeHeaderMenuSubItem[item.name.toLowerCase()]}`}
@@ -40,7 +39,6 @@ function HeaderMenuItem({item}) {
             }
             </div>
         </>
-        // </li>
     );
 }
 
