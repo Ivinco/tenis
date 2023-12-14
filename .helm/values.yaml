@@ -64,4 +64,4 @@ usersCommentReplaceRules:
 - prefix: 'SG\d+'
   site: "https://socialgist.atlasian.net/browse/"
 - prefix: 'PRJ/\w+'
-  site: "https://wiki.ivinco.com/prj"
+  site: "https://wiki.ivinco.com/prj/"
