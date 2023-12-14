@@ -22,8 +22,6 @@ const FilterMenu = () => {
                 }
             }
         })
-        console.log(`Found ${foundAlerts.length} alerts`)
-        console.log(foundAlerts)
         dispatch(setFoundAlerts(foundAlerts))
     }
 
@@ -42,7 +40,6 @@ const FilterMenu = () => {
                                     onClick={e => {
                                         e.preventDefault()
                                         submitAction(searchPhrase)
-                                        console.log("Submitted!")
                                     }}
                             />
                             <input id="alertSearchField" type="search" className={styles.searchField}

@@ -32,7 +32,6 @@ const AlertsDetails = () => {
                 ))}
             </>
         )
-        console.log(alert.alert.comment)
     }
 
     const handleEnterKey = (e) => {
