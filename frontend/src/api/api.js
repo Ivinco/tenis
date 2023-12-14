@@ -3,7 +3,7 @@ import axios from "axios";
 
 const api = axios.create({
     withCredentials: true,
-    baseURL: BACKEND_SERVER
+    baseURL: `${BACKEND_SERVER}:${PORT}`
 })
 
 api.interceptors.request.use ((config) => {

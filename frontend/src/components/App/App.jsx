@@ -40,7 +40,7 @@ function App () {
             }
         }
         checkAuth()
-    }, []);
+    },[dispatch]);
 
   if(isLoading){
       return <LoadingWindow/>

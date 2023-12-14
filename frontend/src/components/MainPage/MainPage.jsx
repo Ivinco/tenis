@@ -30,7 +30,7 @@ function MainPage(){
         if (!isLoggedIn){
             dispatch(switchLoginModal())
         }
-    }, []);
+    }, [dispatch, isLoggedIn]);
 
     return (
         <div className={styles.page}>
