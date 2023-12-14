@@ -34,7 +34,7 @@ export const webSocketReducer = (state = defaultState, action) => {
             const newAlerts = [...state.alerts]
             action.payload.map((alert) => {
                 const index = newAlerts.findIndex((item) => item._id === alert._id)
-                if (index != -1) {
+                if (index !== -1) {
                     newAlerts[index] = alert
                 } else {
                     newAlerts.push(alert)

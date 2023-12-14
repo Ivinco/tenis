@@ -6,7 +6,6 @@ import {loginAction} from "../../store/reducers/authReducer";
 import {closeModal} from "../../store/reducers/modalReducer";
 import AuthService from "../../services/AuthService";
 import {switchErrorMessageModal} from "../../store/reducers/modalReducer";
-import {emailHashTool} from "../../utils/utils";
 import {sha256} from "js-sha256";
 
 

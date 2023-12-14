@@ -3,7 +3,7 @@ import styles from './HeaderMenuItem.module.css'
 import {useDispatch, useSelector} from "react-redux";
 import {switchActiveHeaderMenuItem} from "../../store/reducers/headerMenuReducer";
 
-function HeaderMenuItem({item}, key) {
+function HeaderMenuItem({item}) {
     const dispatch = useDispatch()
     const activeHeaderMenuItem = useSelector(state => state.switchHeaderMenuItem.activeHeaderMenuItem)
     const activeHeaderMenuSubItem = useSelector(state => state.setHeaderMenuItemValue)
@@ -24,7 +24,7 @@ function HeaderMenuItem({item}, key) {
     }
 
     return (
-        <li key={key} className={styles.menuItem}>
+        <>
             <button className={activeHeaderMenuItem === item.name ? `${styles.menuHeader} ${styles.menuHeader_active}`: styles.menuHeader} onClick={() => itemOnClickHandler(item.name)}>
                 {`${item.name}: ${activeHeaderMenuSubItem[item.name.toLowerCase()]}`}
             </button>
@@ -38,7 +38,7 @@ function HeaderMenuItem({item}, key) {
                 )
             }
             </div>
-        </li>
+        </>
     );
 }
 

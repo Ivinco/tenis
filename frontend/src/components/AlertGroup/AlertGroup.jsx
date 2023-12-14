@@ -10,7 +10,6 @@ const AlertGroup = ({group, alertHeight}) => {
         e.preventDefault()
         setIsAlertBlockOpened(!isAlertsBlockOpened)
     }
-    const alertBlockHeight = alertHeight*group.alerts.length
 
     let alertBackground
     let fontColor

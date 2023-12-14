@@ -1,8 +1,7 @@
 import {useEffect} from "react";
 import SocketApiService from "../services/SocketApiService";
-import {useDispatch, useSelector} from "react-redux";
+import {useDispatch} from "react-redux";
 import {
-    addAlerts,
     closeWebSocket,
     openWebSocket,
     removeAlerts,
