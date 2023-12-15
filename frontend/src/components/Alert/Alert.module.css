@@ -251,17 +251,18 @@
 }
 
 
-@media screen and (max-width: 1650px){
+@media screen and (max-width: 2150px){
     .alertBody {
         margin: 6px auto;
+        border: #8a8a8a solid 2px;
     }
 
     .projectName {
-        height: 27px;
-        width: 27px;
+        height: 21px;
+        width: 21px;
         font-size: 1.4rem;
         margin: auto 6px;
-        padding: 6px;
+        padding: 4px;
     }
 
     .host {

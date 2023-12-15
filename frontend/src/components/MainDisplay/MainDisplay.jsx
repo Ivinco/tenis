@@ -37,9 +37,9 @@ export default function MainDisplay() {
         };
     }, []);
 
-    if(windowWidth > 1650 && isInspectMode){
+    if(windowWidth > 2150 && isInspectMode){
         rowHeight = 95
-    } else if ((1150 < windowWidth && windowWidth <= 1650) && isInspectMode) {
+    } else if ((1150 < windowWidth && windowWidth <= 2150) && isInspectMode) {
         rowHeight = 60
     } else {
         rowHeight = 47
@@ -118,12 +118,13 @@ export default function MainDisplay() {
                         height={height}
                         itemCount={ungroupedAlerts.length}
                         itemSize={rowHeight}
-                        width={width}
+                        width={width*0.98}
                     >
                         {alertRow}
                     </List>
                 )}
             </AutoSizer>
+
                 </>
             :
             <div style={{textAlign: 'center', fontSize: '2rem', marginTop: '20px'}}>NO CONNECTION</div>
