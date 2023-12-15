@@ -3,13 +3,19 @@
     flex-direction: column;
     width: 100%;
     overflow-y: scroll;
+    padding-left: calc(1.5%);
+    scrollbar-width: none;
+}
+
+.mainDisplay::-webkit-scrollbar {
+    display: none;
 }
 
 .groupWrapper {
     display: flex;
-    width: 100%;
-    margin: 0 auto;
+    width: 98%;
+    margin: 0 auto 0 0;
 }
 .groupWrapper_small {
-    margin: 0 auto 4px;
+    margin: 0 auto 0 0;
 }

@@ -63,7 +63,7 @@
     color: #01A2D8;
 }
 
-@media screen and (max-width: 1650px) {
+@media screen and (max-width: 2150px) {
     .menuHeader {
         font-size: 1.13rem;
     }
