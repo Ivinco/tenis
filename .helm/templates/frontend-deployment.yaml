@@ -27,7 +27,7 @@ spec:
         - -e
         - /dev/stderr
         env:
-        - name: SERVER
+        - name: REACT_APP_SERVER
           value: https://api.{{ .Values.env_url }}
         ports:
         - name: http
