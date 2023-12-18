@@ -57,9 +57,9 @@ mongodb:
       _default: "sys@ivinco.com"
 
 usersCommentReplaceRules:
-- prefix: 'TT\\d+'
+- prefix: 'TT-\d+'
   site: "https://ivinco.atlasian.net/browse/"
-- prefix: 'BR\\d+'
+- prefix: 'BR-\d+'
   site: "https://ivinco.atlasian.net/browse/"
-- prefix: 'SG\\d+'
+- prefix: 'SG-\d+'
   site: "https://socialgist.atlasian.net/browse/"
