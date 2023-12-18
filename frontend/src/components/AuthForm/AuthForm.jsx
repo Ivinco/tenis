@@ -7,6 +7,7 @@ import {closeModal} from "../../store/reducers/modalReducer";
 import AuthService from "../../services/AuthService";
 import {switchErrorMessageModal} from "../../store/reducers/modalReducer";
 import {sha256} from "js-sha256";
+import {BACKEND_SERVER} from "../../utils/vars";
 
 
 const AuthForm = () => {
@@ -28,7 +29,6 @@ const AuthForm = () => {
                                     }
                     dispatch(loginAction(user))
                     dispatch(closeModal())
-                    console.log(response.data)
         }
         catch (e) {
             switch (e.request.status){
