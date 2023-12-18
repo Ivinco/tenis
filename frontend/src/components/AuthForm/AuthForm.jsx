@@ -7,6 +7,7 @@ import {closeModal} from "../../store/reducers/modalReducer";
 import AuthService from "../../services/AuthService";
 import {switchErrorMessageModal} from "../../store/reducers/modalReducer";
 import {sha256} from "js-sha256";
+import {BACKEND_SERVER} from "../../utils/vars";
 
 
 const AuthForm = () => {
@@ -14,6 +15,7 @@ const AuthForm = () => {
     const passwordValidator = useInput('', {isEmpty: true, minLength: 6, maxLength: 20})
     const dispatch = useDispatch()
 
+    console.log(`Env Var ${BACKEND_SERVER}`)
     const onLogin = async (email, password) => {
         try {
             const response = await AuthService.login(email, password)
