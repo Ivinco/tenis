@@ -33,6 +33,8 @@ const AuthForm = () => {
                     console.log(response.data)
         }
         catch (e) {
+            console.log("request error")
+            console.log(e)
             switch (e.request.status){
                 case 401:
                     dispatch(switchErrorMessageModal("Login failed"))
