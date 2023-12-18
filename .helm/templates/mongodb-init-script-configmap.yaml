@@ -13,15 +13,15 @@ data:
       sleep 2
     done
 
-    mongosh $INIT_DB --eval 'if (db.getCollectionNames().includes("users") === false) {
+    mongosh {{ pluck .Values.werf.env .Values.mongodb.env.INIT_DB | first | default .Values.mongodb.env.INIT_DB._default }} --eval 'if (db.getCollectionNames().includes("users") === false) {
       db.createCollection("users", { capped: true, size: 5242880, max: 5000 });
     }'
 
-    mongosh $INIT_DB --eval 'if (db.users.findOne({ name: "$INIT_USER_NAME" }) === null) {
+    mongosh {{ pluck .Values.werf.env .Values.mongodb.env.INIT_DB | first | default .Values.mongodb.env.INIT_DB._default }} --eval 'if (db.users.findOne({ name: "{{ pluck .Values.werf.env .Values.mongodb.env.INIT_USER_NAME | first | default .Values.mongodb.env.INIT_USER_NAME._default }}" }) === null) {
       db.users.insertOne({
-        name: "$INIT_USER_NAME",
-        email: "$INIT_USER_EMAIL",
-        password: "$INIT_PASSWORD",
+        name: "{{ pluck .Values.werf.env .Values.mongodb.env.INIT_USER_NAME | first | default .Values.mongodb.env.INIT_USER_NAME._default }}",
+        email: "{{ pluck .Values.werf.env .Values.mongodb.env.INIT_USER_EMAIL | first | default .Values.mongodb.env.INIT_USER_EMAIL._default }}",
+        password: "{{ pluck .Values.werf.env .Values.mongodb.env.INIT_PASSWORD | first | default .Values.mongodb.env.INIT_PASSWORD._default }}",
         active: true,
         commentReplaceRules: {
         {{- $length := len .Values.usersCommentReplaceRules -}}
