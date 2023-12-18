@@ -253,7 +253,7 @@
 
 @media screen and (max-width: 2150px){
     .alertBody {
-        margin: 6px auto;
+        margin: auto;
         border: #8a8a8a solid 2px;
     }
 
@@ -315,7 +315,7 @@
 
 @media screen and (max-width: 1150px){
     .alertBody {
-        margin: 4px auto;
+        margin: auto;
     }
 
     .projectName {

@@ -15,12 +15,9 @@ const AuthForm = () => {
     const passwordValidator = useInput('', {isEmpty: true, minLength: 6, maxLength: 20})
     const dispatch = useDispatch()
 
-    console.log(`Env Var ${BACKEND_SERVER}`)
     const onLogin = async (email, password) => {
         try {
             const response = await AuthService.login(email, password)
-            console.log("Auth response")
-            console.log(response)
                     localStorage.setItem('token', response.data.access_token)
                     console.log(`https://gravatar.com/avatar/${sha256(response.data.user.email)}?s=150`)
                     const user = {
@@ -32,11 +29,8 @@ const AuthForm = () => {
                                     }
                     dispatch(loginAction(user))
                     dispatch(closeModal())
-                    console.log(response.data)
         }
         catch (e) {
-            console.log("request error")
-            console.log(e)
             switch (e.request.status){
                 case 401:
                     dispatch(switchErrorMessageModal("Login failed"))

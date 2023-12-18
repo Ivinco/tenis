@@ -8,16 +8,21 @@
 .groupBody {
     width: 99%;
     height: 99%;
-    margin: 0 auto 6px;
+    margin: 0 auto 3px;
     display: flex;
     border: #8a8a8a solid 3px;
     border-radius: 10px;
     cursor: pointer;
 }
 
+.groupBodyOpened {
+    margin: auto;
+    border-bottom: #8a8a8a solid 1px;
+}
+
 .groupBody_small {
     border: #8a8a8a solid 1px;
-    margin: 0 auto 2px;
+    margin: 0 auto;
 }
 
 .projectName {
@@ -157,6 +162,7 @@
 .alertBlock {
     display: flex;
     flex-direction: column;
+    margin-bottom: 15px;
 }
 
 .alertBlockHidden {
@@ -206,6 +212,15 @@
         border-left: slategrey solid 2px;
 
     }
+    .alertBlock {
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 10px;
+    }
+
+    .alertBlockHidden {
+        display: none;
+    }
 }
 
 @media screen and (max-width: 1150px) {
@@ -246,6 +261,15 @@
         padding: 0 4px;
         border-left: slategrey solid 1px;
 
+    }
+    .alertBlock {
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 7px;
+    }
+
+    .alertBlockHidden {
+        display: none;
     }
 }
 

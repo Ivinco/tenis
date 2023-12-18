@@ -33,7 +33,7 @@ const AlertGroup = ({group, alertHeight}) => {
 
     return (
         <div className={styles.groupSection} key={group.id}>
-        <div className={`${styles.groupBody} ${isInspectMode ? null : styles.groupBody_small} ${isAlertsBlockOpened ? '' : styles.alertGroup}`}
+        <div className={`${styles.groupBody} ${isInspectMode ? null : styles.groupBody_small} ${isAlertsBlockOpened ? '' : styles.groupBodyOpened}`}
                  style={{ backgroundColor: alertBackground, color: fontColor, height: `${alertHeight}px`}}>
             <div className={`${isInspectMode ? styles.projectName : styles.projectName_small}`} onClick={e => onAlertClickHandler(e)}>{group.project[0].toUpperCase()}</div>
             <div className={`${isInspectMode ? styles.alertsNumber : styles.alertsNumber_small}`} onClick={e => onAlertClickHandler(e)}>{group.alerts.length}</div>
