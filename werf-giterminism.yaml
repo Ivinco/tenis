@@ -1,0 +1,8 @@
+giterminismConfigVersion: 1
+config:
+  goTemplateRendering:
+    allowEnvVariables: ["/REACT_APP.*/"]
+  stapel:
+    mount:
+      allowFromPaths:
+      - ".git"

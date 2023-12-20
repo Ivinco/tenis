@@ -26,9 +26,6 @@ spec:
         - nginx
         - -e
         - /dev/stderr
-        env:
-        - name: REACT_APP_SERVER
-          value: https://api.{{ .Values.env_url }}
         ports:
         - name: http
           containerPort: 3000
