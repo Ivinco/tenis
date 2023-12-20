@@ -1,5 +1,5 @@
 import {ALERT_DETAILS} from "../actions/MODAL_ACTIONS";
-import {DETAILED_ALERT, SET_ALERTS_NUMBER} from "../actions/ALERT_ACTIONS";
+import {DETAILED_ALERT, SET_ALERTS_NUMBER, SET_FOUND_ALERTS} from "../actions/ALERT_ACTIONS";
 
 const defaultdAlert = {
 alert: {
@@ -13,7 +13,8 @@ alert: {
     responsibleUser: '',
     customField: {}
     },
-    alertsNumber: 0
+    alertsNumber: 0,
+    foundAlerts: null
 }
 
 export const alertReducer = (state = defaultdAlert, action) => {
@@ -22,6 +23,8 @@ export const alertReducer = (state = defaultdAlert, action) => {
             return{...state, alert: action.payload}
         case SET_ALERTS_NUMBER:
             return {...state, alertsNumber: action.payload}
+        case SET_FOUND_ALERTS:
+            return {...state, foundAlerts: action.payload}
         default:
             return state
     }
@@ -35,4 +38,9 @@ export const setDetailedAlert = (alert) => ({
 export const setAlertsNumber = (number) => ({
     type: SET_ALERTS_NUMBER,
     payload: number
+})
+
+export const setFoundAlerts = (alerts) => ({
+    type: SET_FOUND_ALERTS,
+    payload: alerts
 })

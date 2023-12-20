@@ -6,7 +6,6 @@ export function processTimeStamp (unixDateString) {
     const day = dateObject.getDate();
     const hours = dateObject.getHours();
     const minutes = dateObject.getMinutes();
-    const seconds = dateObject.getSeconds();
     return `${day}-${month}-${year} ${hours}h:${minutes}m`;
 }
 
@@ -24,7 +23,6 @@ export function processDuration(unixDateString) {
 }
 
 export function processAlertComment (word, commentReplaceRules) {
-    const links = []
     for (const [key, value] of Object.entries(commentReplaceRules)){
         const regex = new RegExp(key, "i")
         const match = word.match(regex)

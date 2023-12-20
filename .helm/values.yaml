@@ -56,10 +56,10 @@ mongodb:
     INIT_USER_EMAIL:
       _default: "sys@ivinco.com"
 
-jira:
-- prefix: "TT-"
-  site: "ivinco.atlasian.net"
-- prefix: "BR-"
-  site: "ivinco.atlasian.net"
-- prefix: "SG-"
-  site: "socialgist.atlasian.net"
+usersCommentReplaceRules:
+- prefix: 'TT-\d+'
+  site: "https://ivinco.atlasian.net/browse/"
+- prefix: 'BR-\d+'
+  site: "https://ivinco.atlasian.net/browse/"
+- prefix: 'SG-\d+'
+  site: "https://socialgist.atlasian.net/browse/"

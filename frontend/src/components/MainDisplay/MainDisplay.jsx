@@ -18,7 +18,9 @@ export default function MainDisplay() {
     const isInspectMode = useSelector(state => state.setHeaderMenuItemValue.inspectMode)
     const activeProject = useSelector(state => state.setHeaderMenuItemValue.project)
     const isGrouped = useSelector(state => state.setHeaderMenuItemValue.grouping)
+    const foundAlerts = useSelector(state => state.setAlertReducer.foundAlerts)
     const [windowWidth, setWindowWidth] = useState(window.innerWidth)
+    let alertList
     let alertsToDisplay
     let rowHeight
 
@@ -35,22 +37,28 @@ export default function MainDisplay() {
         };
     }, []);
 
-    if(windowWidth > 1650 && isInspectMode){
+    if(windowWidth > 2150 && isInspectMode){
         rowHeight = 95
-    } else if ((1150 < windowWidth && windowWidth <= 1650) && isInspectMode) {
+    } else if ((1150 < windowWidth && windowWidth <= 2150) && isInspectMode) {
         rowHeight = 60
     } else {
         rowHeight = 47
+    }
+
+    if (foundAlerts){
+        alertList = [...foundAlerts]
+    } else {
+        alertList = [...rawAlerts]
     }
 
 
     //Here we filter all alerts by project and display only related ones
     switch (activeProject){
         case "All":
-                alertsToDisplay = [...rawAlerts]
+                alertsToDisplay = alertList
             break
         default:
-            alertsToDisplay = rawAlerts.filter((alert) => alert.project === activeProject)
+            alertsToDisplay = alertList.filter((alert) => alert.project === activeProject)
     }
     //Define ungrouped alerts which will be displayed in virtual list
     let ungroupedAlerts = alertsToDisplay
@@ -67,7 +75,9 @@ export default function MainDisplay() {
 
         const hostnameAlerts = alertsToGroup(alertGroups)
         ungroupedAlerts = alertsToDisplay.filter(alert => !hostnameAlerts.has(alert._id));
+        //Here we are grouping alerts by Alert Name
         const groupsByAlertName = groupByField(ungroupedAlerts, 'alertName')
+        //Process alerts grouped by Alert Name
         const alertnameGroups = alertNameGroups(groupsByAlertName)
         alertnameGroups.forEach(group => alertGroups.push(group))
         const alertnameAlerts = alertsToGroup(alertGroups)
@@ -108,12 +118,13 @@ export default function MainDisplay() {
                         height={height}
                         itemCount={ungroupedAlerts.length}
                         itemSize={rowHeight}
-                        width={width}
+                        width={width*0.98}
                     >
                         {alertRow}
                     </List>
                 )}
             </AutoSizer>
+
                 </>
             :
             <div style={{textAlign: 'center', fontSize: '2rem', marginTop: '20px'}}>NO CONNECTION</div>

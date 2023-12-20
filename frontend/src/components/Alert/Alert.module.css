@@ -48,6 +48,7 @@
     align-items: center;
     margin: auto 5px;
     padding: 0 10px;
+    justify-content: center;
     text-align: center;
     font-size: 1.3rem;
     border-left: slategrey solid 3px;
@@ -61,6 +62,7 @@
     align-items: center;
     margin: auto 2px;
     padding: 0 4px;
+    justify-content: center;
     font-size: 0.9rem;
     border-left: slategrey solid 1px;
     border-right: slategrey solid 1px;
@@ -251,17 +253,18 @@
 }
 
 
-@media screen and (max-width: 1650px){
+@media screen and (max-width: 2150px){
     .alertBody {
-        margin: 6px auto;
+        margin: auto;
+        border: #8a8a8a solid 2px;
     }
 
     .projectName {
-        height: 27px;
-        width: 27px;
+        height: 21px;
+        width: 21px;
         font-size: 1.4rem;
         margin: auto 6px;
-        padding: 6px;
+        padding: 4px;
     }
 
     .host {
@@ -314,7 +317,7 @@
 
 @media screen and (max-width: 1150px){
     .alertBody {
-        margin: 4px auto;
+        margin: auto;
     }
 
     .projectName {

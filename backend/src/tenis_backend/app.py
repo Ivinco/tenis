@@ -1,14 +1,14 @@
-import os, atexit, jsonschema, jwt
+import os, atexit, jsonschema, jwt, threading
 from datetime import datetime, timezone, timedelta
 import pymongo
 from flask import Flask, request, jsonify, make_response
 from flask_cors import CORS
 from flask_socketio import SocketIO, emit, send, disconnect
-from werkzeug.exceptions import Unauthorized, BadRequest, InternalServerError
+from werkzeug.exceptions import HTTPException, Unauthorized, BadRequest, InternalServerError
 import json
 from .auth import create_token, token_required, token_required_ws
 from .user import User
-
+from .alert import load_alerts, lookup_alert
 
 # Global vars init
 app = Flask(__name__)
@@ -32,20 +32,19 @@ app.config['API_TOKEN'] = os.getenv('API_TOKEN', 'asdfg')
 app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=1)
 app.config['JWT_REFRESH_TOKEN_EXPIRES'] = timedelta(days=30)
 
+# Load alerts from the DB
+alerts_lock = threading.Lock()
+alerts = list()
+with alerts_lock:
+    alerts = load_alerts(app.db['current'])
+
 # JSON schema to validate inbound JSON
 schema = {
     "definitions": {
         "custom_field_definition": {
-            "properties": {
-                "fixInstructions": { "type": "string" },
-                "labels": { "type": "string" }, # XXX: change to array
-                "grafanaLink": { "type": "string" }
-            },
-            # XXX: fix the validation
-            #"anyOf": [ "fixInstructions", "labels", "grafanaLink" ],
-            #"additionalProperties": False
+            "additionalProperties": True,
         },
-        "alert_definition": {
+        "new_alert_definition": {
             "properties": {
                 "project": { "type": "string" },
                 "host": { "type": "string" },
@@ -58,27 +57,40 @@ schema = {
                 "isScheduled": { "type": "boolean" },
                 "customFields": { "type": "object", "$ref": "#/definitions/custom_field_definition" }
             },
-            "required": [
-                "project", "host", "fired", "alertName", "severity", "msg", "responsibleUser", "comment", "isScheduled"
+            "anyOf": [
+                {"required": [ "project", "host", "fired", "alertName", "severity", "msg", "responsibleUser", "comment", "isScheduled" ]},
+                {"required": [ "project", "host", "fired", "alertName", "severity", "msg", "responsibleUser", "comment", "isScheduled", "customFields" ]}
             ],
+            "additionalProperties": False
+        },
+        "resolved_alert_definition": {
+            "properties": {
+                "project": { "type": "string" },
+                "host": { "type": "string" },
+                "alertName": { "type": "string" },
+            },
+            "required": [ "project", "host", "alertName" ],
             "additionalProperties": False
         }
     },
 
 
     "type": "object", # this is for the root element
-    "oneOf" : [{"required": ["new"]}, {"required": ["resolved"]}, {"required": ["new", "resolved"]} ],
+    "oneOf": [ {"required": ["update"]}, {"required": ["resolve"]}, {"required": ["update", "resolve"]}, {"required": ["reload"]} ],
     "properties": {
-        "new": {
+        "update": {
             "type": "array",
             "maxItems": 10000,
-            "items": { "$ref": "#/definitions/alert_definition" }
+            "items": { "$ref": "#/definitions/new_alert_definition" }
         },
-        "resolved": {
+        "resolve": {
             "type": "array",
             "maxItems": 10000,
-            "items": { "$ref": "#/definitions/alert_definition" }
+            "items": { "$ref": "#/definitions/resolved_alert_definition" }
         },
+        "reload": {
+            "type": "boolean"
+        }
     },
     "additionalProperties": False
 }
@@ -96,6 +108,21 @@ def parse_json(data):
 #
 # API handles
 #
+@app.errorhandler(HTTPException)
+def handle_exception(e):
+    """Return JSON instead of HTML for HTTP errors"""
+    # start with the correct headers and status code from the error
+    response = e.get_response()
+    # replace the body with JSON
+    response.data = json.dumps({
+        "code": e.code,
+        "name": e.name,
+        "description": e.description,
+    })
+    response.content_type = "application/json"
+    return response
+
+
 @app.route('/')
 def index():
     return "Hello, world!\n", 200
@@ -153,6 +180,8 @@ def login():
 @app.route('/in', methods=['POST'])
 def inbound():
     """ Inbound API calls to inject alerts and updates """
+    global alerts
+
     # This is separate from the frontend auth - just standard API token check
     try:
         token = request.headers['X-Tenis-Token']
@@ -169,35 +198,70 @@ def inbound():
 
 
     alerts_collection = app.db['current']
-    #XXX: history_collection = app.db['history']
-    if 'new' in data:
-        print(data['new'])
-        try:
-            alerts_collection.insert_many(data['new'])
-            # XXX: update history_collection here
-        except pymongo.errors.PyMongoError as e:
-            raise InternalServerError(e)
+
+    # history_collection = app.db['history']
+    if 'update' in data:
+        with alerts_lock:
+            new_alerts = []
+            for a in data['update']:
+                    if lookup_alert(alerts, a): continue # we already have this alert in global alerts list
+                    new_alerts.append(a)
+
+            if len(new_alerts) == 0: # all submitted alerts are already in the system
+                return 'OK', 200
+
+            try:
+                res = alerts_collection.insert_many(new_alerts)
+                for i, _id in enumerate(res.inserted_ids):
+                    new_alerts[i]['_id'] = _id
+                # TODO: update history_collection here
+            except pymongo.errors.PyMongoError as e:
+                raise InternalServerError(e)
+
+            # If DB write was successful, update global alerts list
+            for a in new_alerts:
+                alerts.append(a)
+
         try:
             # Send broadcast event to all connected clients
-            socketio.emit('update', data['new'], json=True);
-        except Exception:
-            # Don't blame the reporter if backend failed to update clients
-            pass
+            socketio.emit('update', parse_json(new_alerts))
+        except Exception: pass # Don't blame the reporter if backend failed to update clients
         return 'OK', 200
 
-    if 'resolved' in data:
+    if 'resolve' in data:
+        resolved_alerts = []
+        resolved_ids = []
+        with alerts_lock:
+            for entry in data['resolve']:
+                a = lookup_alert(alerts, entry)
+                if a is None: continue # we don't have this alert in the global list, skip
+                resolved_alerts.append(a)
+                resolved_ids.append(a['_id'])
+            if len(resolved_alerts) == 0:
+                return 'OK', 200 # submitted alerts list does not match a single alert from the global list
+
+            try:
+                alerts_collection.delete_many({'_id': {'$in': resolved_ids}})
+                # TODO: update history_collection here
+            except pymongo.errors.PyMongoError as e:
+                raise InternalServerError(e)
+
+            # If DB write was successful, remove resolved alerts from the global list
+            for a in resolved_alerts:
+                alerts.remove(a)
+
         try:
-            for alert in data['resolved']:
-                query = { "alertName": alert["alertName"], "host": alert["host"] }
-                alerts_collection.delete_one(query)
-                # XXX: update history_collection here
-        except pymongo.errors.PyMongoError as e:
-            raise InternalServerError(e)
+            socketio.emit('resolve', parse_json(resolved_ids))
+        except Exception: pass # Don't blame the reporter if backend failed to update clients
+        return 'OK', 200
+
+    if 'reload' in data:
+        with alerts_lock:
+            alerts = load_alerts(app.db['current'])
+            # TODO: decided what to do with history_collection
         try:
-            socketio.emit('resolve', data['resolved'], json=True);
-        except Exception:
-            # Again, Don't blame the reporter if backend failed to update clients
-            pass
+            socketio.emit('init', parse_json(alerts))
+        except Exception: pass # don't blame the reporter if backend failed to update clients
         return 'OK', 200
 
     # not reached
@@ -230,12 +294,7 @@ def refresh(user):
 #
 @socketio.on('connect')
 @token_required_ws
-def on_connect(user = None, data = None):
-    alerts = []
-    try:
-        col = app.db['current']
-        for alert in col.find({}):
-            alerts.append(alert)
-    except pymongo.errors.PyMongoError as e:
-        disconnect() # can't do anything here if Mongo query fails
-    emit('init', parse_json(alerts), json=True)
+def on_connect(user, data = None):
+    global alerts
+    with alerts_lock:
+        emit('init', parse_json(alerts))

@@ -25,16 +25,15 @@ export const webSocketReducer = (state = defaultState, action) => {
         case ADD_ALERTS:
             return { ...state, alerts: [...state.alerts, ...action.payload] };
         case REMOVE_ALERTS:
-            const idsToRemove = action.payload.map((alert) => alert.id);
             return {
                 ...state,
-                alerts: state.alerts.filter((alert) => !idsToRemove.includes(alert.id)),
+                alerts: state.alerts.filter((alert) => !action.payload.includes(alert._id)),
             };
         case UPDATE_ALERTS:
             const newAlerts = [...state.alerts]
             action.payload.map((alert) => {
-                const index = newAlerts.findIndex((item) => item.id === alert.id)
-                if (index != -1) {
+                const index = newAlerts.findIndex((item) => item._id === alert._id)
+                if (index !== -1) {
                     newAlerts[index] = alert
                 } else {
                     newAlerts.push(alert)

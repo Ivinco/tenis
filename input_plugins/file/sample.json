@@ -11,7 +11,6 @@
             "isScheduled": false,
             "customFields": {
                 "fixInstructions": "https://wiki.ivinco.com/prj/intranet#mnu",
-                "labels": "label 3, label 1, label 7, label 7",
                 "grafanaLink": "https://grafana.sgdctroy.net/d/vYIh9K9Mzss/redis?orgId=1&refresh=30s"
             }
         },
@@ -27,7 +26,6 @@
             "isScheduled": false,
             "customFields": {
                 "fixInstructions": "https://wiki.ivinco.com/prj/intranet#mnu",
-                "labels": "label 3, label 1, label 7, label 7",
                 "grafanaLink": "https://grafana.sgdctroy.net/d/vYIh9K9Mzss/redis?orgId=1&refresh=30s"
             }
         },
@@ -43,7 +41,6 @@
             "isScheduled": false,
             "customFields": {
                 "fixInstructions": "https://wiki.ivinco.com/prj/intranet#mnu",
-                "labels": "label 3, label 1, label 7, label 7",
                 "grafanaLink": "https://grafana.sgdctroy.net/d/vYIh9K9Mzss/redis?orgId=1&refresh=30s"
             }
         },
@@ -59,7 +56,6 @@
             "isScheduled": false,
             "customFields": {
                 "fixInstructions": "https://wiki.ivinco.com/prj/intranet#mnu",
-                "labels": "label 3, label 1, label 7, label 7",
                 "Text field": "Some other text field"
             }
         },
@@ -75,7 +71,6 @@
             "isScheduled": false,
             "customFields": {
                 "fixInstructions": "https://wiki.ivinco.com/prj/intranet#mnu",
-                "labels": "label 3, label 1, label 7, label 7",
                 "Text field": "Some other text field"
             }
         },
@@ -91,7 +86,6 @@
             "isScheduled": false,
             "customFields": {
                 "fixInstructions": "https://wiki.ivinco.com/prj/intranet#mnu",
-                "labels": "label 3, label 1, label 7, label 7",
                 "Text field": "Some other text field"
             }
         },
@@ -131,7 +125,6 @@
             "isScheduled": false,
             "customFields": {
                 "fixInstructions": "https://wiki.ivinco.com/prj/intranet#mnu",
-                "labels": "label 3, label 1, label 7, label 7",
                 "grafanaLink": "https://grafana.sgdctroy.net/d/vYIh9K9Mzss/redis?orgId=1&refresh=30s"
             }
         },
@@ -147,7 +140,6 @@
             "isScheduled": false,
             "customFields": {
                 "fixInstructions": "https://wiki.ivinco.com/prj/intranet#mnu",
-                "labels": "label 3, label 1, label 7, label 7",
                 "grafanaLink": "https://grafana.sgdctroy.net/d/vYIh9K9Mzss/redis?orgId=1&refresh=30s"
             }
         },
@@ -163,7 +155,6 @@
             "isScheduled": false,
             "customFields": {
                 "fixInstructions": "https://wiki.ivinco.com/prj/intranet#mnu",
-                "labels": "label 3, label 1, label 7, label 7",
                 "grafanaLink": "https://grafana.sgdctroy.net/d/vYIh9K9Mzss/redis?orgId=1&refresh=30s"
             }
         },
@@ -179,7 +170,6 @@
             "isScheduled": false,
             "customFields": {
                 "fixInstructions": "https://wiki.ivinco.com/prj/intranet#mnu",
-                "labels": "label 3, label 1, label 7, label 7",
                 "grafanaLink": "https://grafana.sgdctroy.net/d/vYIh9K9Mzss/redis?orgId=1&refresh=30s"
             }
         },
@@ -195,7 +185,6 @@
             "isScheduled": false,
             "customFields": {
                 "fixInstructions": "https://wiki.ivinco.com/prj/intranet#mnu",
-                "labels": "label 3, label 1, label 7, label 7",
                 "grafanaLink": "https://grafana.sgdctroy.net/d/vYIh9K9Mzss/redis?orgId=1&refresh=30s"
             }
         },

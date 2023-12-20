@@ -6,13 +6,7 @@ from time import sleep
 schema = {
     "definitions": {
         "custom_field_definition": {
-            "properties": {
-                "fixInstructions": { "type": "string" },
-                "labels": { "type": "string" }, # XXX: change to array
-                "grafanaLink": { "type": "string" }
-            },
-            #"anyOf": [ "fixInstructions", "labels", "grafanaLink" ],
-            #"additionalProperties": False
+            "additionalProperties": True
         },
         "alert_definition": {
             "properties": {
@@ -27,8 +21,9 @@ schema = {
                 "isScheduled": { "type": "boolean" },
                 "customFields": { "type": "object", "$ref": "#/definitions/custom_field_definition" }
             },
-            "required": [
-                "project", "host", "fired", "alertName", "severity", "msg", "responsibleUser", "comment", "isScheduled"
+            "anyOf": [
+                {"required": [ "project", "host", "fired", "alertName", "severity", "msg", "responsibleUser", "comment", "isScheduled" ]},
+                {"required": [ "project", "host", "fired", "alertName", "severity", "msg", "responsibleUser", "comment", "isScheduled", "customFields" ]}
             ],
             "additionalProperties": False
         }
@@ -39,21 +34,12 @@ schema = {
     "properties": {
         "alerts": {
             "type": "array",
-            "maxItems": 20,
+            "maxItems": 10000,
             "items": { "$ref": "#/definitions/alert_definition" }
         }
     },
     "additionalProperties": False
 }
-
-
-def make_json(elems, key):
-    """ Make json from a specially crafted set """
-    # expect to get elems= [ "{'name': 'Disk space on penis03', 'host': 'penis03', 'triggered': 1702218451}", ... 
-    s = ','.join(elems) # join elems
-    s = '{ ' + f'"{key}": [' + s + ']}' # wrap key with quotes, add semicolon and other things
-    return json.loads(s) # make json out of this
-
 
 def usage():
     print(f"""
@@ -130,30 +116,33 @@ def main():
         print(f"Tenis server connection OK, now watching {fname}")
 
         # Start infinite loop to watch {fname} and send alerts to {server}
-        new_alerts = set()
-        old_alerts = set()
+        new_alerts = []
+        old_alerts = []
         while(1):
             try:
                 with open(fname) as fp:
                     data  = json.load(fp)
                     jsonschema.validate(instance=data, schema=schema)
                     old_alerts = new_alerts
-                    new_alerts = set(json.dumps(x) for x in data['alerts'])
-    
-                    new = new_alerts - old_alerts
-                    resolved = old_alerts - new_alerts
-    
-                    if new:
-                        data = make_json(new, 'new')
-                        print("Got new alerts: " + repr(data))
+                    new_alerts = data['alerts']
+   
+                    new = [ a for a in new_alerts if a not in old_alerts ]
+                    resolved = []
+                    for a in old_alerts:
+                        if a not in new_alerts:
+                            resolved.append({"project": a["project"], "host": a["host"], "alertName": a["alertName"]})
+
+                    if len(new) > 0:
+                        data = { "update": new }
+                        print("Got %d new alerts" % len(new))
                         res = s.post(url, json=data)
-                        print(f"Sent the alerts to %s, got %d response" % (url, res.status_code))
+                        print("Sent the alerts to %s, got %d code, response: %s" % (url, res.status_code, res.text))
     
-                    if resolved:
-                        data = make_json(resolved, 'resolved')
-                        print("Revolved alert: " + repr(data))
+                    if len(resolved) > 0:
+                        data = { "resolve": resolved }
+                        print("Found %d resolved alerts" % len(resolved))
                         res = s.post(url, json=data)
-                        print(f"Sent the resolved list to %s, got %d response" % (url, res.status_code))
+                        print("Sent the resolved list to %s, got %d code, response: %s" % (url, res.status_code, res.text))
 
             except jsonschema.exceptions.ValidationError as e:
                 print("JSON schema validation failed: %s" % (e.message))

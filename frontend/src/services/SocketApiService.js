@@ -6,6 +6,8 @@ class SocketApiService {
     static createConnection(token) {
         // This is test endpoint for web socket server hosted on local host
         // this.socket = io ("localhost:8080")
+
+        //This is real backend endpoint
         this.socket = io(`${BACKEND_SERVER}`,{
             extraHeaders:{
                 'Authorization': `Bearer ${token}`
