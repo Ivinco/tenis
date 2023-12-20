@@ -4,7 +4,7 @@ import pymongo
 from flask import Flask, request, jsonify, make_response
 from flask_cors import CORS
 from flask_socketio import SocketIO, emit, send, disconnect
-from werkzeug.exceptions import Unauthorized, BadRequest, InternalServerError
+from werkzeug.exceptions import HTTPException, Unauthorized, BadRequest, InternalServerError
 import json
 from .auth import create_token, token_required, token_required_ws
 from .user import User
@@ -108,6 +108,21 @@ def parse_json(data):
 #
 # API handles
 #
+@app.errorhandler(HTTPException)
+def handle_exception(e):
+    """Return JSON instead of HTML for HTTP errors"""
+    # start with the correct headers and status code from the error
+    response = e.get_response()
+    # replace the body with JSON
+    response.data = json.dumps({
+        "code": e.code,
+        "name": e.name,
+        "description": e.description,
+    })
+    response.content_type = "application/json"
+    return response
+
+
 @app.route('/')
 def index():
     return "Hello, world!\n", 200
