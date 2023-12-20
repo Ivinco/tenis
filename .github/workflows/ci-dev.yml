@@ -3,6 +3,7 @@ name: Manual deploy to main dev and auto deploy when PR to dev is closed
 env:
   WERF_SECRET_KEY: ${{ secrets.WERF_SECRET_KEY }}
   WERF_REPO: docker-registry.ivinco.com/tenis
+  REACT_APP_SERVER: https://api.tenis-dev.k8s-test.ivinco.com
 
 on:
   pull_request:
