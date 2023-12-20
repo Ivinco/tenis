@@ -1,4 +1,4 @@
-import os, atexit, jsonschema, jwt
+import os, atexit, jsonschema, jwt, threading
 from datetime import datetime, timezone, timedelta
 import pymongo
 from flask import Flask, request, jsonify, make_response
@@ -8,7 +8,7 @@ from werkzeug.exceptions import Unauthorized, BadRequest, InternalServerError
 import json
 from .auth import create_token, token_required, token_required_ws
 from .user import User
-
+from .alert import load_alerts, lookup_alert
 
 # Global vars init
 app = Flask(__name__)
@@ -32,13 +32,19 @@ app.config['API_TOKEN'] = os.getenv('API_TOKEN', 'asdfg')
 app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=1)
 app.config['JWT_REFRESH_TOKEN_EXPIRES'] = timedelta(days=30)
 
+# Load alerts from the DB
+alerts_lock = threading.Lock()
+alerts = list()
+with alerts_lock:
+    alerts = load_alerts(app.db['current'])
+
 # JSON schema to validate inbound JSON
 schema = {
     "definitions": {
         "custom_field_definition": {
             "additionalProperties": True,
         },
-        "alert_definition": {
+        "new_alert_definition": {
             "properties": {
                 "project": { "type": "string" },
                 "host": { "type": "string" },
@@ -56,23 +62,35 @@ schema = {
                 {"required": [ "project", "host", "fired", "alertName", "severity", "msg", "responsibleUser", "comment", "isScheduled", "customFields" ]}
             ],
             "additionalProperties": False
+        },
+        "resolved_alert_definition": {
+            "properties": {
+                "project": { "type": "string" },
+                "host": { "type": "string" },
+                "alertName": { "type": "string" },
+            },
+            "required": [ "project", "host", "alertName" ],
+            "additionalProperties": False
         }
     },
 
 
     "type": "object", # this is for the root element
-    "oneOf": [ {"required": ["update"]}, {"required": ["resolve"]}, {"required": ["update", "resolve"]} ],
+    "oneOf": [ {"required": ["update"]}, {"required": ["resolve"]}, {"required": ["update", "resolve"]}, {"required": ["reload"]} ],
     "properties": {
         "update": {
             "type": "array",
             "maxItems": 10000,
-            "items": { "$ref": "#/definitions/alert_definition" }
+            "items": { "$ref": "#/definitions/new_alert_definition" }
         },
         "resolve": {
             "type": "array",
             "maxItems": 10000,
-            "items": { "$ref": "#/definitions/alert_definition" }
+            "items": { "$ref": "#/definitions/resolved_alert_definition" }
         },
+        "reload": {
+            "type": "boolean"
+        }
     },
     "additionalProperties": False
 }
@@ -147,6 +165,8 @@ def login():
 @app.route('/in', methods=['POST'])
 def inbound():
     """ Inbound API calls to inject alerts and updates """
+    global alerts
+
     # This is separate from the frontend auth - just standard API token check
     try:
         token = request.headers['X-Tenis-Token']
@@ -163,34 +183,60 @@ def inbound():
 
 
     alerts_collection = app.db['current']
-    #TODO: history_collection = app.db['history']
+
+    # history_collection = app.db['history']
     if 'update' in data:
+        new_alerts = []
+        for a in data['update']:
+            with alerts_lock:
+                if lookup_alert(alerts, a): continue # we already have this alert in global alerts list
+                alerts.append(a)
+                new_alerts.append(a)
+
+        if len(new_alerts) == 0: # all submitted alerts are already in the system
+            return 'OK', 200
+
         try:
-            alerts_collection.insert_many(data['update'])
+            alerts_collection.insert_many(new_alerts)
             # TODO: update history_collection here
         except pymongo.errors.PyMongoError as e:
             raise InternalServerError(e)
         try:
             # Send broadcast event to all connected clients
-            socketio.emit('update', parse_json(data['update']));
-        except Exception:
-            # Don't blame the reporter if backend failed to update clients
-            pass
+            socketio.emit('update', parse_json(new_alerts))
+        except Exception: pass # Don't blame the reporter if backend failed to update clients
         return 'OK', 200
 
     if 'resolve' in data:
+        resolved_ids = []
+        with alerts_lock:
+            for a in data['resolve']:
+                r = lookup_alert(alerts, a)
+                if r is None: continue # we don't have this alert in the global list, skip
+                alerts.remove(r)
+                resolved_ids.append(r['_id'])
+        if len(resolved_ids) == 0:
+            return 'OK', 200 # submitted alerts list does not match a single alert from the global list
+
         try:
-            for alert in data['resolve']:
-                query = { "alertName": alert["alertName"], "host": alert["host"] }
-                alerts_collection.delete_one(query)
-                # TODO: update history_collection here
+            #alerts_collection.delete_many({'_id': {'$in': (lambda r: ObjectId(r), resolved_ids)}})
+            alerts_collection.delete_many({'_id': {'$in': resolved_ids}})
+            # TODO: update history_collection here
         except pymongo.errors.PyMongoError as e:
             raise InternalServerError(e)
+
         try:
-            socketio.emit('resolve', parse_json(data['resolve']));
-        except Exception:
-            # Again, Don't blame the reporter if backend failed to update clients
-            pass
+            socketio.emit('resolve', parse_json(resolved_ids))
+        except Exception: pass # Don't blame the reporter if backend failed to update clients
+        return 'OK', 200
+
+    if 'reload' in data:
+        with alerts_lock:
+            alerts = load_alerts(app.db['current'])
+            # TODO: decided what to do with history_collection
+        try:
+            socketio.emit('init', parse_json(alerts))
+        except Exception: pass # don't blame the reporter if backend failed to update clients
         return 'OK', 200
 
     # not reached
@@ -223,12 +269,7 @@ def refresh(user):
 #
 @socketio.on('connect')
 @token_required_ws
-def on_connect(user = None, data = None):
-    alerts = []
-    try:
-        col = app.db['current']
-        for alert in col.find({}):
-            alerts.append(alert)
-    except pymongo.errors.PyMongoError as e:
-        disconnect() # can't do anything here if Mongo query fails
-    emit('init', parse_json(alerts))
+def on_connect(user, data = None):
+    global alerts
+    with alerts_lock:
+        emit('init', parse_json(alerts))
