@@ -140,7 +140,7 @@ def main():
     
                     if len(resolved) > 0:
                         data = { "resolve": resolved }
-                        print("Found %d alerts to become revolved" % len(resolved))
+                        print("Found %d resolved alerts" % len(resolved))
                         res = s.post(url, json=data)
                         print("Sent the resolved list to %s, got %d code, response: %s" % (url, res.status_code, res.text))
 

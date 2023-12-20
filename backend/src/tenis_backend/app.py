@@ -186,21 +186,27 @@ def inbound():
 
     # history_collection = app.db['history']
     if 'update' in data:
-        new_alerts = []
-        for a in data['update']:
-            with alerts_lock:
-                if lookup_alert(alerts, a): continue # we already have this alert in global alerts list
+        with alerts_lock:
+            new_alerts = []
+            for a in data['update']:
+                    if lookup_alert(alerts, a): continue # we already have this alert in global alerts list
+                    new_alerts.append(a)
+
+            if len(new_alerts) == 0: # all submitted alerts are already in the system
+                return 'OK', 200
+
+            try:
+                res = alerts_collection.insert_many(new_alerts)
+                for i, _id in enumerate(res.inserted_ids):
+                    new_alerts[i]['_id'] = _id
+                # TODO: update history_collection here
+            except pymongo.errors.PyMongoError as e:
+                raise InternalServerError(e)
+
+            # If DB write was successful, update global alerts list
+            for a in new_alerts:
                 alerts.append(a)
-                new_alerts.append(a)
 
-        if len(new_alerts) == 0: # all submitted alerts are already in the system
-            return 'OK', 200
-
-        try:
-            alerts_collection.insert_many(new_alerts)
-            # TODO: update history_collection here
-        except pymongo.errors.PyMongoError as e:
-            raise InternalServerError(e)
         try:
             # Send broadcast event to all connected clients
             socketio.emit('update', parse_json(new_alerts))
@@ -208,22 +214,26 @@ def inbound():
         return 'OK', 200
 
     if 'resolve' in data:
+        resolved_alerts = []
         resolved_ids = []
         with alerts_lock:
-            for a in data['resolve']:
-                r = lookup_alert(alerts, a)
-                if r is None: continue # we don't have this alert in the global list, skip
-                alerts.remove(r)
-                resolved_ids.append(r['_id'])
-        if len(resolved_ids) == 0:
-            return 'OK', 200 # submitted alerts list does not match a single alert from the global list
+            for entry in data['resolve']:
+                a = lookup_alert(alerts, entry)
+                if a is None: continue # we don't have this alert in the global list, skip
+                resolved_alerts.append(a)
+                resolved_ids.append(a['_id'])
+            if len(resolved_alerts) == 0:
+                return 'OK', 200 # submitted alerts list does not match a single alert from the global list
 
-        try:
-            #alerts_collection.delete_many({'_id': {'$in': (lambda r: ObjectId(r), resolved_ids)}})
-            alerts_collection.delete_many({'_id': {'$in': resolved_ids}})
-            # TODO: update history_collection here
-        except pymongo.errors.PyMongoError as e:
-            raise InternalServerError(e)
+            try:
+                alerts_collection.delete_many({'_id': {'$in': resolved_ids}})
+                # TODO: update history_collection here
+            except pymongo.errors.PyMongoError as e:
+                raise InternalServerError(e)
+
+            # If DB write was successful, remove resolved alerts from the global list
+            for a in resolved_alerts:
+                alerts.remove(a)
 
         try:
             socketio.emit('resolve', parse_json(resolved_ids))
