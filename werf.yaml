@@ -39,7 +39,7 @@ shell:
   - npm install
   setup:
   - cd /app
-  - export REACT_APP_SERVER="{{ env "REACT_APP_SERVER" }}
+  - export REACT_APP_SERVER="{{ env "REACT_APP_SERVER" }}"
   - npm run build
 
 ---
