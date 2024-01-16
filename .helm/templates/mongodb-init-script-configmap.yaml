@@ -29,12 +29,12 @@ data:
           {{ $element.prefix | quote }}: {{ printf "%s$1" $element.site | quote }}{{ if ne (add1 $index) $length }},{{ end }}
         {{- end }}
         },
-        userProjects: {
+        userProjects: [
         {{- $length := len .Values.userProjects.init_user -}}
         {{- range $index, $element := .Values.userProjects.init_user }}
           {{ $element | quote }}{{ if ne (add1 $index) $length }},{{ end }}
         {{- end }}
-        }
+        ]
       });
     }'
 
