@@ -63,3 +63,9 @@ usersCommentReplaceRules:
   site: "https://ivinco.atlasian.net/browse/"
 - prefix: 'SG-\d+'
   site: "https://socialgist.atlasian.net/browse/"
+
+userProjects:
+  init_user:
+  - Boardreader
+  - Ivinco
+  - Tenis
