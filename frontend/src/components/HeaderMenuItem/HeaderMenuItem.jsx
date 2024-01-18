@@ -7,7 +7,7 @@ function HeaderMenuItem({item}) {
     const dispatch = useDispatch()
     const activeHeaderMenuItem = useSelector(state => state.switchHeaderMenuItem.activeHeaderMenuItem)
     const activeHeaderMenuSubItem = useSelector(state => state.setHeaderMenuItemValue)
-    const isLogged = useSelector(state => state.authReducer.isLogged)
+    const isActive = useSelector(state => state.webSocket.isOpened)
 
     const itemOnClickHandler = (itemName) => {
         if (activeHeaderMenuItem === item.name) {
@@ -25,7 +25,7 @@ function HeaderMenuItem({item}) {
 
     return (
             //null
-            isLogged ?
+        isActive ?
                 <>
                     <button
                         className={activeHeaderMenuItem === item.name ? `${styles.menuHeader} ${styles.menuHeader_active}` : styles.menuHeader}
