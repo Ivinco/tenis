@@ -7,12 +7,12 @@ function HeaderMenuItem({item}) {
     const dispatch = useDispatch()
     const activeHeaderMenuItem = useSelector(state => state.switchHeaderMenuItem.activeHeaderMenuItem)
     const activeHeaderMenuSubItem = useSelector(state => state.setHeaderMenuItemValue)
+    const isLogged = useSelector(state => state.authReducer.isLogged)
 
     const itemOnClickHandler = (itemName) => {
-        if (activeHeaderMenuItem === item.name){
+        if (activeHeaderMenuItem === item.name) {
             dispatch(switchActiveHeaderMenuItem(null))
-        }
-        else {
+        } else {
             dispatch(switchActiveHeaderMenuItem(itemName))
         }
     }
@@ -24,22 +24,31 @@ function HeaderMenuItem({item}) {
     }
 
     return (
-        <>
-            <button className={activeHeaderMenuItem === item.name ? `${styles.menuHeader} ${styles.menuHeader_active}`: styles.menuHeader} onClick={() => itemOnClickHandler(item.name)}>
-                {`${item.name}: ${activeHeaderMenuSubItem[item.name.toLowerCase()]}`}
-            </button>
-            <div className={activeHeaderMenuItem === item.name ? `${styles.itemBody} ${styles.itemBody_active}` : styles.itemBody}>
-            {
-                item.buttons.map((button, index) =>
-                    <button key={index} onClick={(e) => {
-                        e.preventDefault()
-                        subItemOnClickHandler(item.action,button)
-                    }} className={styles.itemButton}>{button}</button>
-                )
-            }
-            </div>
-        </>
-    );
+            //null
+            isLogged ?
+                <>
+                    <button
+                        className={activeHeaderMenuItem === item.name ? `${styles.menuHeader} ${styles.menuHeader_active}` : styles.menuHeader}
+                         onClick={() => itemOnClickHandler(item.name)}>
+                         {`${item.name}: ${activeHeaderMenuSubItem[item.name.toLowerCase()]}`}
+                     </button>
+                     <div
+                         className={activeHeaderMenuItem === item.name ? `${styles.itemBody} ${styles.itemBody_active}` : styles.itemBody}>
+                         {
+                             item.buttons.map((button, index) =>
+                                 <button key={index} onClick={(e) => {
+                                     e.preventDefault()
+                                     subItemOnClickHandler(item.action, button)
+                                 }} className={styles.itemButton}>{button}</button>
+                             )
+                         }
+                     </div>
+                </>
+                : <></>
+
+        )
 }
+
+
 
 export default HeaderMenuItem;
