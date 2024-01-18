@@ -5,11 +5,16 @@ import HeaderMenuItem from "../HeaderMenuItem/HeaderMenuItem";
 import {useDispatch, useSelector} from "react-redux";
 import {setFoundAlerts} from "../../store/reducers/alertReducer";
 
+
 const FilterMenu = () => {
     const dispatch = useDispatch()
     const isOpened = useSelector(state => state.hiddenMenu.isOpenedFilterMenu)
     const alerts = useSelector(state => state.webSocket.alerts)
     const [searchPhrase, setSearchPhrase] = useState('')
+    const projects = useSelector(state => state.authReducer.user.userProjects)
+    const menuItems = headerMenuItems.map((item, index) =>
+        index === 0 ? { ...item, buttons: projects } : item
+    );
 
     const submitAction = (searchString) => {
         const foundAlerts = []
@@ -24,6 +29,7 @@ const FilterMenu = () => {
         })
         dispatch(setFoundAlerts(foundAlerts))
     }
+
 
     const resetAction = () => {
         dispatch(setFoundAlerts(null))
@@ -53,13 +59,13 @@ const FilterMenu = () => {
                             />
                             <button id="resetSearchButton"
                                     type="reset"
-                                    className={`${styles.resetSearchButton} ${searchPhrase ? '' : styles.resetSearchButton_hidden }`}
-                            onClick={e => resetAction()}
+                                    className={`${styles.resetSearchButton} ${searchPhrase ? '' : styles.resetSearchButton_hidden}`}
+                                    onClick={e => resetAction()}
                             />
                         </form>
                     </li>
                     {
-                        headerMenuItems.map((item, index) =>
+                        menuItems.map((item, index) =>
                             <li key={index} className={styles.menuItem}>
                                 <HeaderMenuItem item={item}/>
                             </li>
@@ -67,12 +73,11 @@ const FilterMenu = () => {
 
                     }
 
-
                 </ul>
             </div>
 
         </>
-    );
+);
 };
 
 export default FilterMenu;
