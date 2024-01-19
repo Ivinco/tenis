@@ -27,7 +27,9 @@ function App () {
                         userName: fetchUser.data.user.name,
                         userId: fetchUser.data.user._id,
                         userEmail: fetchUser.data.user.email,
-                        userImage: `https://gravatar.com/avatar/${sha256(fetchUser.data.user.email)}?s=150`
+                        userImage: `https://gravatar.com/avatar/${sha256(fetchUser.data.user.email)}?s=150`,
+                        usersCommentReplaceRules: fetchUser.data.user.commentReplaceRules,
+                        userProjects: fetchUser.data.user.userProjects
                     }
                     dispatch(loginAction(user))
                     dispatch(closeModal())
