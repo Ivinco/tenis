@@ -24,8 +24,7 @@ function HeaderMenuItem({item}) {
     }
 
     return (
-            //null
-        isActive ?
+        item.buttons ?
                 <>
                     <button
                         className={activeHeaderMenuItem === item.name ? `${styles.menuHeader} ${styles.menuHeader_active}` : styles.menuHeader}
