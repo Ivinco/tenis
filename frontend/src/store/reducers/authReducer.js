@@ -7,7 +7,8 @@ const defaultAuth =  {
         userName: null,
         userImage: null,
         userEmail: null,
-        commentReplaceRules:{}
+        commentReplaceRules:{},
+        userProjects:['All']
     }
 
 }
