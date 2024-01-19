@@ -23,7 +23,7 @@ function App () {
                     const refresh = await axios.get(`${BACKEND_SERVER}/refresh`, {withCredentials: true})
                     localStorage.setItem('token', refresh.data.access_token)
                     const fetchUser = await UserService.getUser()
-                    const user = {
+                    const raw_user = {
                         userName: fetchUser.data.user.name,
                         userId: fetchUser.data.user._id,
                         userEmail: fetchUser.data.user.email,
@@ -31,6 +31,7 @@ function App () {
                         usersCommentReplaceRules: fetchUser.data.user.commentReplaceRules,
                         userProjects: fetchUser.data.user.userProjects
                     }
+                    const user = {...raw_user, userProjects: ['All', ...raw_user.userProjects]}
                     dispatch(loginAction(user))
                     dispatch(closeModal())
                 } catch (e) {
