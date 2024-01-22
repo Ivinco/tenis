@@ -159,6 +159,7 @@ def main():
 
             while 2:  # Continuously read log file
                 line = f.readline()
+                it_is_an_alert = False
                 # Log data example:
                 # N of index in lst:       0            1        2      3   4       5
                 # [1705421869] SERVICE ALERT: host;Alert name;CRITICAL;SOFT;1;Alert message
@@ -173,14 +174,17 @@ def main():
                         severity = lst[2]
                         message = lst[5]
                         name = lst[1]
+                        it_is_an_alert = True
                     if re.match(r'.*HOST ALERT:.*', lst[0]) and lst[1] != 'UP':
                         fired = re.sub(r'.*\[(.*)\].*', r'\1', lst[0])
                         host = lst[0].split(' ')[-1]
                         severity = lst[1]
                         message = lst[4]
                         name = f"host_name\t{host}"
-                    alert = {'fired': fired, 'host': host, 'name': name, 'severity': severity, 'message': message}
-                    add_alerts(alert, alerts, objects)
+                        it_is_an_alert = True
+                    if it_is_an_alert:
+                        alert = {'fired': fired, 'host': host, 'name': name, 'severity': severity, 'message': message}
+                        add_alerts(alert, alerts, objects)
                 else:
                     if alerts:
                         send_alerts(alerts, tenis)
