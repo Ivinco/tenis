@@ -11,6 +11,10 @@ Options:
     -p Project within TENIS (default value 'main')
     -s TENIS server url (required)
     -t Access token (optional)
+
+Note that it's more secure to write token to 'access_token' variable inside tenis_nip.py instead of adding through args.
+Use this command to check files location:
+    egrep 'log_file|object_cache_file' /etc/nagios/nagios.cfg
 "
 
 #Get opts
@@ -38,7 +42,10 @@ ExecStart=/usr/bin/tenis_nip.py ${opts[@]}
 WantedBy=multi-user.target
 " > tenis-nip.service
 
-sudo install -oroot -groot -m755 tenis_nip.py      /usr/bin/tenis_nip.py
+sudo install -oroot -groot -m700 tenis_nip.py      /usr/bin/tenis_nip.py
 sudo install -oroot -groot -m644 tenis-nip.service /lib/systemd/system/tenis-nip.service
 sudo systemctl daemon-reload
-echo "Run 'sudo systemctl restart tenis-nip.service' to start Nagios input plugin for TENIS"
+sudo systemctl restart tenis-nip
+rm   tenis-nip.service # cleanup
+
+echo "Run 'systemctl status tenis-nip' to check Nagios input plugin for TENIS"
