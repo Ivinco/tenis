@@ -219,7 +219,7 @@ Here's the hasing alghorithm (scrypt:32768:8:1), salt (wlKfg9o3d9jtl0AU) and has
 "scrypt:32768:8:1$wlKfg9o3d9jtl0AU$0aebc1e1d841a46b049a53052ac9c53ccd998975ce84b0dd98089029f072b360316a9c0283e0ef26aa313835b29bf5ad4e8c1674737953ffcc0c2647fe912d64"
 
 ```
-Passwords are stored encrypted in `.helm/secret-values.yaml`. You need to acquire WERF_SECRET_KEY in lastpass and add it to `.werf_secret_key` file in the root of the repo (it's in .gitignore, so it's safe) or export to variable WERF_SECRET_KEY locally.
+Passwords are stored encrypted in `.helm/secret-values.yaml`. You need to acquire WERF_SECRET_KEY and add it to `.werf_secret_key` file in the root of the repo (it's in .gitignore, so it's safe) or export to variable WERF_SECRET_KEY locally.
 ```
 export WERF_SECRET_KEY=example-string-qwerty
 ```
