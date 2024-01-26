@@ -151,9 +151,11 @@ def main():
 
     tenis = requests.Session()  # Open persistent connection to Tenis server
     try:
+        check_url = '/healz'
         if args.token:
+            check_url = '/whoami'
             tenis.headers.update({'X-Tenis-Token': args.token})
-        test = tenis.get(args.server + '/healz')
+        test = tenis.get(args.server + check_url)
         if test.ok:
             logging.info(f"Connection to {args.server} established")
     except Exception as e:
