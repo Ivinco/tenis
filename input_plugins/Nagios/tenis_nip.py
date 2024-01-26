@@ -173,47 +173,49 @@ def main():
                 f.seek(0, os.SEEK_END)  # Jump to the end of log file
 
                 while 2:  # Continuously read log file
-                    line = f.readline()
+                    raw_alert = f.readline()
                     # Nagios' log data example, we need strings with '.*ALERT.*' pattern:
                     # N of index in lst:       0            1        2      3   4       5
                     # [1705421869] SERVICE ALERT: host;Alert name;CRITICAL;SOFT;1;Alert message
+                    #                 0        1        2          3        4         5
+                    service_map = ['fired', 'name', 'severity', 'trash', 'trash', 'message']
 
                     # N of index in lst:    0         1    2  3       4
                     # [1705421869] HOST ALERT: host;DOWN;SOFT;1;Alert message
                     # Note that Host alerts don't have name, therefore list indexes are differs a bit
+                    #              0         1          2        3         4
+                    host_map = ['fired', 'severity', 'trash', 'trash', 'message']
 
-                    if line != '':
-                        event_type = ''
-                        lst = line.split(';')
-                        if re.match(r'.*ALERT:.*', lst[0]):
-                            fired = re.sub(r'.*\[(.*)\].*', r'\1', lst[0])
-                            host = lst[0].split(' ')[-1]
-                            event_type = 'update'
-                            if re.match(r'.*HOST.*', lst[0]):  # than it's Host alert
-                                name = f"host_name\t{host}"
-                                severity = lst[1]
-                                message = ''
-                                if lst[4]:
-                                    message = lst[4]
-                            else:                              # it's service alert
-                                name = lst[1]
-                                severity = lst[2]
-                                message = ''
-                                if lst[5]:
-                                    message = lst[5]
-                            if re.match(r'OK|UP', severity):   # I't a resolve
-                                event_type = 'resolve'
+                    if raw_alert != '':
+                        raw_alert_split = raw_alert.split(';')
+                        event = {'type': '', 'fired': '', 'host': '', 'name': '', 'severity': '', 'message': ''}
 
-                        if event_type:
-                            event = {
-                                'type': event_type,
-                                'fired': int(fired),
-                                'host': host.strip(),
-                                'name': name.strip(),
-                                'message': message.strip(),
-                                'severity': severity.strip()
-                            }
-                            add_events(event, events[event_type], objects)
+                        if re.match(r'.*ALERT:.*', raw_alert_split[0]):
+                            event['type'] = 'update'
+                            if re.match(r'.*HOST.*', raw_alert_split[0]):  # than it's Host alert
+                                for i in range(0, len(raw_alert_split)):
+                                    parameter_name = host_map[i]
+                                    parameter_value = raw_alert_split[i]
+                                    if parameter_name == 'fired':
+                                        event['fired'] = int(re.sub(r'.*\[(.*)\].*', r'\1', parameter_value))
+                                        event['host'] = parameter_value.split(' ')[-1]
+                                    else:
+                                        event[parameter_name] = parameter_value.strip()
+                                event['name'] = f"host_name\t{event['host']}"
+                            else:  # it's Service alert
+                                for i in range(0, len(raw_alert_split)):
+                                    parameter_name = service_map[i]
+                                    parameter_value = raw_alert_split[i]
+                                    if parameter_name == 'fired':
+                                        event['fired'] = int(re.sub(r'.*\[(.*)\].*', r'\1', parameter_value))
+                                        event['host'] = parameter_value.split(' ')[-1]
+                                    else:
+                                        event[parameter_name] = parameter_value.strip()
+                            if re.match(r'OK|UP', event['severity']):  # it's Resolve
+                                event['type'] = 'resolve'
+
+                        if event['type']:
+                            add_events(event, events[event['type']], objects)
                     else:
                         if events['update'] or events['resolve']:
                             send_events(events, tenis)
