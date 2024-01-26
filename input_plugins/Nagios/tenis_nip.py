@@ -186,7 +186,7 @@ def main():
                     #              0         1          2        3         4
                     host_map = ['fired', 'severity', 'trash', 'trash', 'message']
 
-                    if raw_alert != '':
+                    if raw_alert != '':  # If string is not empty parse it
                         raw_alert_split = raw_alert.split(';')
                         event = {'type': '', 'fired': '', 'host': '', 'name': '', 'severity': '', 'message': ''}
 
@@ -216,7 +216,7 @@ def main():
 
                         if event['type']:
                             add_events(event, events[event['type']], objects)
-                    else:
+                    else:  # If string is empty it means we reached the end of file, send collected events, renew events
                         if events['update'] or events['resolve']:
                             send_events(events, tenis)
                             events = {'update': [], 'resolve': []}
