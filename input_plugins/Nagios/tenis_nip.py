@@ -216,6 +216,7 @@ def main():
 
                         if event['type']:
                             add_events(event, events[event['type']], objects)
+
                     else:  # If string is empty it means we reached the end of file, send collected events, renew events
                         if events['update'] or events['resolve']:
                             send_events(events, tenis)
