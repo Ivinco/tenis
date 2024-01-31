@@ -8,7 +8,7 @@ from werkzeug.exceptions import HTTPException, Unauthorized, BadRequest, Interna
 import json
 from .auth import create_token, token_required, token_required_ws
 from .user import User
-from .alert import load_alerts, lookup_alert, update_alert
+from .alert import load_alerts, lookup_alert
 
 # Global vars init
 app = Flask(__name__)
