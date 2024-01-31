@@ -8,7 +8,7 @@ from werkzeug.exceptions import HTTPException, Unauthorized, BadRequest, Interna
 import json
 from .auth import create_token, token_required, token_required_ws
 from .user import User
-from .alert import load_alerts, lookup_alert
+from .alert import load_alerts, lookup_alert, update_alert
 
 # Global vars init
 app = Flask(__name__)
@@ -196,36 +196,54 @@ def inbound():
     except jsonschema.exceptions.ValidationError as e:
         raise BadRequest(e.message)
 
-
     alerts_collection = app.db['current']
 
     # history_collection = app.db['history']
     if 'update' in data:
         with alerts_lock:
             new_alerts = []
+            upd_alerts = []
             for a in data['update']:
-                    if lookup_alert(alerts, a): continue # we already have this alert in global alerts list
+                i = lookup_alert(alerts, a)
+                if i is not None:
+                    need_update = {}
+                    if alerts[i]['severity'] is not a['severity']:
+                        need_update['severity'] = a['severity']
+                        alerts[i]['severity'] = a['severity']
+                    if alerts[i]['msg'] is not a['msg']:
+                        need_update['msg'] = a['msg']
+                        alerts[i]['msg'] = a['msg']
+                    if need_update:
+                        upd_alerts.append(pymongo.UpdateOne({'_id': alerts[i]['_id']}, {"$set": need_update}))
+                    continue  # we already have this alert in global alerts list and don't need to change it
+                else:
                     new_alerts.append(a)
 
-            if len(new_alerts) == 0: # all submitted alerts are already in the system
+            if not new_alerts and not upd_alerts:  # all submitted alerts are already in the system
                 return 'OK', 200
 
-            try:
-                res = alerts_collection.insert_many(new_alerts)
-                for i, _id in enumerate(res.inserted_ids):
-                    new_alerts[i]['_id'] = _id
-                # TODO: update history_collection here
-            except pymongo.errors.PyMongoError as e:
-                raise InternalServerError(e)
+            if new_alerts:
+                try:
+                    res = alerts_collection.insert_many(new_alerts)
+                    for i, _id in enumerate(res.inserted_ids):
+                        new_alerts[i]['_id'] = _id
+                    # TODO: update history_collection here
+                except pymongo.errors.PyMongoError as e:
+                    raise InternalServerError(e)
+
+            if upd_alerts:
+                try:
+                    alerts_collection.bulk_write(upd_alerts)
+                except pymongo.errors.PyMongoError as e:
+                    raise InternalServerError(e)
 
             # If DB write was successful, update global alerts list
-            for a in new_alerts:
-                alerts.append(a)
+            alerts.extend(new_alerts)
 
         try:
             # Send broadcast event to all connected clients
             socketio.emit('update', parse_json(new_alerts))
-        except Exception: pass # Don't blame the reporter if backend failed to update clients
+        except Exception: pass  # Don't blame the reporter if backend failed to update clients
         return 'OK', 200
 
     if 'resolve' in data:
@@ -238,7 +256,7 @@ def inbound():
                 resolved_alerts.append(a)
                 resolved_ids.append(a['_id'])
             if len(resolved_alerts) == 0:
-                return 'OK', 200 # submitted alerts list does not match a single alert from the global list
+                return 'OK', 200  # submitted alerts list does not match a single alert from the global list
 
             try:
                 alerts_collection.delete_many({'_id': {'$in': resolved_ids}})
@@ -252,7 +270,7 @@ def inbound():
 
         try:
             socketio.emit('resolve', parse_json(resolved_ids))
-        except Exception: pass # Don't blame the reporter if backend failed to update clients
+        except Exception: pass  # Don't blame the reporter if backend failed to update clients
         return 'OK', 200
 
     if 'reload' in data:
@@ -261,7 +279,7 @@ def inbound():
             # TODO: decided what to do with history_collection
         try:
             socketio.emit('init', parse_json(alerts))
-        except Exception: pass # don't blame the reporter if backend failed to update clients
+        except Exception: pass  # don't blame the reporter if backend failed to update clients
         return 'OK', 200
 
     # not reached

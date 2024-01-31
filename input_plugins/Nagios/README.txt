@@ -27,6 +27,8 @@ Options description:
 -s|--server  - TENIS server url (required)
 -t|--token   - Access token (optional)
 
-Note that it's more secure to write token to 'access_token' variable inside tenis_nip.py instead of adding through args.
+Note that it's more secure to write token to 'access_token' variable inside tenis_nip.py.
+Or as environment variable 'NIP_TOKEN' instead of adding through args.
+
 Use this command to check files location:
     egrep 'log_file|object_cache_file' /etc/nagios/nagios.cfg
