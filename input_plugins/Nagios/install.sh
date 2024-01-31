@@ -12,7 +12,6 @@ Options:
     -s TENIS server url (required)
     -t Access token (optional)
 
-Note that it's more secure to write token to 'access_token' variable inside tenis_nip.py instead of adding through args.
 Use this command to check files location:
     egrep 'log_file|object_cache_file' /etc/nagios/nagios.cfg
 "
@@ -20,13 +19,13 @@ Use this command to check files location:
 #Get opts
 while getopts ":o:l:n:p:s:t:" opt; do
     case "$opt" in
-	       (o)  opts+=("--obj '$OPTARG'");;
-	       (l)  opts+=("--log '$OPTARG'");;
-	       (t)  opts+=("--token '$OPTARG'");;
+           (o)  opts+=("--obj '$OPTARG'");;
+           (l)  opts+=("--log '$OPTARG'");;
            (n)  opts+=("--nip_log '$OPTARG'");;
-	       (p)  opts+=("--project '$OPTARG'");;
-	       (s)  srv=$OPTARG; opts+=("--server '$srv'");;
-           (*)  printf "$help"; exit 1;;
+           (p)  opts+=("--project '$OPTARG'");;
+           (s)  srv=$OPTARG; opts+=("--server '$srv'");;
+           (t)  printf -v token -- '\nEnvironment="NIP_TOKEN=%s"' "$OPTARG";;
+           (*)  printf -- "$help"; exit 1;;
     esac
 done
 [[ $srv ]] || { printf "$help"; exit 1; }
@@ -35,7 +34,7 @@ echo "[Unit]
 Description=Nagios Input Plugin for TENIS
 After=multi-user.target
 
-[Service]
+[Service]$token
 Type=simple
 Restart=always
 ExecStart=/usr/bin/tenis_nip.py ${opts[@]}

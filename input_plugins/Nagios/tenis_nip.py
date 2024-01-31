@@ -3,25 +3,31 @@
 
 import os
 import re
-# import json
 import logging
 import requests
 from time import sleep
 from argparse import ArgumentParser
 
-access_token = ''   # TENIS Access token, it's more secure to write it here instead of adding through args
+access_token = ''   # TENIS Access token, it's more secure to write it here or as env var instead of adding through args
 check_timeout = 60  # Main files check timeout in sec, if files where deleted or recreated we have to reopen them
-
+objects_file = '/var/log/nagios/objects.cache'  # Default Nagios' active objects cache file path
+nagios_log = '/var/log/nagios/nagios.log'       # Default Nagios' event log file path to parse
+plugin_log = '/var/log/nip.log'                 # Default log file path for this script
+project_name = 'main'                           # Default project name
 # -------------------------------------------------------------------------------------------------------------------- #
-parser = ArgumentParser()
-parser.add_argument('-o', '--obj',     help='Path to Nagios object.cache file', default='/var/log/nagios/objects.cache')
-parser.add_argument('-l', '--log',     help='Path to Nagios log file',          default='/var/log/nagios/nagios.log')
-parser.add_argument('-n', '--nip_log', help='Path to NIP log file',             default='/var/log/nip.log')
-parser.add_argument('-t', '--token',   help='Access token',                     default=access_token)
-parser.add_argument('-d', '--debug',   help='Print some debug data',            action='store_true')
-parser.add_argument('-p', '--project', help='Project within TENIS',             default='main')
-parser.add_argument('-s', '--server',  help='TENIS server url',                 required=True)
-args = parser.parse_args()
+
+
+def args_parser():
+    token = os.environ.get('NIP_TOKEN', access_token)
+    parser = ArgumentParser()
+    parser.add_argument('-o', '--obj',     help='Path to Nagios object.cache file', default=objects_file)
+    parser.add_argument('-p', '--project', help='Project within TENIS',             default=project_name)
+    parser.add_argument('-d', '--debug',   help='Print some debug data',            action='store_true')
+    parser.add_argument('-l', '--log',     help='Path to Nagios log file',          default=nagios_log)
+    parser.add_argument('-n', '--nip_log', help='Path to NIP log file',             default=plugin_log)
+    parser.add_argument('-s', '--server',  help='TENIS server url',                 required=True)
+    parser.add_argument('-t', '--token',   help='Access token',                     default=token)
+    return parser.parse_args()
 
 
 def check_file_id(file):
@@ -35,10 +41,11 @@ def check_file_id(file):
     return stats.st_ino
 
 
-def load_objects(objects):
+def load_objects(args, objects):
     """
     Creates a dictionary with services and hosts info, needed to parse fix_instruction url.
 
+    :param args: Script's arguments
     :param objects: Dictionary with services and hosts info to fill
     :return: nothing
     """
@@ -71,10 +78,11 @@ def load_objects(objects):
                     obj_name = re.sub(r'.*service_description\s*(.+)$', r'\1', line).strip()
 
 
-def add_events(event, events, objects):
+def add_events(args, event, events, objects):
     """
     Append the list of alerts with new items.
 
+    :param args: Script's arguments
     :param event: Dictionary with Alert parameters
     :param events: Lists of updates and resolves to append too
     :param objects: Dictionary with services info, needed to parse fix_instruction url
@@ -112,23 +120,30 @@ def add_events(event, events, objects):
     events.append(event_template[event['type']])
 
 
-def send_events(events, tenis):
+def send_events(args, events, dump, tenis):
     """
     Send alerts.json to TENIS server.
 
+    :param args: Script's arguments
     :param events: Global List of alerts and resolves
+    :param dump: Global List of alerts and resolves that weren't send, to try to send them again
     :param tenis: Persistent connection to Tenis server
-    :return: nothing
+    :return: True if data were sent ok or False in case of some error
     """
+    can_clear_data = True
     for event_type in ['update', 'resolve']:
-        if events[event_type]:
-            alerts_dick = {event_type: events[event_type]}
-            # alerts_json = json.dumps(alerts_dick)
-            # res = tenis.post(args.server + '/in', json=alerts_json) # We should use json but dick is used O_o
-            res = tenis.post(args.server + '/in', json=alerts_dick)
-            if args.debug:
-                # print(res.status_code, res.text, '\n', alerts_json)
-                print(res.status_code, res.text, '\n', alerts_dick)
+        if events[event_type] or dump[event_type]:
+            tmp_list = events[event_type]
+            tmp_list.extend(dump[event_type])
+            alerts_dick = {event_type: tmp_list}
+            try:
+                resp = tenis.post(args.server + '/in', json=alerts_dick)
+                if args.debug:
+                    print(resp.status_code, resp.text, '\n', alerts_dick)
+            except Exception as e:
+                can_clear_data = False
+                logging.critical(f"Error during sending events to TENIS: {str(e)}")
+    return can_clear_data
 
 
 def main():
@@ -141,6 +156,19 @@ def main():
     :return: nothing
     """
 
+    args = args_parser()
+    # Nagios' log data example, we need strings with '.*ALERT.*' pattern:
+    # N of index in lst:       0            1        2      3   4       5
+    # [1705421869] SERVICE ALERT: host;Alert name;CRITICAL;SOFT;1;Alert message
+    #                 0        1        2          3        4         5
+    service_map = ('fired', 'name', 'severity', 'trash', 'trash', 'message')
+
+    # N of index in lst:    0         1    2  3       4
+    # [1705421869] HOST ALERT: host;DOWN;SOFT;1;Alert message
+    # Note that Host alerts don't have name, therefore list indexes are differs a bit
+    #              0         1          2        3         4
+    host_map = ('fired', 'severity', 'trash', 'trash', 'message')
+
     # Start logging
     logging.basicConfig(
         filemode="w",
@@ -148,16 +176,17 @@ def main():
         filename=args.nip_log,
         format="%(asctime)s %(levelname)s %(message)s"
     )
+    logging.info('NIP service restarted')
 
     tenis = requests.Session()  # Open persistent connection to Tenis server
     try:
-        check_url = '/healz'
         if args.token:
-            check_url = '/whoami'
             tenis.headers.update({'X-Tenis-Token': args.token})
-        test = tenis.get(args.server + check_url)
-        if test.ok:
+        resp = tenis.get(args.server + '/healz')
+        if resp.ok:
             logging.info(f"Connection to {args.server} established")
+        else:
+            logging.critical(f'Failed to establish connection to TENIS server: {resp.text}')
     except Exception as e:
         logging.critical(f"Error connection to TENIS server: {str(e)}")
 
@@ -165,41 +194,29 @@ def main():
         n = 0.001
         timer = 0
         objects = {}
-        load_objects(objects)
+        load_objects(args, objects)
         log_id = check_file_id(args.log)
         obj_id = check_file_id(args.obj)
+        dump = {'update': [], 'resolve': []}
         events = {'update': [], 'resolve': []}
         logging.info(f"Start reading file {args.log}")
-        try:  # To log all possible errors
-            with open(args.log) as f:
-                f.seek(0, os.SEEK_END)  # Jump to the end of log file
 
-                while 2:  # Continuously read log file
+        with open(args.log) as f:
+            f.seek(0, os.SEEK_END)  # Jump to the end of log file
+            while 2:  # Continuously read log file
+                try:  # To log all possible errors
                     raw_alert = f.readline()
-                    # Nagios' log data example, we need strings with '.*ALERT.*' pattern:
-                    # N of index in lst:       0            1        2      3   4       5
-                    # [1705421869] SERVICE ALERT: host;Alert name;CRITICAL;SOFT;1;Alert message
-                    #                 0        1        2          3        4         5
-                    service_map = ['fired', 'name', 'severity', 'trash', 'trash', 'message']
-
-                    # N of index in lst:    0         1    2  3       4
-                    # [1705421869] HOST ALERT: host;DOWN;SOFT;1;Alert message
-                    # Note that Host alerts don't have name, therefore list indexes are differs a bit
-                    #              0         1          2        3         4
-                    host_map = ['fired', 'severity', 'trash', 'trash', 'message']
-
                     if raw_alert != '':  # If string is not empty parse it
                         raw_alert_split = raw_alert.split(';')
-                        event = {'type': '', 'fired': '', 'host': '', 'name': '', 'severity': '', 'message': ''}
 
-                        if re.match(r'.*ALERT:.*', raw_alert_split[0]):
-                            event['type'] = 'update'
+                        if re.match(r'^\[[0-9]+].*(SERVICE|HOST)\sALERT:.*', raw_alert_split[0]):
+                            event = {'type': 'update', 'fired': '', 'host': '', 'name': '', 'severity': '', 'message': ''}
                             if re.match(r'.*HOST.*', raw_alert_split[0]):  # than it's Host alert
                                 for i in range(0, len(raw_alert_split)):
                                     parameter_name = host_map[i]
                                     parameter_value = raw_alert_split[i]
                                     if parameter_name == 'fired':
-                                        event['fired'] = int(re.sub(r'.*\[(.*)\].*', r'\1', parameter_value))
+                                        event['fired'] = int(re.sub(r'.*\[(.*)].*', r'\1', parameter_value))
                                         event['host'] = parameter_value.split(' ')[-1]
                                     else:
                                         event[parameter_name] = parameter_value.strip()
@@ -209,46 +226,59 @@ def main():
                                     parameter_name = service_map[i]
                                     parameter_value = raw_alert_split[i]
                                     if parameter_name == 'fired':
-                                        event['fired'] = int(re.sub(r'.*\[(.*)\].*', r'\1', parameter_value))
+                                        event['fired'] = int(re.sub(r'.*\[(.*)].*', r'\1', parameter_value))
                                         event['host'] = parameter_value.split(' ')[-1]
                                     else:
                                         event[parameter_name] = parameter_value.strip()
+                            # Check INFO alerts
+                            # If alert name started from '_', change severity to INFO
+                            if re.match(r'^_.*', event['name']):
+                                event['name'] = re.sub(r'^_', '', event['name'])
+                                event['severity'] = 'INFO'
+                            # If alert message started from 'INFO:', change severity to INFO
+                            if re.match(r'^INFO:.*', event['message']):
+                                event['severity'] = 'INFO'
+
                             if re.match(r'OK|UP', event['severity']):  # it's Resolve
                                 event['type'] = 'resolve'
 
-                        if event['type']:
-                            add_events(event, events[event['type']], objects)
+                            add_events(args, event, events[event['type']], objects)
 
                     else:  # If string is empty it means we reached the end of file, send collected events, renew events
                         if events['update'] or events['resolve']:
-                            send_events(events, tenis)
-                            events = {'update': [], 'resolve': []}
+                            if send_events(args, events, dump, tenis):  # If sender succeeded, renew data
+                                events = {'update': [], 'resolve': []}
+                                dump = {'update': [], 'resolve': []}
+                            else:  # If sender failed, save data to dump dick to try to send it later
+                                dump['update'].extend(events['update'])
+                                dump['resolve'].extend(events['resolve'])
+                                events = {'update': [], 'resolve': []}
 
-                    sleep(n)  # To keep low CPU load
-                    timer += n
-                    if timer >= check_timeout:
-                        timer = 0
-                        try:  # Check that log file is not deleted/recreated
-                            if check_file_id(args.log) != log_id:
-                                break
-                        except FileNotFoundError:
-                            while not os.path.exists(args.log):
-                                logging.warning(f"Can't find {args.log}")
-                                sleep(check_timeout)
+                except Exception as e:  # Logg all errors
+                    logging.critical(f"Some error occurred: {str(e)}")
+                    sleep(check_timeout)
+
+                sleep(n)  # To keep low CPU load
+                timer += n
+                if timer >= check_timeout:
+                    timer = 0
+                    try:  # Check that log file is not deleted/recreated
+                        if check_file_id(args.log) != log_id:
                             break
+                    except FileNotFoundError:
+                        while not os.path.exists(args.log):
+                            logging.critical(f"Can't find {args.log}")
+                            sleep(check_timeout)
+                        break
 
-                        try:  # Check that objects file is not deleted/recreated
-                            if check_file_id(args.obj) != obj_id:
-                                logging.info(f"Rereading {args.obj}")
-                                obj_id = check_file_id(args.obj)
-                                load_objects(objects)
-                        except FileNotFoundError:
-                            logging.info(f"Can't find {args.obj}")
-                            pass  # Objects.cache is not the main file, just pass if it's not ready yet
-
-        except Exception as e:  # Logg all errors
-            logging.critical(f"Some error occurred: {str(e)}")
-            sleep(check_timeout)
+                    try:  # Check that objects file is not deleted/recreated
+                        if check_file_id(args.obj) != obj_id:
+                            logging.info(f"Rereading {args.obj}")
+                            obj_id = check_file_id(args.obj)
+                            load_objects(args, objects)
+                    except FileNotFoundError:
+                        logging.info(f"Can't find {args.obj}")
+                        pass  # Objects.cache is not the main file, just pass if it's not ready yet
 
 
 if __name__ == '__main__':
