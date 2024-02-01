@@ -94,6 +94,17 @@ def add_events(args, event, events, objects):
     except KeyError:
         notes_url = ''
 
+    # Check for INFO alerts
+    # If alert name starts with '_' change severity to INFO and remove '_' from name
+    # or if alert message started from 'INFO:', change severity to INFO
+    if event['type'] == 'update':
+        if re.match(r'^INFO:.*', event['message']):
+            event['severity'] = 'INFO'
+    # Note that we need to change names for resolves too, otherwise they won't work
+    if re.match(r'^_', event['name']):
+        event['name'] = re.sub(r'^_', '', event['name'])
+        event['severity'] = 'INFO'
+
     event_template = {
         'resolve': {
             "project": args.project,
@@ -157,7 +168,7 @@ def main():
     """
 
     args = args_parser()
-    # Nagios' log data example, we need strings with '.*ALERT.*' pattern:
+    # Nagios' log data example, we need strings with '^\[[0-9]+].*(SERVICE|HOST)\sALERT:.*' pattern:
     # N of index in lst:       0            1        2      3   4       5
     # [1705421869] SERVICE ALERT: host;Alert name;CRITICAL;SOFT;1;Alert message
     #                 0        1        2          3        4         5
@@ -234,14 +245,6 @@ def main():
                                         event['host'] = parameter_value.split(' ')[-1]
                                     else:
                                         event[parameter_name] = parameter_value.strip()
-                            # Check INFO alerts
-                            # If alert name started from '_', change severity to INFO
-                            if re.match(r'^_.*', event['name']):
-                                event['name'] = re.sub(r'^_', '', event['name'])
-                                event['severity'] = 'INFO'
-                            # If alert message started from 'INFO:', change severity to INFO
-                            if re.match(r'^INFO:.*', event['message']):
-                                event['severity'] = 'INFO'
 
                             if re.match(r'OK|UP', event['severity']):  # it's Resolve
                                 event['type'] = 'resolve'
