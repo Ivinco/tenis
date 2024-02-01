@@ -23,6 +23,10 @@
     font-size: 1.5rem;
 }
 
+.alertsNumber_small {
+    font-size: 0.7rem;
+}
+
 .alertBlock {
     display: flex;
     flex-direction: column;

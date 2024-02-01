@@ -49,7 +49,7 @@ const Alert = ({alert}) => {
                 <p className={styles.textFields}>{alert.alertName}</p>
             </div>
             <div className={`${isInspectMode ? styles.alertTime : styles.alertTime_small}`}>{processTimeStamp(alert.fired)}</div>
-            <div className={`${isInspectMode ? styles.message : styles.message_small}`}>
+            <div className={`${isInspectMode ? styles.message : styles.message_small}`} data-tooltip={alert.msg}>
                 <p className={styles.textFields}>{alert.msg}</p>
             </div>
             <div className={`${isInspectMode ? styles.refresh : styles.refresh_small}`}/>
