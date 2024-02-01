@@ -203,6 +203,7 @@ def inbound():
         with alerts_lock:
             new_alerts = []
             upd_alerts = []
+            updated_alerts = []
             for a in data['update']:
                 i = lookup_alert(alerts, a)
                 if i is not None:
@@ -215,6 +216,7 @@ def inbound():
                         alerts[i]['msg'] = a['msg']
                     if need_update:
                         upd_alerts.append(pymongo.UpdateOne({'_id': alerts[i]['_id']}, {"$set": need_update}))
+                        updated_alerts.append(alerts[i])
                     continue  # we already have this alert in global alerts list and don't need to change it
                 else:
                     new_alerts.append(a)
@@ -242,7 +244,10 @@ def inbound():
 
         try:
             # Send broadcast event to all connected clients
-            socketio.emit('update', parse_json(new_alerts))
+            if new_alerts:
+                socketio.emit('update', parse_json(new_alerts))
+            if updated_alerts:
+                socketio.emit('update', parse_json(updated_alerts))
         except Exception: pass  # Don't blame the reporter if backend failed to update clients
         return 'OK', 200
 

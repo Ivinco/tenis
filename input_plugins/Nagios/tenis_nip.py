@@ -190,6 +190,7 @@ def main():
     except Exception as e:
         logging.critical(f"Error connection to TENIS server: {str(e)}")
 
+    first_start = True
     while 1:  # Main loop to reopen nagios.log and objects.cache files if they were recreated
         n = 0.001
         timer = 0
@@ -202,7 +203,10 @@ def main():
         logging.info(f"Start reading file {args.log}")
 
         with open(args.log) as f:
-            f.seek(0, os.SEEK_END)  # Jump to the end of log file
+            if first_start:
+                f.seek(0, os.SEEK_END)  # Jump to the end of log file if plugin just started
+                first_start = False     # But then read file from the beginning if it's rolled
+
             while 2:  # Continuously read log file
                 try:  # To log all possible errors
                     raw_alert = f.readline()
