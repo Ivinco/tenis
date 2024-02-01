@@ -39,7 +39,7 @@ const AlertGroup = ({group, alertHeight}) => {
                 style={{backgroundColor: alertBackground, color: fontColor, height: `${alertHeight * 0.9}px`, cursor: 'pointer'}}>
                 <div className={`${isInspectMode ? alertStyles.projectName : alertStyles.projectName_small}`}
                      onClick={e => onAlertClickHandler(e)}>{group.project[0].toUpperCase()}</div>
-                <div className={`${isInspectMode ? alertStyles.host : alertStyles.host_small} ${styles.alertsNumber}`}
+                <div className={`${isInspectMode ? alertStyles.host : alertStyles.host_small} ${isInspectMode ? styles.alertsNumber : styles.alertsNumber_small}`}
                      onClick={e => onAlertClickHandler(e)}>
                     {group.alerts.length}
                 </div>

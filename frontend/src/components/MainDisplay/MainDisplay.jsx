@@ -41,7 +41,11 @@ export default function MainDisplay() {
         rowHeight = 95
     } else if ((1150 < windowWidth && windowWidth <= 2150) && isInspectMode) {
         rowHeight = 60
-    } else {
+    } else if (!isInspectMode){
+        rowHeight = 32
+    }
+
+    else  {
         rowHeight = 47
     }
 
