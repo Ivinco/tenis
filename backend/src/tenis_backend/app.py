@@ -251,10 +251,10 @@ def inbound():
         resolved_ids = []
         with alerts_lock:
             for entry in data['resolve']:
-                a = lookup_alert(alerts, entry)
-                if a is None: continue # we don't have this alert in the global list, skip
-                resolved_alerts.append(a)
-                resolved_ids.append(a['_id'])
+                i = lookup_alert(alerts, entry)
+                if i is None: continue # we don't have this alert in the global list, skip
+                resolved_alerts.append(alerts[i])
+                resolved_ids.append(alerts[i]['_id'])
             if len(resolved_alerts) == 0:
                 return 'OK', 200  # submitted alerts list does not match a single alert from the global list
 
