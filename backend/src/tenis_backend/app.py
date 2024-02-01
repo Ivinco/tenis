@@ -95,15 +95,19 @@ schema = {
     "additionalProperties": False
 }
 
+
 def cleanup_on_shutdown():
     """Properly close MongoDB connection on shutdown"""
     app.mongodb_client.close()
+
+
 atexit.register(cleanup_on_shutdown)
 
 
 def parse_json(data):
     """ Parse Mongo's OIDs """
     return json.dumps(data, default=str)
+
 
 #
 # API handles
@@ -129,7 +133,7 @@ def index():
 
 
 @app.route('/whoami')
-@token_required() # note () are required!
+@token_required()  # note () are required!
 def whoami(user):
     """ 
     Method that just returns user's email
