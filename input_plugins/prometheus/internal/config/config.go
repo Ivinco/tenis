@@ -22,6 +22,10 @@ type HttpServer struct {
 	Address     string        `yaml:"address" env-required:"true"`
 	Timeout     time.Duration `yaml:"timeout" env-default:"4s"`
 	IdleTimeout time.Duration `yaml:"idleTimeout" env-default:"60s"`
+	FilePath    string        `yaml:"filePath" env-required:"true"`
+	User        string        `yaml:"user" env-required:"true"`
+	Password    string        `yaml:"password" env-required:"true" env:"CLIENT_PASSWORD"`
+	Project     string        `yaml:"project"`
 }
 
 func MustLoad() *ConfFile {
