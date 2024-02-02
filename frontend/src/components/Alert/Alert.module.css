@@ -182,9 +182,9 @@
     top: 10%;
     left: 66%;
     transform: translateX(-50%);
-    max-width: 600px;
+    max-width: 1200px;
     padding: 10px;
-    background-color: #333;
+    background-color: #333333E5;
     color: #fff;
     border-radius: 5px;
     z-index: 10;
@@ -224,7 +224,7 @@
     transform: translateX(-50%);
     max-width: 600px;
     padding: 10px;
-    background-color: #333;
+    background-color:  #333333E5;
     color: #fff;
     border-radius: 5px;
     z-index: 10;
