@@ -179,7 +179,7 @@
 .message::after {
     content: attr(data-tooltip);
     position: absolute;
-    top: 100%;
+    top: 10%;
     left: 66%;
     transform: translateX(-50%);
     max-width: 600px;
@@ -219,7 +219,7 @@
 .message_small::after {
     content: attr(data-tooltip);
     position: absolute;
-    top: 100%;
+    top: 30%;
     left: 66%;
     transform: translateX(-50%);
     max-width: 600px;
