@@ -52,7 +52,7 @@ const AlertGroup = ({group, alertHeight}) => {
                     className={`${isInspectMode ? alertStyles.alertTime : alertStyles.alertTime_small}`}
                     onClick={e => onAlertClickHandler(e)}>
                 </div>
-                <div className={`${isInspectMode ? alertStyles.message : alertStyles.message_small}`}
+                <div className={`${isInspectMode ? styles.alertsGroupMessage : styles.alertsGroupMessage_small}`}
                      onClick={e => onAlertClickHandler(e)}>
                     {group.description}
                 </div>
