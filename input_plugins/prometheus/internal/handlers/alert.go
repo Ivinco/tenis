@@ -2,6 +2,8 @@ package handlers
 
 import (
 	"github.com/Ivinco/tenis.git/internal/helpers/alertprocessor"
+	"github.com/Ivinco/tenis.git/internal/helpers/alertsender"
+	"github.com/Ivinco/tenis.git/internal/lib/sl"
 	"github.com/go-chi/chi/v5/middleware"
 	"io"
 	"log/slog"
@@ -13,7 +15,7 @@ type Response struct {
 	Error  string `json:"error,omitempty"`
 }
 
-func AlertHandler(log *slog.Logger, filePath string, project string) http.HandlerFunc {
+func AlertHandler(log *slog.Logger, filePath string, project string, serverUrl string, token string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		const op = "handlers.alert.AlertHandler"
 
@@ -28,14 +30,25 @@ func AlertHandler(log *slog.Logger, filePath string, project string) http.Handle
 			log.Error("Can't read body")
 		}
 
-		err = alertprocessor.ProcessAlert(log, r.Context(), filePath, project, body)
+		alerts, err := alertprocessor.ProcessAlert(log, r.Context(), filePath, project, body)
+
+		resp, err := alertsender.AlertSender(*log, alerts, serverUrl, token)
 
 		if err != nil {
+			log.Error("Error during sending alert to backend", sl.Err(err))
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			return
 		}
 
-		log.Info("Request body:", slog.Any("request", string(body)))
+		if resp.StatusCode() != 200 {
+			log.Info("Backend server returned non OK status, ", slog.String("status", resp.Status()))
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			return
+		}
+
+		log.Info("Alerts sent to backend", slog.String("status", resp.Status()))
+
+		//log.Info("Request body:", slog.Any("request", string(body)))
 
 		//var req http.Response
 		//

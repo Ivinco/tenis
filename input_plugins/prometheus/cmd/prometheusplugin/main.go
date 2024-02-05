@@ -26,7 +26,7 @@ func main() {
 			cfg.HttpServer.User: cfg.HttpServer.Password,
 		}))
 
-		r.Post("/v2/alerts", handlers.AlertHandler(logger, cfg.HttpServer.FilePath, cfg.HttpServer.Project))
+		r.Post("/v2/alerts", handlers.AlertHandler(logger, cfg.HttpServer.FilePath, cfg.HttpServer.Project, cfg.Server.Address, cfg.Server.Token))
 	})
 
 	logger.Info("Starting server", slog.String("address", cfg.HttpServer.Address))

@@ -22,6 +22,7 @@ Command flag takes precedence over environment variable. Config file has the nex
   - **filePath**: the path where plugin saves input alerts
   - **user**: username of a client to be authenticated on plugin
   - **password**: password of a client to be authenticated on plugin
+  - **project**: the project which is monitored
 
 Here is a sample of config file:
 
@@ -37,9 +38,60 @@ httpServer:
   filePath: "/tmp/alerts.txt"
   user: "user"
   password: "password"
+  project: "Tenis"
 ```
 Keep in mind, that configs contain some sensitive data, like token to communicate with Tenis backend server and basic
 auth credentials which prometheus should use to send alerts to plugin. In prod environment you would prefer to omit 
 them in config file and set them by command flags or environment variables. Command flags take precedence over
 environment variables.
 
+For proper displaying of alerts in Tenis UI your alerts definitions in prometheus rules.yml file should contain severity
+label and descriptions annotation. If you want to have the link to some fix instructions related to alert, you should 
+also put it in alert labels. Here is the simple example of alert definition in prometheus rules.yml file:
+
+```yaml
+- alert: NodeDown
+  expr: node_down == 0
+  for: 5m
+  labels:
+    severity: CRITICAL
+    instance: "{{.Labels.instance}}"
+    fixInstructions: "https://wiki.project.local/how_to_fix"
+  annotations:
+    descriptions: "Metrics exporter on {{.Labels.instance}} is unavailable"
+```
+
+### How to run
+
+To run this plugin you should build main.go file as binary accordingly to your OS and architecture:
+
+```shell
+GOARCH=amd64 GOOS=linux go build -o tenis-plugin
+```
+
+Run this binary with the path to config file as argument and, if you need, with some other command line arguments:
+
+```shell
+./tenis-plugin --config=./tenis.yml
+```
+or
+```shell
+./tenis-plugin --config=./tenis.yml --token="my_secret_token" 
+```
+
+You may run it as a binary but more preferable way is to make a systemd service and use environment variables to
+set sensitive parameters. Here is the example of `.service` file:
+
+```shell
+[Unit]
+Description=Prometheus Input Plugin for TENIS
+After=multi-user.target
+
+[Service]
+Type=simple
+Restart=always
+ExecStart=/usr/local/bin/tenis-pip --config /etc/tenis-pip.yaml
+WantedBy=multi-user.target
+```
+
+Plugin write its logs to STDOUT, so you may find them in `messages` or in container logs.

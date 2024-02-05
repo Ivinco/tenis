@@ -3,12 +3,17 @@ package alertprocessor
 import (
 	"context"
 	"encoding/json"
-	"fmt"
+	"github.com/Ivinco/tenis.git/internal/helpers/filewriter"
 	"github.com/Ivinco/tenis.git/internal/lib/sl"
 	"github.com/go-chi/chi/v5/middleware"
 	"log/slog"
+	"strings"
 	"time"
 )
+
+type AlertsList struct {
+	Update []PreparedAlert `json:"update"`
+}
 
 type PreparedAlert struct {
 	Project      string                 `json:"project"`
@@ -31,7 +36,7 @@ type RawAlert struct {
 	Labels       map[string]interface{} `json:"labels"`
 }
 
-func ProcessAlert(logger *slog.Logger, ctx context.Context, filePath string, project string, alert []byte) error {
+func ProcessAlert(logger *slog.Logger, ctx context.Context, filePath string, project string, alert []byte) ([]byte, error) {
 	const op = "helpers/alertprocessor/PrecessAlert"
 	logger.With(
 		slog.String("op", op),
@@ -44,30 +49,30 @@ func ProcessAlert(logger *slog.Logger, ctx context.Context, filePath string, pro
 	err := json.Unmarshal(alert, &rawAlerts)
 	if err != nil {
 		logger.Error("Error during unmarshalling alerts", sl.Err(err))
-		return err
+		return nil, err
 	}
 
 	for _, item := range rawAlerts {
 		var alert PreparedAlert
 		alert.Project = project
-		if item.Labels.instance {
-			alert.Host = item.Labels.instance
+		if instance, ok := item.Labels["instance"].(string); ok {
+			alert.Host = strings.Split(instance, ":")[0]
 		} else {
 			alert.Host = "Undefined"
 		}
-		if item.Labels.alertname {
-			alert.Name = item.Labels.alertname
+		if name, ok := item.Labels["alertname"].(string); ok {
+			alert.Name = name
 		} else {
 			alert.Name = "Undefined"
 		}
 		alert.Fired = item.StartsAt.Unix()
-		if item.Labels.severity {
-			alert.Severity = item.Labels.severity
+		if severity, ok := item.Labels["severity"].(string); ok {
+			alert.Severity = severity
 		} else {
 			alert.Severity = "UNKNOWN"
 		}
-		if item.Annotations.description {
-			alert.Msg = item.Annotations.description
+		if message, ok := item.Annotations["descriptions"].(string); ok {
+			alert.Msg = message
 		} else {
 			alert.Msg = "UNDEFINED"
 		}
@@ -79,17 +84,25 @@ func ProcessAlert(logger *slog.Logger, ctx context.Context, filePath string, pro
 		alerts = append(alerts, alert)
 	}
 
-	fmt.Println(alerts)
+	alertsToSend := AlertsList{
+		Update: alerts,
+	}
 
-	//fw, err := filewriter.NewFileWriter(filePath)
-	//if err != nil {
-	//	logger.Error("Error during creating file writer", sl.Err(err))
-	//	return err
-	//}
-	//
-	//if err := fw.Write(alert); err != nil {
+	data, err := json.MarshalIndent(&alertsToSend, "", "    ")
+
+	fw, err := filewriter.NewFileWriter(filePath)
+	if err != nil {
+		logger.Error("Error during creating file writer", sl.Err(err))
+		return nil, err
+	}
+
+	//if err = fw.Write(alert); err != nil {
 	//	logger.Error("Can't write alert to file")
 	//}
+
+	if err = fw.Write(data); err != nil {
+		logger.Error("Can't write alerts to file")
+	}
 	//for _, alert := range rawAlerts {
 	//	result, err := json.MarshalIndent(alert, "", "    ")
 	//	if err != nil {
@@ -100,5 +113,5 @@ func ProcessAlert(logger *slog.Logger, ctx context.Context, filePath string, pro
 	//		}
 	//	}
 	//}
-	return nil
+	return data, nil
 }
