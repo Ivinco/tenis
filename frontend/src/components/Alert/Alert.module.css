@@ -192,7 +192,7 @@
     white-space: pre-line;
     visibility: hidden;
     opacity: 0;
-    transition: visibility 0s, opacity 0.5s ease;
+    transition: visibility 0s, opacity 0.5s ease 1s;
 }
 
 .message:hover::after {
@@ -232,7 +232,7 @@
     white-space: pre-line;
     visibility: hidden;
     opacity: 0;
-    transition: visibility 0s, opacity 0.5s ease;
+    transition: visibility 0s, opacity 0.5s ease 1s;
 }
 
 .message_small:hover::after {
