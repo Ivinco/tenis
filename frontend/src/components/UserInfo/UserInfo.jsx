@@ -3,6 +3,7 @@ import styles from './UserInfo.module.css'
 import {useDispatch, useSelector} from "react-redux";
 import {logoutAction} from "../../store/reducers/authReducer";
 import {closeModal} from "../../store/reducers/modalReducer";
+import {setAlertsNumber} from "../../store/reducers/alertReducer";
 
 
 const UserInfo = () => {
@@ -14,6 +15,7 @@ const UserInfo = () => {
         localStorage.removeItem('token')
         dispatch(logoutAction())
         dispatch(closeModal())
+        dispatch(setAlertsNumber(0))
     }
     return (
         <>
