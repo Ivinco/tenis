@@ -18,7 +18,6 @@ function MainPage(){
     const isOpenedModal = useSelector(state => state.switchModal.isOpened)
     const modalContent = useSelector(state => state.switchModal.content)
     const isLoggedIn = useSelector(state => state.authReducer.isLogged)
-    const alerts = useSelector(state => state.setAlertReducer.alertsNumber)
 
     const onSideBarClick = () => {
         dispatch(switchSideBarState())
