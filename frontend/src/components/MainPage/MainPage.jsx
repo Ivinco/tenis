@@ -33,10 +33,6 @@ function MainPage(){
         }
     }, [dispatch, isLoggedIn]);
 
-    useEffect(() => {
-        document.title = `${alerts} alerts fired`
-    },[alerts])
-
     return (
         <div className={styles.page}>
             <header className={styles.header}>

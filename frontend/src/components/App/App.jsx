@@ -14,6 +14,7 @@ import LoadingWindow from "../LoadingWindow/LoadingWindow";
 function App () {
     const dispatch = useDispatch()
     const isLoading = useSelector(state => state.switchLoadingWindow.isLoading)
+    const totalAlerts = useSelector(state => state.setAlertReducer.alertsNumber)
 
     useEffect( () => {
         async function checkAuth () {
@@ -44,6 +45,40 @@ function App () {
         }
         checkAuth()
     },[dispatch]);
+
+    useEffect(() => {
+        document.title = `${totalAlerts} alerts fired`;
+
+
+            const favicon = document.getElementById('favicon');
+            const faviconSize = 22;
+
+            const canvas = document.createElement('canvas');
+            canvas.width = faviconSize;
+            canvas.height = faviconSize;
+
+            const context = canvas.getContext('2d');
+            const img = document.createElement('img');
+            img.src = favicon.href;
+
+            img.onload = () => {
+                context.drawImage(img, 0, 0, faviconSize, faviconSize);
+
+                context.beginPath();
+                context.arc(canvas.width - faviconSize / 3, faviconSize / 3, faviconSize / 3, 0, 2 * Math.PI);
+                context.fillStyle = '#FF0000';
+                context.fill();
+
+                context.font = '14px "helvetica", sans-serif';
+                context.textAlign = 'center';
+                context.textBaseline = 'middle';
+                context.fillStyle = '#FFFFFF';
+
+                context.fillText(`${totalAlerts}`, canvas.width - faviconSize / 3, faviconSize / 3);
+
+                favicon.href = canvas.toDataURL('image/png');
+            };
+    }, [totalAlerts]);
 
   if(isLoading){
       return <LoadingWindow/>
