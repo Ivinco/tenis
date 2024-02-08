@@ -4,10 +4,15 @@ import (
 	"github.com/Ivinco/tenis.git/internal/config"
 	"github.com/Ivinco/tenis.git/internal/handlers"
 	logger2 "github.com/Ivinco/tenis.git/internal/logger"
+	"github.com/Ivinco/tenis.git/internal/tickers"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"log"
 	"log/slog"
 	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
 )
 
 func main() {
@@ -39,10 +44,20 @@ func main() {
 		IdleTimeout:  cfg.HttpServer.IdleTimeout,
 	}
 
-	if err := srv.ListenAndServe(); err != nil {
-		logger.Error("Failed to start server")
-	}
+	tickers.SendSavedAlerts(logger, cfg.Server.Address, cfg.Server.Token, cfg.HttpServer.FilePath, cfg.HttpServer.ResendInterval)
 
-	logger.Error("Server stopped")
+	shtdwnSig := make(chan os.Signal, 1)
+
+	signal.Notify(shtdwnSig, os.Interrupt, syscall.SIGTERM)
+
+	go func() {
+		if err := srv.ListenAndServe(); err != nil {
+			log.Fatalln("Failed to start server")
+		}
+	}()
+
+	<-shtdwnSig
+
+	logger.Info("Server stopped")
 
 }

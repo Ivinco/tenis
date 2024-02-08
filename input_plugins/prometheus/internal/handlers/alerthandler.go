@@ -3,6 +3,7 @@ package handlers
 import (
 	"github.com/Ivinco/tenis.git/internal/helpers/alertprocessor"
 	"github.com/Ivinco/tenis.git/internal/helpers/alertsender"
+	"github.com/Ivinco/tenis.git/internal/helpers/alertwriter"
 	"github.com/Ivinco/tenis.git/internal/lib/sl"
 	"github.com/go-chi/chi/v5/middleware"
 	"io"
@@ -32,33 +33,30 @@ func AlertHandler(log *slog.Logger, filePath string, project string, serverUrl s
 
 		alerts, err := alertprocessor.ProcessAlert(log, r.Context(), filePath, project, body)
 
-		resp, err := alertsender.AlertSender(*log, alerts, serverUrl, token)
+		resp, err := alertsender.AlertSender(log, alerts, serverUrl, token)
 
 		if err != nil {
 			log.Error("Error during sending alert to backend", sl.Err(err))
+			if err = alertwriter.AlertWriter(log, filePath, alerts); err != nil {
+				log.Error("Error writing alerts to file")
+			}
+			log.Info("Saved resolved alerts to temp file", slog.String("file", filePath))
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			return
 		}
 
-		if resp.StatusCode() != 200 {
+		if resp.StatusCode() != http.StatusOK && resp.StatusCode() != http.StatusBadRequest {
 			log.Info("Backend server returned non OK status, ", slog.String("status", resp.Status()))
+			if err = alertwriter.AlertWriter(log, filePath, alerts); err != nil {
+				log.Error("Error writing alerts to file")
+			}
+			log.Info("Saved resolved alerts to temp file", slog.String("file", filePath))
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			return
 		}
 
 		log.Info("Alerts sent to backend", slog.String("status", resp.Status()))
-
-		//log.Info("Request body:", slog.Any("request", string(body)))
-
-		//var req http.Response
-		//
-		//err := render.DecodeJSON(r.Body, &req)
-		//if err != nil {
-		//	log.Error("failed to decode request body")
-		//	return
-		//}
-
-		//log.Info("request body decoded", slog.Any("request", req))
+		
 		w.WriteHeader(http.StatusOK)
 	}
 }

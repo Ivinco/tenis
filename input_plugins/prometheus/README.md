@@ -19,7 +19,8 @@ Command flag takes precedence over environment variable. Config file has the nex
   - **address**: listening address and port
   - **timeout**: request and response timeout
   - **idleTimeout**: idle timeout for session
-  - **filePath**: the path where plugin saves input alerts
+  - **resendInterval**: interval to send alerts from temp file
+  - **filePath**: the path to the temp file where plugin saves unsent resolved alerts
   - **user**: username of a client to be authenticated on plugin
   - **password**: password of a client to be authenticated on plugin
   - **project**: the project which is monitored
@@ -35,7 +36,8 @@ httpServer:
   address: "localhost:8080"
   timeout: 4s
   idleTimeout: 60s
-  filePath: "/tmp/alerts.txt"
+  resendInterval: 1m
+  filePath: "/tmp/alerts.tmp"
   user: "user"
   password: "password"
   project: "Tenis"
@@ -60,6 +62,10 @@ also put it in alert labels. Here is the simple example of alert definition in p
   annotations:
     descriptions: "Metrics exporter on {{.Labels.instance}} is unavailable"
 ```
+
+In case backend server is unavailable for some reason, Input Plugin will save resolved alerts to temp file,
+and will try to send them again according to time interval which is set in `httpServer.resendInterval`. After 
+alerts from `.tmp` file successfully sent, the file will be removed.
 
 ### How to run
 
@@ -95,3 +101,5 @@ WantedBy=multi-user.target
 ```
 
 Plugin write its logs to STDOUT, so you may find them in `messages` or in container logs.
+
+

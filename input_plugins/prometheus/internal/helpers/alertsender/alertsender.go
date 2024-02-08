@@ -6,7 +6,7 @@ import (
 	"log/slog"
 )
 
-func AlertSender(logger slog.Logger, alerts []byte, server string, token string) (*resty.Response, error) {
+func AlertSender(logger *slog.Logger, alerts []byte, server string, token string) (*resty.Response, error) {
 	sender := resty.New().
 		SetHeader("X-Tenis-Token", token).
 		SetHeader("Content-Type", "application/json")
