@@ -1,4 +1,4 @@
-# TENIS PROMETHEUS INPUT FILE
+# TENIS PROMETHEUS INPUT PLUGIN
 
 ### General Description
 
@@ -72,7 +72,7 @@ alerts from `.tmp` file successfully sent, the file will be removed.
 To run this plugin you should build main.go file as binary accordingly to your OS and architecture:
 
 ```shell
-GOARCH=amd64 GOOS=linux go build -o tenis-plugin
+GOARCH=amd64 GOOS=linux go build -o tenis-pip
 ```
 
 Run this binary with the path to config file as argument and, if you need, with some other command line arguments:
