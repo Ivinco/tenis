@@ -4,11 +4,12 @@ import pymongo
 from flask import Flask, request, jsonify, make_response
 from flask_cors import CORS
 from flask_socketio import SocketIO, emit, send, disconnect
+from apscheduler.schedulers.background import BackgroundScheduler
 from werkzeug.exceptions import HTTPException, Unauthorized, BadRequest, InternalServerError
 import json
 from .auth import create_token, token_required, token_required_ws
 from .user import User
-from .alert import load_alerts, lookup_alert
+from .alert import load_alerts, lookup_alert, make_history_entry
 
 # Global vars init
 app = Flask(__name__)
@@ -25,6 +26,9 @@ app.config['SECRET_KEY'] = os.getenv('SECRET', 'big-tenis')
 app.config['LISTEN_PORT'] = os.getenv('LISTEN_PORT', '8000')
 app.config['LISTEN_HOST'] = os.getenv('LISTEN_HOST', '0.0.0.0')
 app.config['API_TOKEN'] = os.getenv('API_TOKEN', 'asdfg')
+app.config['HISTORY_RETENTION_DAYS'] = 30
+app.config['HISTORY_PERIOD_MINUTES'] = 1
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 #
 # This can be useful for testing
 #app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(minutes=1)
@@ -32,11 +36,42 @@ app.config['API_TOKEN'] = os.getenv('API_TOKEN', 'asdfg')
 app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=1)
 app.config['JWT_REFRESH_TOKEN_EXPIRES'] = timedelta(days=30)
 
+
 # Load alerts from the DB
 alerts_lock = threading.Lock()
 alerts = list()
 with alerts_lock:
     alerts = load_alerts(app.db['current'])
+
+# Internal periodic tasks
+scheduler = BackgroundScheduler()
+def db_retention():
+    """ Delete old history entrues.
+        Also, each 5 mins make a record for each active alert in the DB. """
+    print("Starting DB history retention background process...")
+    try:
+        cutoff = now = datetime.now(timezone.utc) - timedelta(days=app.config['HISTORY_RETENTION_DAYS'])
+        app.db['history'].delete_many({'logged': {'$lte': cutoff}})
+    except pymongo.errors.PyMongoError as e:
+        print("Warning: DB retention task failed: %s" % e)
+        pass
+
+    print("Dumping active alerts history...")
+    history_entries = []
+    with alerts_lock:
+        for a in alerts:
+            history_entries.append(make_history_entry(a))
+    try:
+        app.db['history'].insert_many(history_entries)
+    except pymongo.errors.PyMongoError as e:
+        print("Warning: failed to save history data: %s" % e)
+        pass
+    print("Periodic DB routine finished")
+    return
+            
+job = scheduler.add_job(db_retention, 'interval', minutes=app.config['HISTORY_PERIOD_MINUTES'])
+scheduler.start()
+
 
 # JSON schema to validate inbound JSON
 schema = {
@@ -167,7 +202,7 @@ def login():
         raise Unauthorized("Invalid credentials")
 
     try:
-        now = datetime.now(timezone.utc)
+        now = now = datetime.now(timezone.utc)
         acccess_token_expires = now + app.config['JWT_ACCESS_TOKEN_EXPIRES']
         refresh_token_expires = now + app.config['JWT_REFRESH_TOKEN_EXPIRES']
         
@@ -200,95 +235,118 @@ def inbound():
     except jsonschema.exceptions.ValidationError as e:
         raise BadRequest(e.message)
 
-    alerts_collection = app.db['current']
-
-    # history_collection = app.db['history']
     if 'update' in data:
         with alerts_lock:
-            new_alerts = []
-            upd_alerts = []
-            updated_alerts = []
+            new_alerts = [] # list of new alerts
+            updated_alerts = [] # list of updated alerts
+            update_alerts_query = [] # list to hold MongoDB query to update 'current' collection
+            new_history_entries = [] # list of entries to add to 'history' collection
             for a in data['update']:
-                i = lookup_alert(alerts, a)
-                if i is not None:
-                    need_update = {}
-                    if alerts[i]['severity'] is not a['severity']:
-                        need_update['severity'] = a['severity']
-                        alerts[i]['severity'] = a['severity']
-                    if alerts[i]['msg'] is not a['msg']:
-                        need_update['msg'] = a['msg']
-                        alerts[i]['msg'] = a['msg']
-                    if need_update:
-                        upd_alerts.append(pymongo.UpdateOne({'_id': alerts[i]['_id']}, {"$set": need_update}))
-                        updated_alerts.append(alerts[i])
-                    continue  # we already have this alert in global alerts list and don't need to change it
-                else:
+                existing_alert = lookup_alert(alerts, a)
+                if existing_alert is None: # new alert
                     new_alerts.append(a)
+                    continue # next 'a' from data['update]', please
 
-            if not new_alerts and not upd_alerts:  # all submitted alerts are already in the system
+                # if severity changed, this should be logged to history collection
+                if existing_alert['severity'] != a['severity']:
+                    a['_id'] = existing_alert['_id']
+                    new_history_entries.append(make_history_entry(a))
+
+                # found this alert in global list, maybe alert attributes have changed?
+                new_attributes = {}
+                for attr in ['fired', 'severity', 'msg', 'responsibleUser', 'comment', 'isScheduled', 'customFields']:
+                    if existing_alert[attr] == a[attr]: # works OK even for dicts (e.g. 'customFields' is a dict)
+                        new_attributes[attr] = a[attr] # to be saved in DB
+                        existing_alert[attr] = a[attr] # update in the global list
+                if new_attributes:
+                    update_alerts_query.append(pymongo.UpdateOne({'_id': existing_alert['_id']}, {"$set": new_attributes}))
+                    updated_alerts.append(existing_alert)
+
+            if not new_alerts and not updated_alerts:  # all submitted alerts are already in the system
                 return 'OK', 200
 
             if new_alerts:
                 try:
-                    res = alerts_collection.insert_many(new_alerts)
+                    res = app.db['current'].insert_many(new_alerts)
                     for i, _id in enumerate(res.inserted_ids):
                         new_alerts[i]['_id'] = _id
-                    # TODO: update history_collection here
+                        new_history_entries.append(make_history_entry(new_alerts[i]))
+                    # note that socketio.emit can be only done after insert_many:
+                    # we need Mongo to give us inserted object _ids
+                    socketio.emit('update', parse_json(new_alerts))
                 except pymongo.errors.PyMongoError as e:
-                    raise InternalServerError(e)
+                    raise InternalServerError("Failed to save alerts in MongoDB: %s" % e)
+                except socketio.exceptions.SocketIOError as e:
+                    print("Warning: Failed to send update to connected socketio clients: %s" % e)
+                    pass
+                alerts.extend(new_alerts)
 
-            if upd_alerts:
-                try:
-                    alerts_collection.bulk_write(upd_alerts)
-                except pymongo.errors.PyMongoError as e:
-                    raise InternalServerError(e)
-
-            # If DB write was successful, update global alerts list
-            alerts.extend(new_alerts)
-
-        try:
-            # Send broadcast event to all connected clients
-            if new_alerts:
-                socketio.emit('update', parse_json(new_alerts))
             if updated_alerts:
-                socketio.emit('update', parse_json(updated_alerts))
-        except Exception: pass  # Don't blame the reporter if backend failed to update clients
+                try:
+                    app.db['current'].bulk_write(update_alerts_query)
+                    socketio.emit('update', parse_json(updated_alerts))
+                except pymongo.errors.PyMongoError as e:
+                    raise InternalServerError("Failed to save alerts in MongoDB: %s" % e)
+                except socketio.exceptions.SocketIOError as e:
+                    print("Warning: Failed to send update to connected socketio clients: %s" % e)
+                    pass
+
+        # history can be updated outside of alerts_lock: it's write_only
+        if new_history_entries:
+            try:
+                app.db['history'].insert_many(new_history_entries)
+            except pymongo.errors.PyMongoError as e:
+                print("Warning: failed to save history data: %s" % e)
+                pass
         return 'OK', 200
 
     if 'resolve' in data:
         resolved_alerts = []
         resolved_ids = []
+        resolved_history_entries = []
         with alerts_lock:
             for entry in data['resolve']:
-                i = lookup_alert(alerts, entry)
-                if i is None: continue # we don't have this alert in the global list, skip
-                resolved_alerts.append(alerts[i])
-                resolved_ids.append(alerts[i]['_id'])
+                a = lookup_alert(alerts, entry)
+                if a is None: continue # we don't have this alert in the global list, skip
+                resolved_alerts.append(a)
+                a['severity'] = 'RESOLVED'
+                resolved_history_entries.append(make_history_entry(a))
+                resolved_ids.append(a['_id'])
+
+            for a in resolved_alerts:
+                alerts.remove(a) # remove from global in-mem list
+
             if len(resolved_alerts) == 0:
                 return 'OK', 200  # submitted alerts list does not match a single alert from the global list
 
             try:
-                alerts_collection.delete_many({'_id': {'$in': resolved_ids}})
-                # TODO: update history_collection here
+                app.db['current'].delete_many({'_id': {'$in': resolved_ids}})
             except pymongo.errors.PyMongoError as e:
-                raise InternalServerError(e)
+                raise InternalServerError("Failed to save alerts in MongoDB: %s" % e)
+            try:
+                socketio.emit('resolve', parse_json(resolved_ids))
+            except socketio.exceptions.SocketIOError as e:
+                print("Warning: Failed to send update to connected socketio clients: %s" % e)
+                pass
 
-            # If DB write was successful, remove resolved alerts from the global list
-            for a in resolved_alerts:
-                alerts.remove(a)
-
+        # History can be updated outside of alerts_lock since it's write only
         try:
-            socketio.emit('resolve', parse_json(resolved_ids))
-        except Exception: pass  # Don't blame the reporter if backend failed to update clients
+            app.db['history'].insert_many(resolved_history_entries)
+        except pymongo.errors.PyMongoError as e:
+            print("Warning: failed to save history data: %s" % e)
+            pass
         return 'OK', 200
 
     if 'reload' in data:
         with alerts_lock:
-            alerts = load_alerts(app.db['current'])
-            # TODO: decided what to do with history_collection
-        try:
-            socketio.emit('init', parse_json(alerts))
-        except Exception: pass  # don't blame the reporter if backend failed to update clients
+            try:
+                alerts = load_alerts(app.db['current'])
+                socketio.emit('init', parse_json(alerts))
+            except pymongo.errors.PyMongoError as e:
+                raise InternalServerError("Failed to load alerts from MongoDB: %s" % e)
+            except socketio.exceptions.SocketIOError as e:
+                print("Warning: Failed to send update to connected socketio clients: %s" % e)
+                pass
         return 'OK', 200
 
     # not reached
@@ -303,7 +361,7 @@ def inbound():
 @token_required(refresh=True)
 def refresh(user):
     try:
-        now = datetime.now(timezone.utc)
+        now = now = datetime.now(timezone.utc)
         acccess_token_expires = now + app.config['JWT_ACCESS_TOKEN_EXPIRES']
         refresh_token_expires = now + app.config['JWT_REFRESH_TOKEN_EXPIRES']
 
