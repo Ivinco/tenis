@@ -202,7 +202,7 @@ def login():
         raise Unauthorized("Invalid credentials")
 
     try:
-        now = now = datetime.now(timezone.utc)
+        now = datetime.now(timezone.utc)
         acccess_token_expires = now + app.config['JWT_ACCESS_TOKEN_EXPIRES']
         refresh_token_expires = now + app.config['JWT_REFRESH_TOKEN_EXPIRES']
         
@@ -361,7 +361,7 @@ def inbound():
 @token_required(refresh=True)
 def refresh(user):
     try:
-        now = now = datetime.now(timezone.utc)
+        now = datetime.now(timezone.utc)
         acccess_token_expires = now + app.config['JWT_ACCESS_TOKEN_EXPIRES']
         refresh_token_expires = now + app.config['JWT_REFRESH_TOKEN_EXPIRES']
 
