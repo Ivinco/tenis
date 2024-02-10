@@ -81,14 +81,14 @@ schema = {
         },
         "new_alert_definition": {
             "properties": {
-                "project": { "type": "string" },
-                "host": { "type": "string" },
+                "project": { "type": "string", "maxLength": 255 },
+                "host": { "type": "string", "maxLength": 255 },
                 "fired": { "type": "integer" },
-                "alertName": { "type": "string" },
-                "severity": { "type": "string" },
-                "msg": { "type": "string" },
-                "responsibleUser": { "type": "string" },
-                "comment": { "type": "string" },
+                "alertName": { "type": "string", "maxLength": 1024 },
+                "severity": { "type": "string", "maxLength": 255 },
+                "msg": { "type": "string", "maxLength": 65536 },
+                "responsibleUser": { "type": "string", "maxLength": 1024 },
+                "comment": { "type": "string" , "maxLength": 65536},
                 "isScheduled": { "type": "boolean" },
                 "customFields": { "type": "object", "$ref": "#/definitions/custom_field_definition" }
             },
