@@ -24,7 +24,8 @@ def lookup_alert(alerts, alert):
 
 
 def make_history_entry(alert):
-    """ Return history entry for the given alert """
+    """ Return history entry for the given alert.
+        This is effectively just a part of alert's data needed for the history collection. """
     return {
         'alert_id': alert['_id'],
         'logged': datetime.now(timezone.utc),

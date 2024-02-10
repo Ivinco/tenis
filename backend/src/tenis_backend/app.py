@@ -46,8 +46,8 @@ with alerts_lock:
 # Internal periodic tasks
 scheduler = BackgroundScheduler()
 def db_retention():
-    """ Delete old history entrues.
-        Also, each 5 mins make a record for each active alert in the DB. """
+    """ Delete old history entries.
+        Also, make intermediate record for each active alert in the DB to history table - needed for reports generation. """
     print("Starting DB history retention background process...")
     try:
         cutoff = now = datetime.now(timezone.utc) - timedelta(days=app.config['HISTORY_RETENTION_DAYS'])
