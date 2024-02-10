@@ -10,7 +10,7 @@ def lookup_alert(alerts, alert):
     Check if alert is already in the list
     :param alerts: Global list of alerts
     :param alert: New alert to check
-    :return: First element in the alerts list that matches
+    :return: First element in the alerts list that matches, or None
     """
     try:
         for a in alerts:
