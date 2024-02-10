@@ -22,10 +22,18 @@ db.users.insertOne({
   password: 'pbkdf2:sha256:260000$IRLzDvGK1yPx6f1R$f9caf10a1c5d0931c3962fc19316c68f37377804a24b70d6b7a857303394d5d7',
   active: true
 })
+db.createCollection("current")
 db.current.createIndex(
   { project: 1, host: 1, alertName: 1 },
   { unique: true }
 )
+db.createCollection("history")
+db.history.createIndex(
+  { project: 1, host: 1, alertName: 1, logged: 1 },
+  { unique: false }
+)
+
+
 ```
 - finally, [re]start backend service:
 ```
