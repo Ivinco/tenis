@@ -22,6 +22,20 @@ def lookup_alert(alerts, alert):
     except TypeError:
         return None
 
+def update_alerts(alerts, alert):
+    """ Look for alert in the global list that matches the given one
+        and update the details """
+    try:
+        for a in alerts:
+            if (a['project'] == alert['project'] and
+                a['alertName'] == alert['alertName'] and
+                a['host'] == alert['host']):
+                for attr in ['fired', 'severity', 'msg', 'responsibleUser', 'comment', 'isScheduled', 'customFields']:
+                    a[attr] = alert[attr]
+    except TypeError:
+        pass
+    return
+            
 
 def make_history_entry(alert):
     """ Return history entry for the given alert.
