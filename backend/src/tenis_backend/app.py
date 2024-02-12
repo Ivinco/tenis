@@ -27,7 +27,7 @@ app.config['LISTEN_PORT'] = os.getenv('LISTEN_PORT', '8000')
 app.config['LISTEN_HOST'] = os.getenv('LISTEN_HOST', '0.0.0.0')
 app.config['API_TOKEN'] = os.getenv('API_TOKEN', 'asdfg')
 app.config['HISTORY_RETENTION_DAYS'] = 30
-app.config['HISTORY_PERIOD_MINUTES'] = 1
+app.config['HISTORY_PERIOD_MINUTES'] = 15
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 #
 # This can be useful for testing
@@ -61,12 +61,12 @@ def db_retention():
     with alerts_lock:
         for a in alerts:
             history_entries.append(make_history_entry(a))
-    if history_entries:
-        try:
-            app.db['history'].insert_many(history_entries)
-        except pymongo.errors.PyMongoError as e:
-            print("Warning: failed to save history data: %s" % e)
-            pass
+        if history_entries:
+            try:
+                app.db['history'].insert_many(history_entries)
+            except pymongo.errors.PyMongoError as e:
+                print("Warning: failed to save history data: %s" % e)
+                pass
     print("Periodic DB routine finished")
     return
             
