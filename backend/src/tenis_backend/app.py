@@ -9,7 +9,7 @@ from werkzeug.exceptions import HTTPException, Unauthorized, BadRequest, Interna
 import json
 from .auth import create_token, token_required, token_required_ws
 from .user import User
-from .alert import load_alerts, lookup_alert, make_history_entry
+from .alert import load_alerts, lookup_alert, update_alerts, make_history_entry
 
 # Global vars init
 app = Flask(__name__)
@@ -61,11 +61,12 @@ def db_retention():
     with alerts_lock:
         for a in alerts:
             history_entries.append(make_history_entry(a))
-    try:
-        app.db['history'].insert_many(history_entries)
-    except pymongo.errors.PyMongoError as e:
-        print("Warning: failed to save history data: %s" % e)
-        pass
+    if history_entries:
+        try:
+            app.db['history'].insert_many(history_entries)
+        except pymongo.errors.PyMongoError as e:
+            print("Warning: failed to save history data: %s" % e)
+            pass
     print("Periodic DB routine finished")
     return
             
@@ -247,6 +248,8 @@ def inbound():
                     new_alerts.append(a)
                     continue # next 'a' from data['update]', please
 
+                existing_alert = existing_alert.copy() # we will update gloabl list later
+
                 # if severity changed, this should be logged to history collection
                 if existing_alert['severity'] != a['severity']:
                     a['_id'] = existing_alert['_id']
@@ -255,9 +258,9 @@ def inbound():
                 # found this alert in global list, maybe alert attributes have changed?
                 new_attributes = {}
                 for attr in ['fired', 'severity', 'msg', 'responsibleUser', 'comment', 'isScheduled', 'customFields']:
-                    if existing_alert[attr] == a[attr]: # works OK even for dicts (e.g. 'customFields' is a dict)
+                    if existing_alert[attr] != a[attr]: # works OK even for dicts (e.g. 'customFields' is a dict)
                         new_attributes[attr] = a[attr] # to be saved in DB
-                        existing_alert[attr] = a[attr] # update in the global list
+                        existing_alert[attr] = a[attr] # note this won't affect the global list since existing_alert is a copy
                 if new_attributes:
                     update_alerts_query.append(pymongo.UpdateOne({'_id': existing_alert['_id']}, {"$set": new_attributes}))
                     updated_alerts.append(existing_alert)
@@ -271,6 +274,7 @@ def inbound():
                     for i, _id in enumerate(res.inserted_ids):
                         new_alerts[i]['_id'] = _id
                         new_history_entries.append(make_history_entry(new_alerts[i]))
+                    alerts.extend(new_alerts)
                     # note that socketio.emit can be only done after insert_many:
                     # we need Mongo to give us inserted object _ids
                     socketio.emit('update', parse_json(new_alerts))
@@ -279,11 +283,12 @@ def inbound():
                 except socketio.exceptions.SocketIOError as e:
                     print("Warning: Failed to send update to connected socketio clients: %s" % e)
                     pass
-                alerts.extend(new_alerts)
 
             if updated_alerts:
                 try:
                     app.db['current'].bulk_write(update_alerts_query)
+                    for a in updated_alerts:
+                        update_alerts(alerts, a)
                     socketio.emit('update', parse_json(updated_alerts))
                 except pymongo.errors.PyMongoError as e:
                     raise InternalServerError("Failed to save alerts in MongoDB: %s" % e)
