@@ -42,10 +42,10 @@ frontend:
 mongodb:
   resources:
     requests:
-      memory: "256Mi"
-      cpu: "100m"
+      memory: "512Mi"
+      cpu: "200m"
     limits:
-      memory: "256Mi"
+      memory: "512Mi"
 
 
   env:
