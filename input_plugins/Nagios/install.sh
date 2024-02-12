@@ -2,33 +2,29 @@
 
 set -e
 cd $(dirname "$0")
+cfg='/etc/nagios/nagios.cfg'
 
 help="
 Options:
-    -o Path to Nagios object.cache file (default value '/var/log/nagios/objects.cache')
-    -l Path to Nagios log file (default value '/var/log/nagios/nagios.log')
-    -n Path to NIP log file (default value /var/log/nip.log')
+    -c Path to Nagios config file (default value '/etc/nagios/nagios.cfg')
+    -l Path to NIP log file (default value /var/log/nip.log')
     -p Project within TENIS (default value 'main')
     -s TENIS server url (required)
     -t Access token (optional)
-
-Use this command to check files location:
-    egrep 'log_file|object_cache_file' /etc/nagios/nagios.cfg
 "
 
 #Get opts
-while getopts ":o:l:n:p:s:t:" opt; do
+while getopts ":l:p:c:s:t:" opt; do
     case "$opt" in
-           (o)  opts+=("--obj '$OPTARG'");;
-           (l)  opts+=("--log '$OPTARG'");;
-           (n)  opts+=("--nip_log '$OPTARG'");;
            (p)  opts+=("--project '$OPTARG'");;
+           (l)  opts+=("--log '$OPTARG'");;
+           (c)  opts+=("--cfg '$OPTARG'");;
            (s)  srv=$OPTARG; opts+=("--server '$srv'");;
            (t)  printf -v token -- '\nEnvironment="NIP_TOKEN=%s"' "$OPTARG";;
            (*)  printf -- "$help"; exit 1;;
     esac
 done
-[[ $srv ]] || { printf "$help"; exit 1; }
+[[ -f $cfg && $srv ]] || { printf "$help"; exit 1; }
 
 echo "[Unit]
 Description=Nagios Input Plugin for TENIS
