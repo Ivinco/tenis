@@ -27,17 +27,16 @@
 
 .itemBody {
     width: 100%;
-    position: absolute; /* Абсолютное позиционирование */
-    top: 75%; /* Смещение от верхней части родителя */
-    left: 0; /* Расположение слева от родителя */
+    position: absolute;
+    top: 75%;
+    left: 0;
     z-index: 100;
     display: flex;
     align-items: center;
     flex-direction: column;
-    justify-content: center;
     background-color: #E1F6F6FF;
     margin-top: 15px;
-    overflow: hidden;
+    overflow: scroll;
     height: 0;
     transition: height 0.2s;
     border-radius: 10px;

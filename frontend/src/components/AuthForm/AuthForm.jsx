@@ -20,13 +20,15 @@ const AuthForm = () => {
             const response = await AuthService.login(email, password)
                     localStorage.setItem('token', response.data.access_token)
                     console.log(`https://gravatar.com/avatar/${sha256(response.data.user.email)}?s=150`)
-                    const user = {
-                                        userName: response.data.user.name,
-                                        userId: response.data.user._id,
-                                        userEmail: response.data.user.email,
-                                        userImage: `https://gravatar.com/avatar/${sha256(response.data.user.email)}?s=150`,
-                                        usersCommentReplaceRules: response.data.user.commentReplaceRules
-                                    }
+                    const user_raw = {
+                        userName: response.data.user.name,
+                        userId: response.data.user._id,
+                        userEmail: response.data.user.email,
+                        userImage: `https://gravatar.com/avatar/${sha256(response.data.user.email)}?s=150`,
+                        usersCommentReplaceRules: response.data.user.commentReplaceRules,
+                        userProjects: response.data.user.userProjects
+                        }
+                    const user = {...user_raw, userProjects: ['All', ...user_raw.userProjects]}
                     dispatch(loginAction(user))
                     dispatch(closeModal())
         }
@@ -36,7 +38,7 @@ const AuthForm = () => {
                     dispatch(switchErrorMessageModal("Login failed"))
                     break
                 default:
-                    dispatch(switchErrorMessageModal("Oops. Something went worng. Please, try a bit later"))
+                    dispatch(switchErrorMessageModal("Oops. Something went wrong. Please, try a bit later"))
             }
             console.error(`This is request error: ${e.request.status}`)
         }

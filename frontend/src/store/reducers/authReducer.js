@@ -1,6 +1,5 @@
 import {LOGIN, LOGOUT} from "../actions/AUTH_ACTIONS";
 
-
 const defaultAuth =  {
     isLogged: false,
     user : {
@@ -8,7 +7,8 @@ const defaultAuth =  {
         userName: null,
         userImage: null,
         userEmail: null,
-        commentReplaceRules:{}
+        commentReplaceRules: {},
+        userProjects:[]
     }
 
 }
@@ -23,7 +23,6 @@ export const authReducer = (state = defaultAuth, action) => {
             return state
     }
 }
-
 
 export const loginAction = (user) => ({
     type: LOGIN,
