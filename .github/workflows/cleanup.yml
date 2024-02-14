@@ -5,6 +5,8 @@ on:
   repository_dispatch:
     types: [cleanup]
 
+env:
+  REACT_APP_SERVER: placeholder
 jobs:
   cleanup:
     name: Cleanup
