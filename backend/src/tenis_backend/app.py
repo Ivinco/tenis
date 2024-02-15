@@ -90,12 +90,12 @@ schema = {
                 "msg": { "type": "string", "maxLength": 65536 },
                 "responsibleUser": { "type": "string", "maxLength": 1024 },
                 "comment": { "type": "string" , "maxLength": 65536},
-                "isScheduled": { "type": "boolean" },
+                "silenced": { "type": "boolean" },
                 "customFields": { "type": "object", "$ref": "#/definitions/custom_field_definition" }
             },
             "anyOf": [
-                {"required": [ "project", "host", "fired", "alertName", "severity", "msg", "responsibleUser", "comment", "isScheduled" ]},
-                {"required": [ "project", "host", "fired", "alertName", "severity", "msg", "responsibleUser", "comment", "isScheduled", "customFields" ]}
+                {"required": [ "project", "host", "fired", "alertName", "severity", "msg", "responsibleUser", "comment", "silenced" ]},
+                {"required": [ "project", "host", "fired", "alertName", "severity", "msg", "responsibleUser", "comment", "silenced", "customFields" ]}
             ],
             "additionalProperties": False
         },
@@ -257,7 +257,7 @@ def inbound():
 
                 # found this alert in global list, maybe alert attributes have changed?
                 new_attributes = {}
-                for attr in ['fired', 'severity', 'msg', 'responsibleUser', 'comment', 'isScheduled', 'customFields']:
+                for attr in ['fired', 'severity', 'msg', 'responsibleUser', 'comment', 'silenced', 'customFields']:
                     if existing_alert[attr] != a[attr]: # works OK even for dicts (e.g. 'customFields' is a dict)
                         new_attributes[attr] = a[attr] # to be saved in DB
                         existing_alert[attr] = a[attr] # note this won't affect the global list since existing_alert is a copy

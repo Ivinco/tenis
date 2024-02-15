@@ -30,7 +30,7 @@ def update_alerts(alerts, alert):
             if (a['project'] == alert['project'] and
                 a['alertName'] == alert['alertName'] and
                 a['host'] == alert['host']):
-                for attr in ['fired', 'severity', 'msg', 'responsibleUser', 'comment', 'isScheduled', 'customFields']:
+                for attr in ['fired', 'severity', 'msg', 'responsibleUser', 'comment', 'silenced', 'customFields']:
                     a[attr] = alert[attr]
     except TypeError:
         pass
