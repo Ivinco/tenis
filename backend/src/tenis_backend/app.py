@@ -9,7 +9,7 @@ from werkzeug.exceptions import HTTPException, Unauthorized, BadRequest, Interna
 import json
 from .auth import create_token, token_required, token_required_ws
 from .user import User
-from .alert import load_alerts, lookup_alert, update_alerts, make_history_entry
+from .alert import load_alerts, lookup_alert, update_alerts, make_history_entry, is_resolved
 
 # Global vars init
 app = Flask(__name__)
@@ -243,6 +243,8 @@ def inbound():
             update_alerts_query = [] # list to hold MongoDB query to update 'current' collection
             new_history_entries = [] # list of entries to add to 'history' collection
             for a in data['update']:
+                if is_resolved(a): continue # do not process resolved alerts in 'update' section
+
                 existing_alert = lookup_alert(alerts, a)
                 if existing_alert is None: # new alert
                     new_alerts.append(a)
