@@ -48,3 +48,13 @@ def make_history_entry(alert):
         'alertName': alert['alertName'],
         'severity': alert['severity']
     }
+
+def is_resolved(alert):
+    """ Return true if alert['severity'] indicates that alert is resolved """
+    try:
+        s = alert['severity'].lower()
+        if s == 'ok' or s == 'resolved':
+            return True
+    except TypeError:
+        pass
+    return False
