@@ -11,11 +11,6 @@ import (
 	"net/http"
 )
 
-type Response struct {
-	Status string `json:"status"`
-	Error  string `json:"error,omitempty"`
-}
-
 func AlertHandler(log *slog.Logger, filePath string, project string, serverUrl string, token string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		const op = "handlers.alert.AlertHandler"
@@ -31,7 +26,7 @@ func AlertHandler(log *slog.Logger, filePath string, project string, serverUrl s
 			log.Error("Can't read body")
 		}
 
-		alerts, err := alertprocessor.ProcessAlert(log, r.Context(), filePath, project, body)
+		alerts, err := alertprocessor.ProcessAlert(log, r.Context(), project, body)
 
 		resp, err := alertsender.AlertSender(log, alerts, serverUrl, token)
 
@@ -56,7 +51,7 @@ func AlertHandler(log *slog.Logger, filePath string, project string, serverUrl s
 		}
 
 		log.Info("Alerts sent to backend", slog.String("status", resp.Status()))
-		
+
 		w.WriteHeader(http.StatusOK)
 	}
 }
