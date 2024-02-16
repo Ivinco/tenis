@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"encoding/json"
 	"github.com/Ivinco/tenis.git/internal/helpers/alertprocessor"
 	"github.com/Ivinco/tenis.git/internal/helpers/alertsender"
 	"github.com/Ivinco/tenis.git/internal/helpers/alertwriter"
@@ -9,18 +10,23 @@ import (
 	"io"
 	"log/slog"
 	"net/http"
+	"time"
 )
 
-type Response struct {
-	Status string `json:"status"`
-	Error  string `json:"error,omitempty"`
+type Alert struct {
+	Annotations  map[string]interface{} `json:"annotations"`
+	EndsAt       time.Time              `json:"endsAt"`
+	StartsAt     time.Time              `json:"startsAt"`
+	GeneratorURL string                 `json:"generatorURL"`
+	Labels       map[string]interface{} `json:"labels"`
 }
 
-func AlertHandler(log *slog.Logger, filePath string, project string, serverUrl string, token string) http.HandlerFunc {
+func AlertHandler(logger *slog.Logger, filePath string, project string, serverUrl string, token string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		const op = "handlers.alert.AlertHandler"
+		batchSize := 5000
 
-		log = log.With(
+		logger = logger.With(
 			slog.String("op", op),
 			slog.String("request_id", middleware.GetReqID(r.Context())),
 		)
@@ -28,35 +34,82 @@ func AlertHandler(log *slog.Logger, filePath string, project string, serverUrl s
 		body, err := io.ReadAll(r.Body)
 
 		if err != nil {
-			log.Error("Can't read body")
+			logger.Error("Can't read body")
 		}
 
-		alerts, err := alertprocessor.ProcessAlert(log, r.Context(), filePath, project, body)
+		var rawAlerts []alertprocessor.RawAlert
 
-		resp, err := alertsender.AlertSender(log, alerts, serverUrl, token)
+		if err = json.Unmarshal(body, &rawAlerts); err != nil {
+			logger.Error("Error unmarshalling request data", sl.Err(err))
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			return
+		}
+
+		if len(rawAlerts) > batchSize {
+			var alertChunks [][]alertprocessor.RawAlert
+			for i := 0; i < len(rawAlerts); i += batchSize {
+				end := i + batchSize
+				if end > len(rawAlerts) {
+					end = len(rawAlerts)
+				}
+				alertChunks = append(alertChunks, rawAlerts[i:end])
+			}
+			for _, chunk := range alertChunks {
+				alerts, err := alertprocessor.ProcessAlert(logger, r.Context(), project, chunk)
+				if err != nil {
+					logger.Error("Error processing alerts chunk", sl.Err(err))
+					http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+					return
+				}
+				resp, err := alertsender.AlertSender(logger, alerts, serverUrl, token)
+				if err != nil {
+					logger.Error("Error during sending alert to backend", sl.Err(err))
+					if err = alertwriter.AlertWriter(logger, filePath, alerts); err != nil {
+						logger.Error("Error writing alerts to file")
+					}
+					logger.Info("Saved resolved alerts to temp file", slog.String("file", filePath))
+					http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+					return
+				}
+				if resp.StatusCode() != http.StatusOK && resp.StatusCode() != http.StatusBadRequest {
+					logger.Info("Backend server returned non OK status, ", slog.String("status", resp.Status()))
+					if err = alertwriter.AlertWriter(logger, filePath, alerts); err != nil {
+						logger.Error("Error writing alerts to file")
+					}
+					logger.Info("Saved resolved alerts to temp file", slog.String("file", filePath))
+					http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+					return
+				}
+			}
+		}
+
+		alerts, err := alertprocessor.ProcessAlert(logger, r.Context(), project, rawAlerts)
+
+		resp, err := alertsender.AlertSender(logger, alerts, serverUrl, token)
 
 		if err != nil {
-			log.Error("Error during sending alert to backend", sl.Err(err))
-			if err = alertwriter.AlertWriter(log, filePath, alerts); err != nil {
-				log.Error("Error writing alerts to file")
+
+			logger.Error("Error during sending alert to backend", sl.Err(err))
+			if err = alertwriter.AlertWriter(logger, filePath, alerts); err != nil {
+				logger.Error("Error writing alerts to file")
 			}
-			log.Info("Saved resolved alerts to temp file", slog.String("file", filePath))
+			logger.Info("Saved resolved alerts to temp file", slog.String("file", filePath))
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			return
 		}
 
 		if resp.StatusCode() != http.StatusOK && resp.StatusCode() != http.StatusBadRequest {
-			log.Info("Backend server returned non OK status, ", slog.String("status", resp.Status()))
-			if err = alertwriter.AlertWriter(log, filePath, alerts); err != nil {
-				log.Error("Error writing alerts to file")
+			logger.Info("Backend server returned non OK status, ", slog.String("status", resp.Status()))
+			if err = alertwriter.AlertWriter(logger, filePath, alerts); err != nil {
+				logger.Error("Error writing alerts to file")
 			}
-			log.Info("Saved resolved alerts to temp file", slog.String("file", filePath))
+			logger.Info("Saved resolved alerts to temp file", slog.String("file", filePath))
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			return
 		}
 
-		log.Info("Alerts sent to backend", slog.String("status", resp.Status()))
-		
+		logger.Info("Alerts sent to backend", slog.String("status", resp.Status()))
+
 		w.WriteHeader(http.StatusOK)
 	}
 }
