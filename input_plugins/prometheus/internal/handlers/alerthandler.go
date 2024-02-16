@@ -10,16 +10,7 @@ import (
 	"io"
 	"log/slog"
 	"net/http"
-	"time"
 )
-
-type Alert struct {
-	Annotations  map[string]interface{} `json:"annotations"`
-	EndsAt       time.Time              `json:"endsAt"`
-	StartsAt     time.Time              `json:"startsAt"`
-	GeneratorURL string                 `json:"generatorURL"`
-	Labels       map[string]interface{} `json:"labels"`
-}
 
 func AlertHandler(logger *slog.Logger, filePath string, project string, serverUrl string, token string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
