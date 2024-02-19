@@ -30,7 +30,7 @@ def update_alerts(alerts, alert):
             if (a['project'] == alert['project'] and
                 a['alertName'] == alert['alertName'] and
                 a['host'] == alert['host']):
-                for attr in ['fired', 'severity', 'msg', 'responsibleUser', 'comment', 'isScheduled', 'customFields']:
+                for attr in ['fired', 'severity', 'msg', 'responsibleUser', 'comment', 'silenced', 'customFields']:
                     a[attr] = alert[attr]
     except TypeError:
         pass
@@ -48,3 +48,13 @@ def make_history_entry(alert):
         'alertName': alert['alertName'],
         'severity': alert['severity']
     }
+
+def is_resolved(alert):
+    """ Return true if alert['severity'] indicates that alert is resolved """
+    try:
+        s = alert['severity'].lower()
+        if s == 'ok' or s == 'resolved':
+            return True
+    except TypeError:
+        pass
+    return False

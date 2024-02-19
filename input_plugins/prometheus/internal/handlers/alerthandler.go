@@ -30,6 +30,8 @@ func AlertHandler(logger *slog.Logger, filePath string, project string, serverUr
 
 		var rawAlerts []alertprocessor.RawAlert
 
+		alerts, err := alertprocessor.ProcessAlert(log, r.Context(), project, body)
+
 		if err = json.Unmarshal(body, &rawAlerts); err != nil {
 			logger.Error("Error unmarshalling request data", sl.Err(err))
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
@@ -98,6 +100,7 @@ func AlertHandler(logger *slog.Logger, filePath string, project string, serverUr
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			return
 		}
+
 
 		logger.Info("Alerts sent to backend", slog.String("status", resp.Status()))
 

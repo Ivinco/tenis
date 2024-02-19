@@ -25,7 +25,7 @@ type PreparedAlert struct {
 	Msg          string                 `json:"msg"`
 	User         string                 `json:"responsibleUser"`
 	Comment      string                 `json:"comment"`
-	Scheduled    bool                   `json:"isScheduled"`
+	Silenced     bool                   `json:"silenced"`
 	CustomFields map[string]interface{} `json:"customFields"`
 }
 
@@ -42,6 +42,7 @@ type RawAlert struct {
 	GeneratorURL string                 `json:"generatorURL"`
 	Labels       map[string]interface{} `json:"labels"`
 }
+
 
 func ProcessAlert(logger *slog.Logger, ctx context.Context, project string, rawAlerts []RawAlert) ([]byte, error) {
 	const op = "helpers/alertprocessor/PrecessAlert"
@@ -95,7 +96,7 @@ func ProcessAlert(logger *slog.Logger, ctx context.Context, project string, rawA
 			}
 			alert.User = ""
 			alert.Comment = ""
-			alert.Scheduled = false
+			alert.Silenced = false
 			alert.CustomFields = item.Labels
 
 			alerts = append(alerts, alert)

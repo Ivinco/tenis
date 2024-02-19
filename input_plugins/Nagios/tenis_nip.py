@@ -199,7 +199,7 @@ def add_events(project, event, events, objects):
             "msg": event['message'],
             "responsibleUser": "",
             "comment": "",
-            "isScheduled": False,
+            "silenced": False,
             "customFields": {
                 "fixInstructions": notes_url,
             }
@@ -221,9 +221,14 @@ def parse_status_dat(dat, project, events, objects):
     """
 
     # Grep only needed values to ease the process
-    grep1 = '(service|host)status {'
-    grep2 = fr'{grep1}|time_up=|host_name=|service_description=|current_state=|hard_state_change=|\splugin_output='
-    cmd = [f"grep -E '{grep1}' -A32 {dat} | grep -E '{grep2}'"]
+    # grep1 = '(service|host)status {'
+    # grep2 = fr'{grep1}|time_up=|host_name=|service_description=|current_state=|hard_state_change=|\splugin_output='
+    # cmd = [f"grep -E '{grep1}' -A32 {dat} | grep -E '{grep2}'"]
+
+    # Alternate method to grep only actual alerts, the fastest method
+    grep1 = 'current_state=[1-9]'
+    grep2 = fr'{grep1}|(service|host)status\s|time_up=|host_name=|service_description=|hard_state_change=|\splugin_output='
+    cmd = [f"grep -E '{grep1}' -B16 -A15 status.dat | grep -E '{grep2}'"]
     data = []
     try:
         data = subprocess.run(cmd, shell=True, stdout=subprocess.PIPE).stdout.decode('utf-8').split('\n')
