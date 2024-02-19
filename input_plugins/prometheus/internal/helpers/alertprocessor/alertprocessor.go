@@ -43,22 +43,16 @@ type RawAlert struct {
 	Labels       map[string]interface{} `json:"labels"`
 }
 
-func ProcessAlert(logger *slog.Logger, ctx context.Context, project string, alert []byte) ([]byte, error) {
+
+func ProcessAlert(logger *slog.Logger, ctx context.Context, project string, rawAlerts []RawAlert) ([]byte, error) {
 	const op = "helpers/alertprocessor/PrecessAlert"
 	logger.With(
 		slog.String("op", op),
 		slog.String("request_id", middleware.GetReqID(ctx)),
 	)
 
-	var rawAlerts []RawAlert
 	var alerts []PreparedAlert
 	var resolvedAlerts []ResolvedAlert
-
-	err := json.Unmarshal(alert, &rawAlerts)
-	if err != nil {
-		logger.Error("Error during unmarshalling alerts", sl.Err(err))
-		return nil, err
-	}
 
 	for _, item := range rawAlerts {
 		if item.EndsAt.Before(time.Now().UTC()) {
@@ -117,10 +111,10 @@ func ProcessAlert(logger *slog.Logger, ctx context.Context, project string, aler
 
 	fmt.Println(alertsToSend)
 
-	data, er := json.Marshal(&alertsToSend)
-	if er != nil {
+	data, err := json.Marshal(&alertsToSend)
+	if err != nil {
 		logger.Error("Error during marshalling alerts", sl.Err(err))
-		return nil, er
+		return nil, err
 	}
 
 	return data, nil
