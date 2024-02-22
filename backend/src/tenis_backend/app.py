@@ -43,6 +43,7 @@ alerts = list()
 with alerts_lock:
     alerts = load_alerts(app.db['current'])
 
+
 # Internal periodic tasks
 scheduler = BackgroundScheduler()
 def db_retention():
@@ -69,7 +70,8 @@ def db_retention():
                 pass
     print("Periodic DB routine finished")
     return
-            
+
+
 job = scheduler.add_job(db_retention, 'interval', minutes=app.config['HISTORY_PERIOD_MINUTES'])
 scheduler.start()
 
@@ -82,47 +84,67 @@ schema = {
         },
         "new_alert_definition": {
             "properties": {
-                "project": { "type": "string", "maxLength": 255 },
-                "host": { "type": "string", "maxLength": 255 },
-                "fired": { "type": "integer" },
-                "alertName": { "type": "string", "maxLength": 1024 },
-                "severity": { "type": "string", "maxLength": 255 },
-                "msg": { "type": "string", "maxLength": 65536 },
-                "responsibleUser": { "type": "string", "maxLength": 1024 },
-                "comment": { "type": "string" , "maxLength": 65536},
-                "silenced": { "type": "boolean" },
-                "customFields": { "type": "object", "$ref": "#/definitions/custom_field_definition" }
+                "project": {"type": "string", "maxLength": 255},
+                "host": {"type": "string", "maxLength": 255},
+                "fired": {"type": "integer"},
+                "alertName": {"type": "string", "maxLength": 1024},
+                "severity": {"type": "string", "maxLength": 255},
+                "msg": {"type": "string", "maxLength": 65536},
+                "responsibleUser": {"type": "string", "maxLength": 1024},
+                "comment": {"type": "string", "maxLength": 65536},
+                "silenced": {"type": "boolean"},
+                "customFields": {"type": "object", "$ref": "#/definitions/custom_field_definition"}
             },
             "anyOf": [
-                {"required": [ "project", "host", "fired", "alertName", "severity", "msg", "responsibleUser", "comment", "silenced" ]},
-                {"required": [ "project", "host", "fired", "alertName", "severity", "msg", "responsibleUser", "comment", "silenced", "customFields" ]}
+                {"required": ["project", "host", "fired", "alertName", "severity", "msg", "responsibleUser", "comment", "silenced"]},
+                {"required": ["project", "host", "fired", "alertName", "severity", "msg", "responsibleUser", "comment", "silenced", "customFields"]}
             ],
             "additionalProperties": False
         },
         "resolved_alert_definition": {
             "properties": {
-                "project": { "type": "string" },
-                "host": { "type": "string" },
-                "alertName": { "type": "string" },
+                "project": {"type": "string"},
+                "host": {"type": "string"},
+                "alertName": {"type": "string"},
             },
-            "required": [ "project", "host", "alertName" ],
+            "required": ["project", "host", "alertName"],
             "additionalProperties": False
-        }
+        },
+        "deleted_alert_definition": {
+            "properties": {
+                "project": {"type": "string"},
+                "host": {"type": "string"},
+                "alertName": {"type": "string"},
+            },
+            "required": ["project", "host", "alertName"],
+            "additionalProperties": False
+        },
     },
 
 
-    "type": "object", # this is for the root element
-    "oneOf": [ {"required": ["update"]}, {"required": ["resolve"]}, {"required": ["update", "resolve"]}, {"required": ["reload"]} ],
+    "type": "object",  # this is for the root element
+    "oneOf": [
+        {"required": ["update"]},
+        {"required": ["delete"]},
+        {"required": ["resolve"]},
+        {"required": ["update", "resolve", "delete"]},
+        {"required": ["reload"]}
+    ],
     "properties": {
         "update": {
             "type": "array",
             "maxItems": 10000,
-            "items": { "$ref": "#/definitions/new_alert_definition" }
+            "items": {"$ref": "#/definitions/new_alert_definition"}
         },
         "resolve": {
             "type": "array",
             "maxItems": 10000,
-            "items": { "$ref": "#/definitions/resolved_alert_definition" }
+            "items": {"$ref": "#/definitions/resolved_alert_definition"}
+        },
+        "delete": {
+            "type": "array",
+            "maxItems": 10000,
+            "items": {"$ref": "#/definitions/deleted_alert_definition"}
         },
         "reload": {
             "type": "boolean"
@@ -260,9 +282,9 @@ def inbound():
                 # found this alert in global list, maybe alert attributes have changed?
                 new_attributes = {}
                 for attr in ['fired', 'severity', 'msg', 'responsibleUser', 'comment', 'silenced', 'customFields']:
-                    if existing_alert[attr] != a[attr]: # works OK even for dicts (e.g. 'customFields' is a dict)
-                        new_attributes[attr] = a[attr] # to be saved in DB
-                        existing_alert[attr] = a[attr] # note this won't affect the global list since existing_alert is a copy
+                    if existing_alert[attr] != a[attr]:  # works OK even for dicts (e.g. 'customFields' is a dict)
+                        new_attributes[attr] = a[attr]   # to be saved in DB
+                        existing_alert[attr] = a[attr]   # note this won't affect the global list since existing_alert is a copy
                 if new_attributes:
                     update_alerts_query.append(pymongo.UpdateOne({'_id': existing_alert['_id']}, {"$set": new_attributes}))
                     updated_alerts.append(existing_alert)
@@ -342,6 +364,33 @@ def inbound():
         except pymongo.errors.PyMongoError as e:
             print("Warning: failed to save history data: %s" % e)
             pass
+        return 'OK', 200
+
+    if 'delete' in data:
+        delete_alerts = []
+        delete_ids = []
+        with alerts_lock:
+            for entry in data['delete']:
+                a = lookup_alert(alerts, entry)
+                if a is None: continue  # we don't have this alert in the global list, skip
+                delete_alerts.append(a)
+                delete_ids.append(a['_id'])
+
+            for a in delete_alerts:
+                alerts.remove(a)  # remove from global in-mem list
+
+            if len(delete_alerts) == 0:
+                return 'OK', 200  # submitted alerts list does not match a single alert from the global list
+
+            try:
+                app.db['current'].delete_many({'_id': {'$in': delete_ids}})
+            except pymongo.errors.PyMongoError as e:
+                raise InternalServerError("Failed to delete alerts in MongoDB: %s" % e)
+            try:
+                socketio.emit('resolve', parse_json(delete_ids))
+            except socketio.exceptions.SocketIOError as e:
+                print("Warning: Failed to send update to connected socketio clients: %s" % e)
+                pass
         return 'OK', 200
 
     if 'reload' in data:
