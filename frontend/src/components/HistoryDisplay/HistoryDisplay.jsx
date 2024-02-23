@@ -3,7 +3,6 @@ import React, {useState} from 'react';
 import dayjs from 'dayjs';
 import styles from './HistoryDisplay.module.css'
 import commonStiles from '../MainDisplay/MainDisplay.module.css'
-import "react-datepicker/dist/react-datepicker.css";
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { MobileDateTimePicker } from '@mui/x-date-pickers/MobileDateTimePicker';
