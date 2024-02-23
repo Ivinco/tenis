@@ -1,0 +1,29 @@
+.dateField {
+    display: flex;
+    margin: 20px auto auto 20px;
+}
+
+.inputDate {
+    display: flex;
+    font-size: 2rem;
+    padding: 10px;
+}
+
+.submitDateButton {
+    display: flex;
+    width: 80px;
+    margin-left: 30px;
+    border: 1px #656B7A solid;
+    border-radius: 10%;
+    background-color: transparent;
+    background-image: url("../../../public/images/search.svg");
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    transition: transform 0.2s;
+}
+
+.submitDateButton:hover {
+    cursor: pointer;
+    transform: scale(0.9);
+}

@@ -9,6 +9,8 @@ import MainDisplay from "../MainDisplay/MainDisplay";
 import Modal from "../Modal/Modal";
 import {useEffect} from "react";
 import { switchLoginModal} from "../../store/reducers/modalReducer";
+import {HISTORY_DISPLAY, MAIN_DISPLAY} from "../../store/actions/DISPLAY_ACTIONS";
+import HistoryDisplay from "../HistoryDisplay/HistoryDisplay";
 
 
 function MainPage(){
@@ -18,6 +20,7 @@ function MainPage(){
     const isOpenedModal = useSelector(state => state.switchModal.isOpened)
     const modalContent = useSelector(state => state.switchModal.content)
     const isLoggedIn = useSelector(state => state.authReducer.isLogged)
+    const displayMode = useSelector(state => state.setDisplay.display)
 
     const onSideBarClick = () => {
         dispatch(switchSideBarState())
@@ -49,7 +52,9 @@ function MainPage(){
                     ></button>
                 </div>
                 {
-                    isLoggedIn ? <MainDisplay/> : (isOpenedModal ? <></> : <div className={styles.noLoginMainDisplay}/>)
+                    isLoggedIn
+                        ? (displayMode === MAIN_DISPLAY ? <MainDisplay/> : ( displayMode === HISTORY_DISPLAY ? <HistoryDisplay/> : <></>) )
+                        : (isOpenedModal ? <></> : <div className={styles.noLoginMainDisplay}/>)
                 }
 
             </div>
