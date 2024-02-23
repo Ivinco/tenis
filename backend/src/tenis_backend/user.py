@@ -1,4 +1,5 @@
 import bson
+from bson import ObjectId
 from flask import current_app
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -8,7 +9,7 @@ class User:
         self.db = current_app.db
         return
 
-    def create(self, name="", email="", password=""):
+    def create(self, name="", email="", password="", avatar="", grouping=False, timezone="Browser", projects="All", phone=""):
         """Create a new user"""
         user = self.get_by_email(email)
         if user:
@@ -18,6 +19,11 @@ class User:
                 "name": name,
                 "email": email,
                 "password": self.encrypt_password(password),
+                "avatar": avatar,
+                "grouping": grouping,
+                "timezone": timezone,
+                "projects": projects,
+                "phone": phone,
                 "active": True
             }
         )
@@ -25,7 +31,7 @@ class User:
 
     def get_all(self):
         """Get all users"""
-        users = self.db.users.find({"active": True})
+        users = self.db.users.find()
         return [{**user, "_id": str(user["_id"])} for user in users]
 
     def get_by_id(self, user_id):
@@ -39,41 +45,63 @@ class User:
 
     def get_by_email(self, email):
         """Get a user by email"""
-        user = self.db.users.find_one({"email": email, "active": True})
+        user = self.db.users.find_one({"email": email})
         if not user:
             return
         user["_id"] = str(user["_id"])
         return user
 
-    def update(self, user_id, name=""):
-        """Update a user"""
-        data = {}
-        if name:
-            data["name"] = name
-        user = self.db.users.update_one(
-            {"_id": bson.ObjectId(user_id)},
+    def update(self, user_id, update_data):
+        """Update user data based on the provided fields"""
+        
+        result = self.db.users.update_one(
+            {"_id": ObjectId(user_id)},
             {
-                "$set": data
+                "$set": update_data
             }
         )
-        user = self.get_by_id(user_id)
-        return user
+        
+        if result.modified_count == 0:
+            return False 
+        
+        return self.get_by_id(user_id)
 
     def delete(self, user_id):
         """Delete a user"""
-        Books().delete_by_user_id(user_id)
-        user = self.db.users.delete_one({"_id": bson.ObjectId(user_id)})
+        result = self.db.users.delete_one({"_id": ObjectId(user_id)})
         user = self.get_by_id(user_id)
-        return user
+        if result.deleted_count > 0:
+            return True
+        else:
+            return False
 
     def disable_account(self, user_id):
         """Disable a user account"""
-        user = self.db.users.update_one(
+        result = self.db.users.update_one(
             {"_id": bson.ObjectId(user_id)},
-            {"$set": {"active": False}}
+            {
+                "$set": {"active": False}
+            }
         )
         user = self.get_by_id(user_id)
-        return user
+        if result.modified_count > 0:
+            return True
+        else:
+            return False
+
+    def enable_account(self, user_id):
+        """Disable a user account"""
+        result = self.db.users.update_one(
+            {"_id": bson.ObjectId(user_id)},
+            {
+                "$set": {"active": True}
+            }
+        )
+        user = self.get_by_id(user_id)
+        if result.modified_count > 0:
+            return True
+        else:
+            return False
 
     def encrypt_password(self, password):
         """Encrypt password"""
