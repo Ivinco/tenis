@@ -26,7 +26,6 @@ const SideBarMenu = ({header, items}) => {
                             <button className={activeMenuItem === item.value ? `${styles.menuButton} ${styles.menuButtonActive}` : `${styles.menuButton}`} onClick={e => {
                                 e.preventDefault()
                                 onClickItem(item)
-                                console.log(`Selected mode: ${item.value}`)
                             }}> {item.value}</button>
                         </li>
                     )

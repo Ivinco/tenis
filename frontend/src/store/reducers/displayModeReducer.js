@@ -11,7 +11,7 @@ export const displayReducer = (state = defaultValue, action) => {
         case HISTORY_DISPLAY:
             return {...state, display: HISTORY_DISPLAY}
         case STATS_DISPLAY:
-            return {...state, display: HISTORY_DISPLAY}
+            return {...state, display: STATS_DISPLAY}
         default:
             return state
     }
