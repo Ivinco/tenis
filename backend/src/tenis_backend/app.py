@@ -110,25 +110,14 @@ schema = {
             "required": ["project", "host", "alertName"],
             "additionalProperties": False
         },
-        "deleted_alert_definition": {
-            "properties": {
-                "project": {"type": "string"},
-                "host": {"type": "string"},
-                "alertName": {"type": "string"},
-            },
-            "required": ["project", "host", "alertName"],
-            "additionalProperties": False
-        },
     },
 
 
     "type": "object",  # this is for the root element
-    "oneOf": [
+    "anyOf": [
         {"required": ["update"]},
-        {"required": ["delete"]},
+        {"required": ["reload"]},
         {"required": ["resolve"]},
-        {"required": ["update", "resolve", "delete"]},
-        {"required": ["reload"]}
     ],
     "properties": {
         "update": {
@@ -140,11 +129,6 @@ schema = {
             "type": "array",
             "maxItems": 10000,
             "items": {"$ref": "#/definitions/resolved_alert_definition"}
-        },
-        "delete": {
-            "type": "array",
-            "maxItems": 10000,
-            "items": {"$ref": "#/definitions/deleted_alert_definition"}
         },
         "reload": {
             "type": "boolean"
@@ -342,11 +326,11 @@ def inbound():
                 resolved_history_entries.append(make_history_entry(a))
                 resolved_ids.append(a['_id'])
 
-            for a in resolved_alerts:
-                alerts.remove(a) # remove from global in-mem list
-
             if len(resolved_alerts) == 0:
                 return 'OK', 200  # submitted alerts list does not match a single alert from the global list
+
+            for a in resolved_alerts:
+                alerts.remove(a) # remove from global in-mem list
 
             try:
                 app.db['current'].delete_many({'_id': {'$in': resolved_ids}})
@@ -364,33 +348,6 @@ def inbound():
         except pymongo.errors.PyMongoError as e:
             print("Warning: failed to save history data: %s" % e)
             pass
-        return 'OK', 200
-
-    if 'delete' in data:
-        delete_alerts = []
-        delete_ids = []
-        with alerts_lock:
-            for entry in data['delete']:
-                a = lookup_alert(alerts, entry)
-                if a is None: continue  # we don't have this alert in the global list, skip
-                delete_alerts.append(a)
-                delete_ids.append(a['_id'])
-
-            for a in delete_alerts:
-                alerts.remove(a)  # remove from global in-mem list
-
-            if len(delete_alerts) == 0:
-                return 'OK', 200  # submitted alerts list does not match a single alert from the global list
-
-            try:
-                app.db['current'].delete_many({'_id': {'$in': delete_ids}})
-            except pymongo.errors.PyMongoError as e:
-                raise InternalServerError("Failed to delete alerts in MongoDB: %s" % e)
-            try:
-                socketio.emit('resolve', parse_json(delete_ids))
-            except socketio.exceptions.SocketIOError as e:
-                print("Warning: Failed to send update to connected socketio clients: %s" % e)
-                pass
         return 'OK', 200
 
     if 'reload' in data:
