@@ -3,11 +3,26 @@ import styles from './Alert.module.css'
 import {processTimeStamp} from "../../utils/utils";
 import {useDispatch, useSelector} from "react-redux";
 import {setDetailedAlert} from "../../store/reducers/alertReducer";
-import {switchAlertDetailsModal} from "../../store/reducers/modalReducer";
+import {switchAlertDetailsModal, switchErrorMessageModal} from "../../store/reducers/modalReducer";
+import {sha256} from "js-sha256";
+import UserService from "../../services/UserService";
+import {formToJSON} from "axios";
 
 const Alert = ({alert}) => {
     const dispatch = useDispatch()
     const isInspectMode = useSelector(state => state.setHeaderMenuItemValue.inspectMode)
+    const userEmail = useSelector(state => state.authReducer.user.userEmail)
+    const ackedAlert = alert.responsibleUser === userEmail
+        ? {"alertId": alert._id,
+            "responsibleUser": ""}
+        : {"alertId": alert._id,
+            "responsibleUser": userEmail}
+    const onAckHandle = async (ackedAlert) => {
+
+        //TO BE DELETED AFTER IMPLEMENTATION ON BACKEND SIDE
+        console.log(`Alert to be acked: ${JSON.stringify({"ack": [ackedAlert]})}`)
+    }
+
     let alertBackground
     let fontColor
     switch (alert.severity.toUpperCase()){
@@ -43,13 +58,19 @@ const Alert = ({alert}) => {
                 <p className={styles.textFields}>{alert.host}</p>
             </div>
             <div className={`${isInspectMode ? styles.responsibleUser : styles.responsibleUser_small}`}
-                 style={{backgroundImage: `url(${alert.responsibleUser ? process.env.PUBLIC_URL + "/images/stop-sign.svg" : process.env.PUBLIC_URL + "/images/stop-sign.svg"})`}}
+                 style={{backgroundImage: `url(${alert.responsibleUser 
+                         ? `https://gravatar.com/avatar/${sha256(alert.responsibleUser)}?s=150` 
+                         : process.env.PUBLIC_URL + "/images/stop-sign.svg"})`}}
+                 onClick={ e => {
+                     e.preventDefault()
+                     onAckHandle(ackedAlert)
+                 }}
             />
             <div className={`${isInspectMode ? styles.alertName : styles.alertName_small}`}>
                 <p className={styles.textFields}>{alert.alertName}</p>
             </div>
             <div className={`${isInspectMode ? styles.alertTime : styles.alertTime_small}`}>{processTimeStamp(alert.fired)}</div>
-            <div className={`${isInspectMode ? styles.message : styles.message_small}`} data-tooltip={alert.msg}>
+            <div className={`${isInspectMode ? styles.message : styles.message_small}`}f data-tooltip={alert.msg}>
                 <p className={styles.textFields}>{alert.msg}</p>
             </div>
             <div className={`${isInspectMode ? styles.refresh : styles.refresh_small}`}/>

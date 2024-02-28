@@ -3,17 +3,43 @@ import styles from './AlertGroup.module.css'
 import alertStyles from '../Alert/Alert.module.css'
 import {useSelector} from "react-redux";
 import Alert from "../Alert/Alert";
+import {sha256} from "js-sha256";
 
 const AlertGroup = ({group, alertHeight}) => {
     const isInspectMode = useSelector(state => state.setHeaderMenuItemValue.inspectMode)
+    const userEmail = useSelector(state => state.authReducer.user.userEmail)
     const [isAlertsBlockOpened, setIsAlertBlockOpened] = useState('false')
     const onAlertClickHandler = (e) => {
         e.preventDefault()
         setIsAlertBlockOpened(!isAlertsBlockOpened)
     }
 
+    //Check if all alerts handled by the same user
+    const isOneGroupUser = group.alerts.every(alert => {
+        return alert.responsibleUser === group.alerts[0].responsibleUser
+    })
+
+    //define icon for group responsible user
+    const groupUserImage = (isOneGroupUser && group.alerts[0].responsibleUser !== "")
+        ? `https://gravatar.com/avatar/${sha256(group.alerts[0].responsibleUser)}?s=150`
+        : "/images/stop-sign.svg"
+
+
+
     let alertBackground
     let fontColor
+
+
+    const ackedAlerts = group.alerts.map(alert => {
+        if (isOneGroupUser && group.alerts[0].responsibleUser === userEmail) {
+            return {"alertId": alert._id,
+                "responsibleUser": ""}
+        } else {
+            return {"alertId": alert._id,
+                "responsibleUser": userEmail}
+        }
+    })
+
     switch (group.severity.toUpperCase()){
         case 'WARNING':
             alertBackground = '#FEFFC1'
@@ -32,6 +58,11 @@ const AlertGroup = ({group, alertHeight}) => {
             fontColor = 'black'
     }
 
+    const onAckClickHandle = () => {
+        //TO BE DELETED AFTER IMPLEMENTATION ON BACKEND SIDE
+        console.log(`Acked alerts in group: ${JSON.stringify({"ack": ackedAlerts})}`)
+    }
+
     return (
         <div className={styles.groupSection} key={group.id}>
             <div
@@ -44,7 +75,11 @@ const AlertGroup = ({group, alertHeight}) => {
                     {group.alerts.length}
                 </div>
                 <div className={`${isInspectMode ? alertStyles.responsibleUser : alertStyles.responsibleUser_small}`}
-                     style={{backgroundImage: `url(${alert.responsibleUser ? process.env.PUBLIC_URL + "/images/stop-sign.svg" : process.env.PUBLIC_URL + "/images/stop-sign.svg"})`}}
+                     style={{backgroundImage: `url(${groupUserImage})`}}
+                     onClick={e => {
+                         e.preventDefault()
+                         onAckClickHandle()
+                     }}
                 />
                 <div className={`${isInspectMode ? alertStyles.alertName : alertStyles.alertName_small}`}
                      onClick={e => onAlertClickHandler(e)}>{group.groupFactor}</div>
