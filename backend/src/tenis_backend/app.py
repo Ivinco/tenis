@@ -227,7 +227,7 @@ def get_users(current_user):
         users = User().get_all()
         return jsonify(users), 200
     except Exception as e:
-        raise InternalServerError("Failed to retrieve users")
+        raise InternalServerError(f"Failed to retrieve users: {str(e)}")
 
 @app.route('/user', methods=['POST'])
 @token_required()
