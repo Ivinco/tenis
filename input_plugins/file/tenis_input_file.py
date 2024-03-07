@@ -9,7 +9,8 @@ schema = {
             "type": "object",
             "additionalProperties": {
                 "type": "string"
-        },
+            },
+        }
         "alert_definition": {
             "properties": {
                 "project": { "type": "string", "maxLength": 255 },
