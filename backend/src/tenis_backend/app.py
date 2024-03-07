@@ -80,7 +80,10 @@ scheduler.start()
 schema = {
     "definitions": {
         "custom_field_definition": {
-            "additionalProperties": True,
+            "type": "object",
+            "additionalProperties": {
+                "type": "string"
+            }
         },
         "new_alert_definition": {
             "properties": {

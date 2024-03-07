@@ -6,8 +6,11 @@ from time import sleep
 schema = {
     "definitions": {
         "custom_field_definition": {
-            "additionalProperties": True
-        },
+            "type": "object",
+            "additionalProperties": {
+                "type": "string"
+            }
+        }
         "alert_definition": {
             "properties": {
                 "project": { "type": "string", "maxLength": 255 },
