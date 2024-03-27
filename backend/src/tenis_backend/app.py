@@ -1,6 +1,7 @@
 import os, atexit, jsonschema, jwt, threading
 from datetime import datetime, timezone, timedelta
 import pymongo
+from bson.objectid import ObjectId
 from flask import Flask, request, jsonify, make_response
 from flask_cors import CORS
 from flask_socketio import SocketIO, emit, send, disconnect
@@ -35,7 +36,6 @@ app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 #app.config['JWT_REFRESH_TOKEN_EXPIRES'] = timedelta(minutes=5)
 app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=1)
 app.config['JWT_REFRESH_TOKEN_EXPIRES'] = timedelta(days=30)
-
 
 # Load alerts from the DB
 alerts_lock = threading.Lock()
@@ -188,6 +188,51 @@ def whoami(user):
     return resp, 200
 
 
+@app.route('/ack', methods=['POST'])
+@token_required()  # note () are required!
+def ack(user):
+    """
+    Method that just returns user's email
+    We use @token_required with no parameters, this is enough to make sure the user is authenticated
+    """
+    data = request.json
+    ack_user = user['email']
+    updated_alerts = []  # list of updated alerts
+    update_alerts_query = []  # list to hold MongoDB query to update 'current' collection
+    if 'ack' in data:
+        for item in data['ack']:
+            for alert in alerts:
+                ack_id = ObjectId(item['alertId'])
+                if ack_id == alert['_id']:
+                    alert['responsibleUser'] = ack_user
+                    updated_alerts.append(alert)
+                    update_alerts_query.append(pymongo.UpdateOne({'_id': alert['_id']}, {"$set": {"responsibleUser": ack_user}}))
+
+    if 'unack' in data:
+        for item in data['unack']:
+            for alert in alerts:
+                ack_id = ObjectId(item['alertId'])
+                if ack_id == alert['_id']:
+                    alert['responsibleUser'] = ''
+                    updated_alerts.append(alert)
+                    update_alerts_query.append(pymongo.UpdateOne({'_id': alert['_id']}, {"$set": {"responsibleUser": ''}}))
+
+    if updated_alerts:
+        try:
+            app.db['current'].bulk_write(update_alerts_query)
+            for a in updated_alerts:
+                update_alerts(alerts, a)
+            socketio.emit('update', parse_json(updated_alerts))
+        except pymongo.errors.PyMongoError as e:
+            raise InternalServerError("Failed to save alerts in MongoDB: %s" % e)
+        except socketio.exceptions.SocketIOError as e:
+            print("Warning: Failed to send update to connected socketio clients: %s" % e)
+            pass
+
+    print(updated_alerts, update_alerts_query)
+    return "OK", 200
+
+
 @app.route('/healz')
 def healz():
     try:
@@ -259,7 +304,7 @@ def inbound():
                     new_alerts.append(a)
                     continue # next 'a' from data['update]', please
 
-                existing_alert = existing_alert.copy() # we will update gloabl list later
+                existing_alert = existing_alert.copy() # we will update global list later
 
                 # if severity changed, this should be logged to history collection
                 if existing_alert['severity'] != a['severity']:
