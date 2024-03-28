@@ -113,6 +113,13 @@ schema = {
             "required": ["project", "host", "alertName"],
             "additionalProperties": False
         },
+        "ack_definition": {
+            "properties": {
+                "alertId": {"type": "string"},
+            },
+            "required": ["alertId"],
+            "additionalProperties": False
+        },
     },
 
 
@@ -121,6 +128,8 @@ schema = {
         {"required": ["update"]},
         {"required": ["reload"]},
         {"required": ["resolve"]},
+        {"required": ["unack"]},
+        {"required": ["ack"]},
     ],
     "properties": {
         "update": {
@@ -133,8 +142,50 @@ schema = {
             "maxItems": 10000,
             "items": {"$ref": "#/definitions/resolved_alert_definition"}
         },
+        "unack": {
+            "type": "array",
+            "maxItems": 10000,
+            "items": {"$ref": "#/definitions/ack_definition"}
+        },
+        "ack": {
+            "type": "array",
+            "maxItems": 10000,
+            "items": {"$ref": "#/definitions/ack_definition"}
+        },
         "reload": {
             "type": "boolean"
+        },
+    },
+    "additionalProperties": False
+}
+
+# JSON schema to validate inbound silence JSON
+silence_schema = {
+    "anyOf": [
+        {"required": ["hostName"]},
+        {"required": ["alertName"]},
+        {"required": ["startSilence"]},
+        {"required": ["endSilence"]},
+        {"required": ["comment"]},
+    ],
+    "properties": {
+        "hostName": {
+            "type": "string",
+            "maxLength": 255
+        },
+        "alertName": {
+            "type": "string",
+            "maxLength": 255
+        },
+        "startSilence": {
+            "type": "integer"
+        },
+        "endSilence": {
+            "type": "integer"
+        },
+        "comment": {
+            "type": "string",
+            "maxLength": 255
         }
     },
     "additionalProperties": False
@@ -192,10 +243,14 @@ def whoami(user):
 @token_required()  # note () are required!
 def ack(user):
     """
-    Method that just returns user's email
-    We use @token_required with no parameters, this is enough to make sure the user is authenticated
+    Method to set or unset responsibleUser for alerts
     """
-    data = request.json
+    try:
+        data = request.json
+        jsonschema.validate(instance=data, schema=schema)
+    except jsonschema.exceptions.ValidationError as e:
+        raise BadRequest(e.message)
+
     ack_user = user['email']
     updated_alerts = []  # list of updated alerts
     update_alerts_query = []  # list to hold MongoDB query to update 'current' collection
@@ -207,6 +262,7 @@ def ack(user):
                     alert['responsibleUser'] = ack_user
                     updated_alerts.append(alert)
                     update_alerts_query.append(pymongo.UpdateOne({'_id': alert['_id']}, {"$set": {"responsibleUser": ack_user}}))
+                    break
 
     if 'unack' in data:
         for item in data['unack']:
@@ -216,6 +272,7 @@ def ack(user):
                     alert['responsibleUser'] = ''
                     updated_alerts.append(alert)
                     update_alerts_query.append(pymongo.UpdateOne({'_id': alert['_id']}, {"$set": {"responsibleUser": ''}}))
+                    break
 
     if updated_alerts:
         try:
@@ -226,10 +283,31 @@ def ack(user):
         except pymongo.errors.PyMongoError as e:
             raise InternalServerError("Failed to save alerts in MongoDB: %s" % e)
         except socketio.exceptions.SocketIOError as e:
-            print("Warning: Failed to send update to connected socketio clients: %s" % e)
+            print("Warning: Failed to send update to connected socket.io clients: %s" % e)
             pass
 
-    print(updated_alerts, update_alerts_query)
+    return "OK", 200
+
+
+@app.route('/silence', methods=['POST'])
+@token_required()  # note () are required!
+def silence(user):
+    """
+    Method to add silencers
+    """
+    try:
+        data = request.json
+        jsonschema.validate(instance=data, schema=silence_schema)
+    except jsonschema.exceptions.ValidationError as e:
+        raise BadRequest(e.message)
+
+    silence_user = user['email']
+    data["author"] = silence_user
+    try:
+        app.db['silence'].insert_one(data)
+    except pymongo.errors.PyMongoError as e:
+        raise InternalServerError("Failed to save silencer in MongoDB: %s" % e)
+
     return "OK", 200
 
 
