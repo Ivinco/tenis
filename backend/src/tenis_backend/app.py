@@ -311,6 +311,26 @@ def silence(user):
     return "OK", 200
 
 
+@app.route('/silenced', methods=['GET'])
+@token_required()  # note () are required!
+def silenced(user):
+    """
+    Method to return a list(json) of 'silence' objects
+    """
+
+    silence_list = ()
+    try:
+        with alerts_lock:
+            silence_list = load_alerts(app.db['silence'])
+    except pymongo.errors.PyMongoError as e:
+        raise InternalServerError("Failed to read silence table from MongoDB: %s" % e)
+    if silence_list:
+        for item in silence_list:
+            item["_id"] = str(item["_id"])
+
+    return json.dumps(silence_list), 200
+
+
 @app.route('/healz')
 def healz():
     try:
