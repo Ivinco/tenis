@@ -161,12 +161,12 @@ schema = {
 
 # JSON schema to validate inbound silence JSON
 silence_schema = {
-    "anyOf": [
-        {"required": ["hostName"]},
-        {"required": ["alertName"]},
-        {"required": ["startSilence"]},
-        {"required": ["endSilence"]},
-        {"required": ["comment"]},
+    "required": [
+        "hostName",
+        "alertName",
+        "startSilence",
+        "endSilence",
+        "comment",
     ],
     "properties": {
         "hostName": {
