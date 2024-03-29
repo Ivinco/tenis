@@ -181,7 +181,7 @@ silence_schema = {
             "type": "integer"
         },
         "endSilence": {
-            "type": "integer"
+            "type": ["integer", "null"]
         },
         "comment": {
             "type": "string",
@@ -277,8 +277,6 @@ def ack(user):
     if updated_alerts:
         try:
             app.db['current'].bulk_write(update_alerts_query)
-            for a in updated_alerts:
-                update_alerts(alerts, a)
             socketio.emit('update', parse_json(updated_alerts))
         except pymongo.errors.PyMongoError as e:
             raise InternalServerError("Failed to save alerts in MongoDB: %s" % e)
