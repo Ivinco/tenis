@@ -1,0 +1,11 @@
+.silenceBody {
+    display: flex;
+    flex-direction: column;
+    width: 85%;
+}
+
+.silenceForm {
+    display: flex;
+    justify-content: space-around;
+    margin: 20px auto
+}

@@ -1,11 +1,14 @@
 import React, {useState} from 'react';
 import styles from './AlertGroup.module.css'
 import alertStyles from '../Alert/Alert.module.css'
-import {useSelector} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import Alert from "../Alert/Alert";
 import {sha256} from "js-sha256";
+import AlertService from "../../services/AlertService";
+import {switchErrorMessageModal} from "../../store/reducers/modalReducer";
 
 const AlertGroup = ({group, alertHeight}) => {
+    const dispatch = useDispatch()
     const isInspectMode = useSelector(state => state.setHeaderMenuItemValue.inspectMode)
     const userEmail = useSelector(state => state.authReducer.user.userEmail)
     const [isAlertsBlockOpened, setIsAlertBlockOpened] = useState('false')
@@ -31,13 +34,7 @@ const AlertGroup = ({group, alertHeight}) => {
 
 
     const ackedAlerts = group.alerts.map(alert => {
-        if (isOneGroupUser && group.alerts[0].responsibleUser === userEmail) {
-            return {"alertId": alert._id,
-                "responsibleUser": ""}
-        } else {
-            return {"alertId": alert._id,
-                "responsibleUser": userEmail}
-        }
+            return {"alertId": alert._id}
     })
 
     switch (group.severity.toUpperCase()){
@@ -58,9 +55,27 @@ const AlertGroup = ({group, alertHeight}) => {
             fontColor = 'black'
     }
 
-    const onAckClickHandle = () => {
+    const onAckClickHandle =  async () => {
+        let response
+        try {
+            if (isOneGroupUser && group.alerts[0].responsibleUser === userEmail){
+                await AlertService.unack(ackedAlerts)
+            } else {
+                const unackedAlerts = []
+                group.alerts.forEach(alert => {
+                    if (alert.responsibleUser !== userEmail){
+                        unackedAlerts.push({alertId: alert._id})
+                    }
+                })
+                await AlertService.ack(unackedAlerts)
+            }
+        }
+        catch (e) {
+            dispatch(switchErrorMessageModal("Oops. Something went wrong. Please, try a bit later"))
+        }
+
         //TO BE DELETED AFTER IMPLEMENTATION ON BACKEND SIDE
-        console.log(`Acked alerts in group: ${JSON.stringify({"ack": ackedAlerts})}`)
+        // console.log(`Acked alerts in group: ${JSON.stringify({"ack": ackedAlerts})}`)
     }
 
     return (

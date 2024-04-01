@@ -7,20 +7,24 @@ import {switchAlertDetailsModal, switchErrorMessageModal} from "../../store/redu
 import {sha256} from "js-sha256";
 import UserService from "../../services/UserService";
 import {formToJSON} from "axios";
+import AlertService from "../../services/AlertService";
 
 const Alert = ({alert}) => {
     const dispatch = useDispatch()
     const isInspectMode = useSelector(state => state.setHeaderMenuItemValue.inspectMode)
     const userEmail = useSelector(state => state.authReducer.user.userEmail)
-    const ackedAlert = alert.responsibleUser === userEmail
-        ? {"alertId": alert._id,
-            "responsibleUser": ""}
-        : {"alertId": alert._id,
-            "responsibleUser": userEmail}
+    const ackedAlert = {"alertId": alert._id}
     const onAckHandle = async (ackedAlert) => {
-
-        //TO BE DELETED AFTER IMPLEMENTATION ON BACKEND SIDE
-        console.log(`Alert to be acked: ${JSON.stringify({"ack": [ackedAlert]})}`)
+        try {
+            if (alert.responsibleUser === userEmail){
+                 await AlertService.unack([ackedAlert])
+            } else {
+                 await AlertService.ack([ackedAlert])
+            }
+        }
+        catch (e) {
+            dispatch(switchErrorMessageModal("Oops. Something went wrong. Please, try a bit later"))
+        }
     }
 
     let alertBackground
