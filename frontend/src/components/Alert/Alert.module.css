@@ -2,6 +2,7 @@
     width: 99%;
     height: 90%;
     display: flex;
+    position: relative;
     align-content: space-between;
     margin: auto;
     border: #8a8a8a solid 3px;
@@ -241,13 +242,10 @@
 }
 
 
-
-
-.info {
+.controlButton {
     width: 60px;
     height: 60px;
     margin: auto 15px;
-    background-image: url("../../../public/images/comment-dots.svg");
     background-size: contain;
     background-position: center;
     background-repeat: no-repeat;
@@ -255,15 +253,14 @@
     transition: transform 0.2s;
 }
 
-.info:hover {
+.controlButton:hover {
     transform: scale(1.2);
 }
 
-.info_small {
+.controlButton_small {
     width: 23px;
     height: 23px;
     margin: auto 6px;
-    background-image: url("../../../public/images/comment-dots.svg");
     background-size: contain;
     background-position: center;
     background-repeat: no-repeat;
@@ -271,40 +268,108 @@
     transition: transform 0.2s;
 }
 
-.info_small:hover {
+.controlButton_small:hover {
     transform: scale(1.2);
+}
+
+.silenceWindow {
+    display: flex;
+    padding: 13px 30px;
+    position: absolute;
+    right: 300px;
+    background-color: #708090EA;
+    border-radius: 20px;
+}
+
+.silenceWindow_small {
+    padding: 5px 14px;
+    right: 180px;
+}
+
+.silenceWindowActive {
+    display: flex;
+}
+
+.silenceWindowDisabled {
+    display: none;
+}
+
+.silenceComment {
+    resize: none;
+    overflow: auto;
+    font-size: 1.5rem;
+    margin-right: 30px;
+    border-radius: 10px;
+    outline: none;
+}
+
+.silenceComment_small {
+    padding: 2px 5px 0;
+    font-size: 0.9rem;
+    max-height: 17px;
+    margin-right: 14px;
+}
+
+.silenceDuration {
+    font-size: 1.5rem;
+    text-align: center;
+    margin-right: 30px;
+    width: 100px;
+    border-radius: 10px;
+    outline: none;
+}
+.silenceDuration::placeholder {
+    font-size: 1rem;
+}
+
+.silenceDuration_small {
+    font-size: 0.9rem;
+    margin-right: 14px;
+    width: 70px;
+}
+
+.silenceDuration_small::placeholder {
+    font-size: 0.7rem;
+}
+
+
+.silenceButton {
+    font-size: 1.5rem;
+    border-radius: 10px;
+}
+
+.silenceButton_small {
+    font-size: 0.9rem;
+}
+
+.silenceButtonDisabled {
+    background-color: #989898;
+    color: black;
+    border: 2px #989898 solid;
+}
+.silenceButtonEnabled {
+    background-color: #e1fafa;
+    border: 2px solid #C3FAFAFF;
+    transition: transform 0.15s;
+    color: black;
+    cursor: pointer;
+}
+
+.silenceButtonEnabled:hover {
+    cursor: pointer;
+    transform: scale(0.9);
+}
+
+.silence {
+    background-image: url("../../../public/images/mute-notification-svgrepo-com.svg");
+}
+
+.info {
+    background-image: url("../../../public/images/comment-dots.svg");
 }
 
 .refresh {
-    width: 60px;
-    height: 60px;
-    margin: auto 15px;
     background-image: url("../../../public/images/refresh-svgrepo-com.svg");
-    background-size: contain;
-    background-position: center;
-    background-repeat: no-repeat;
-    cursor: pointer;
-    transition: transform 0.2s;
-}
-
-.refresh:hover {
-    transform: scale(1.2);
-}
-
-.refresh_small {
-    width: 23px;
-    height: 23px;
-    margin: auto 6px;
-    background-image: url("../../../public/images/refresh-svgrepo-com.svg");
-    background-size: contain;
-    background-position: center;
-    background-repeat: no-repeat;
-    cursor: pointer;
-    transition: transform 0.2s;
-}
-
-.refresh_small:hover {
-    transform: scale(1.2);
 }
 
 
@@ -357,17 +422,32 @@
         font-size: 0.8rem;
     }
 
-    .refresh {
+    .controlButton {
         width: 40px;
         height: 40px;
         margin: auto 10px;
     }
 
-    .info {
-        width: 40px;
-        height: 40px;
-        margin: auto 10px;
+    .silenceWindow {
+        padding: 9px 20px;
+        right: 200px;
     }
+
+    .silenceComment {
+        font-size: 0.9rem;
+        margin-right: 20px;
+    }
+
+    .silenceDuration {
+        font-size: 0.9rem;
+        margin-right: 20px;
+        width: 140px;
+    }
+
+    .silenceButton {
+        font-size: 1rem;
+    }
+
 }
 
 @media screen and (max-width: 1150px){
@@ -419,15 +499,29 @@
         font-size: 0.6rem;
     }
 
-    .refresh {
+    .controlButton {
         width: 26px;
         height: 26px;
         margin: auto 6px;
     }
 
-    .info {
-        width: 27px;
-        height: 27px;
-        margin: auto 6px;
+    .silenceWindow {
+        padding: 7px 14px;
+        right: 120px;
+    }
+
+    .silenceComment {
+        font-size: 0.6rem;
+        margin-right: 14px;
+    }
+
+    .silenceDuration {
+        font-size: 0.6rem;
+        margin-right: 14px;
+        width: 90px;
+    }
+
+    .silenceButton {
+        font-size: 0.9rem;
     }
 }

@@ -9,7 +9,7 @@ export default class AlertService {
         return api.post('/ack', {unack: ackedAlerts})
     }
 
-    static async silence (silenceRule) {
-        return api.post('/silence', {silenceRule: silenceRule})
+    static async silence (payload) {
+        return api.post('/silence', payload)
     }
 }
