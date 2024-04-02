@@ -102,7 +102,7 @@ function SilenceWindow() {
                               value={comment}
                     />
                     <button className={`${style.silenceButton} 
-                ${hostname && alertName && silenceDuration && comment
+                ${hostname && alertName && silenceDuration && comment && comment.length > 4
                         ? style.silenceButtonEnabled
                         : style.silenceButtonDisabled}`}
                             onClick={e => {
