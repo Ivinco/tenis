@@ -314,6 +314,9 @@ def silence(user):
     except jsonschema.exceptions.ValidationError as e:
         raise BadRequest(e.message)
 
+    if not data['project'] and not data['alertName'] and not data['host']:
+        raise InternalServerError("Too broad regex pattern")
+
     data['project'] = re.escape(data['project'])
     data['alertName'] = re.escape(data['alertName'])
     data['host'] = re.escape(data['host'])
