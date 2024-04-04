@@ -326,9 +326,15 @@ def silence(user):
         "comment": re.escape(data['comment'])
     }
 
+    search_pattern = {
+        "alertName": silence_rule["alertName"],
+        "project": silence_rule["project"],
+        "host": silence_rule["host"]
+    }
+
     updated_alerts = []  # list of updated alerts
     update_alerts_query = []  # list to hold MongoDB query to update 'current' collection
-    matched_alerts = regexp_alerts(alerts, silence_rule)
+    matched_alerts = regexp_alerts(alerts, search_pattern)
 
     if matched_alerts:
         for alert in matched_alerts:
