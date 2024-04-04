@@ -10,7 +10,7 @@ import AlertService from "../../services/AlertService";
 
 function SilenceWindow() {
     const dispatch = useDispatch()
-    const userEmail = useSelector(state => state.authReducer.user.userEmail)
+    const [project, setProject] = useState("")
     const [hostname, setHostname] = useState("")
     const [alertName, setAlertName] = useState("")
     const [silenceDuration, setSilenceDuration] = useState(null)
@@ -20,6 +20,7 @@ function SilenceWindow() {
     const rules = [
         {
             ruleId: "010b29c9-7a8f-4a70-ba4f-498d72e2da7c",
+            project: "Ivinco",
             hostname: "repo01",
             alertName: "disk space usage 90%",
             startSilence : "1709213217",
@@ -29,6 +30,7 @@ function SilenceWindow() {
         },
         {
             ruleId: "3a0cbe28-6f5f-4093-8d9e-7074bf6eefef",
+            project: "Ivinco",
             hostname: "monitor",
             alertName: "High CPU load",
             startSilence : "1709213217",
@@ -46,7 +48,8 @@ function SilenceWindow() {
             endSilenceTime = null
         }
         const silenceRule = {
-            hostName: hostname,
+            project: project,
+            host: hostname,
             alertName: alertName,
             startSilence: Date.now(),
             endSilence: endSilenceTime,
@@ -59,6 +62,7 @@ function SilenceWindow() {
             console.log(e)
             dispatch(switchErrorMessageModal("Oops. Something went wrong. Please, try a bit later"))
         }
+        setProject("")
         setHostname("")
         setAlertName("")
         setSilenceDuration(0)
@@ -85,6 +89,10 @@ function SilenceWindow() {
             </div>
             <div className={style.silenceContent}>
                 <div className={style.silenceForm}>
+                    <input type="text" placeholder="Project name" className={style.silenceInputField}
+                           onChange={e => setProject(e.target.value)}
+                           value={project}
+                    />
                     <input type="text" placeholder="Host Name" className={style.silenceInputField}
                            onChange={e => setHostname(e.target.value)}
                            value={hostname}
@@ -116,7 +124,7 @@ function SilenceWindow() {
                 <div className={style.cationContainer}>
                     <p className={style.tableCaption}>Silence Rules</p>
                     <div className={style.controlButtonsContainer}>
-                        <button className={style.controlButton}>Edit</button>
+                    <button className={style.controlButton}>Edit</button>
                         <button className={style.controlButton}>Delete</button>
                     </div>
                 </div>
@@ -124,6 +132,7 @@ function SilenceWindow() {
                     <thead className={style.tableHeader}>
                     <tr>
                         <th scope="col" className={style.tableHeaderElement}> Author</th>
+                        <th scope="col" className={style.tableHeaderElement}> Project</th>
                         <th scope="col" className={style.tableHeaderElement}> Host name</th>
                         <th scope="col" className={style.tableHeaderElement}> Alert name</th>
                         <th scope="col" className={style.tableHeaderElement}> Silenced till</th>
@@ -143,6 +152,7 @@ function SilenceWindow() {
                                 <td className={`${style.tableCell} ${style.ruleAuthor}`}
                                     style={{backgroundImage: `url(https://gravatar.com/avatar/${sha256(rule.author)}?s=150)`}}
                                 />
+                                <td className={style.tableCell}>{rule.project}</td>
                                 <td className={style.tableCell}>{rule.hostname}</td>
                                 <td className={style.tableCell}>{rule.alertName}</td>
                                 <td className={style.tableCell}>{new Date(parseInt(rule.endSilence, 10) * 1000).toLocaleString()}</td>

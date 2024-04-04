@@ -105,7 +105,8 @@ const Alert = ({alert}) => {
             endSilenceTime = null
         }
         const silenceRule = {
-            hostName: alert.host,
+            project: alert.project,
+            host: alert.host,
             alertName: alert.alertName,
             startSilence: Date.now(),
             endSilence: endSilenceTime,
