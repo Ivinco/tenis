@@ -317,13 +317,18 @@ def silence(user):
     if not data['project'] and not data['alertName'] and not data['host']:
         raise InternalServerError("Too broad regex pattern")
 
-    data['project'] = re.escape(data['project'])
-    data['alertName'] = re.escape(data['alertName'])
-    data['host'] = re.escape(data['host'])
+    silence_rule = {
+        "project": re.escape(data['project']),
+        "host": re.escape(data['host']),
+        "alertName": re.escape(data['alertName']),
+        "startSilence": data['startSilence'],
+        "endSilence": data['endSilence'],
+        "comment": re.escape(data['comment'])
+    }
 
     updated_alerts = []  # list of updated alerts
     update_alerts_query = []  # list to hold MongoDB query to update 'current' collection
-    matched_alerts = regexp_alerts(alerts, data)
+    matched_alerts = regexp_alerts(alerts, silence_rule)
 
     if matched_alerts:
         for alert in matched_alerts:
@@ -335,9 +340,9 @@ def silence(user):
             )
 
     silence_user = user['email']
-    data["author"] = silence_user
+    silence_rule["author"] = silence_user
     try:
-        app.db['silence'].insert_one(data)
+        app.db['silence'].insert_one(silence_rule)
     except pymongo.errors.PyMongoError as e:
         raise InternalServerError("Failed to save silencer in MongoDB: %s" % e)
 
