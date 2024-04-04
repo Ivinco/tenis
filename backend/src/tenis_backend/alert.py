@@ -32,12 +32,15 @@ def regexp_alerts(alerts, rules):
     :param rules: Dictionary with regexp patterns for project, alertName and host to search matching alerts
     :return: List of alerts that matches, or None
     """
+    project = re.escape(rules['project'])
+    alert = re.escape(rules['alertName'])
+    host = re.escape(rules['host'])
     matched_alerts = []
     try:
         for a in alerts:
-            if (re.search(rules['project'], a['project']) and
-                re.search(rules['alertName'], a['alertName']) and
-                re.search(rules['host'], a['host'])):
+            if (re.search(project, a['project']) and
+                re.search(alert, a['alertName']) and
+                re.search(host, a['host'])):
                 matched_alerts.append(a)
         return matched_alerts
     except TypeError:

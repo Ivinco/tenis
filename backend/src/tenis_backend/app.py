@@ -327,9 +327,9 @@ def silence(user):
     }
 
     search_pattern = {
-        "alertName": silence_rule["alertName"],
-        "project": silence_rule["project"],
-        "host": silence_rule["host"]
+        "alertName": data['alertName'],
+        "project": data['project'],
+        "host": data['host']
     }
 
     updated_alerts = []  # list of updated alerts
