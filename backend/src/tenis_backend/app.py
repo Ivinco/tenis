@@ -1,6 +1,7 @@
 import os, atexit, jsonschema, jwt, threading
 from datetime import datetime, timezone, timedelta
 import pymongo
+import re
 from bson.objectid import ObjectId
 from flask import Flask, request, jsonify, make_response
 from flask_cors import CORS
@@ -312,6 +313,10 @@ def silence(user):
         jsonschema.validate(instance=data, schema=silence_schema)
     except jsonschema.exceptions.ValidationError as e:
         raise BadRequest(e.message)
+
+    data['project'] = re.escape(data['project'])
+    data['alertName'] = re.escape(data['alertName'])
+    data['host'] = re.escape(data['host'])
 
     updated_alerts = []  # list of updated alerts
     update_alerts_query = []  # list to hold MongoDB query to update 'current' collection
