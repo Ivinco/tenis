@@ -35,9 +35,9 @@ def regexp_alerts(alerts, rules):
     matched_alerts = []
     try:
         for a in alerts:
-            if (re.match(rf".*{rules['project']}.*", a['project']) and
-                re.match(rf".*{rules['alertName']}.*", a['alertName']) and
-                re.match(rf".*{rules['host']}.*", a['host'])):
+            if (re.search(rules['project'], a['project']) and
+                re.search(rules['alertName'], a['alertName']) and
+                re.search(rules['host'], a['host'])):
                 matched_alerts.append(a)
         return matched_alerts
     except TypeError:
