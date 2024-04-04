@@ -1,4 +1,6 @@
 from datetime import datetime, timezone
+import re
+
 
 def load_alerts(mongo_collection):
     """ Load all alerts from the database upon startup """
@@ -22,6 +24,29 @@ def lookup_alert(alerts, alert):
     except TypeError:
         return None
 
+
+def regexp_alerts(alerts, rules):
+    """
+    Get list of alerts via regexp rules
+    :param alerts: Global list of alerts
+    :param rules: Dictionary with regexp patterns for project, alertName and host to search matching alerts
+    :return: List of alerts that matches, or None
+    """
+    project = re.escape(rules['project'])
+    alert = re.escape(rules['alertName'])
+    host = re.escape(rules['host'])
+    matched_alerts = []
+    try:
+        for a in alerts:
+            if (re.search(project, a['project']) and
+                re.search(alert, a['alertName']) and
+                re.search(host, a['host'])):
+                matched_alerts.append(a)
+        return matched_alerts
+    except TypeError:
+        return None
+
+
 def update_alerts(alerts, alert):
     """ Look for alert in the global list that matches the given one
         and update the details """
@@ -35,7 +60,7 @@ def update_alerts(alerts, alert):
     except TypeError:
         pass
     return
-            
+
 
 def make_history_entry(alert):
     """ Return history entry for the given alert.

@@ -1,6 +1,7 @@
 import os, atexit, jsonschema, jwt, threading
 from datetime import datetime, timezone, timedelta
 import pymongo
+import re
 from bson.objectid import ObjectId
 from flask import Flask, request, jsonify, make_response
 from flask_cors import CORS
@@ -10,7 +11,7 @@ from werkzeug.exceptions import HTTPException, Unauthorized, BadRequest, Interna
 import json
 from .auth import create_token, token_required, token_required_ws
 from .user import User
-from .alert import load_alerts, lookup_alert, update_alerts, make_history_entry, is_resolved
+from .alert import load_alerts, lookup_alert, update_alerts, regexp_alerts, make_history_entry, is_resolved
 
 # Global vars init
 app = Flask(__name__)
@@ -162,14 +163,19 @@ schema = {
 # JSON schema to validate inbound silence JSON
 silence_schema = {
     "required": [
-        "hostName",
+        "project",
+        "host",
         "alertName",
         "startSilence",
         "endSilence",
         "comment",
     ],
     "properties": {
-        "hostName": {
+        "project": {
+            "type": "string",
+            "maxLength": 255
+        },
+        "host": {
             "type": "string",
             "maxLength": 255
         },
@@ -203,6 +209,24 @@ atexit.register(cleanup_on_shutdown)
 def parse_json(data):
     """ Parse Mongo's OIDs """
     return json.dumps(data, default=str)
+
+
+def send_alerts(updated_alerts, update_alerts_query):
+    """
+    Function to send updated alerts to clients and update DB
+    :param updated_alerts: List of updated alerts to send
+    :param update_alerts_query: Queries to update DB
+    :return: nothing
+    """
+    if updated_alerts:
+        try:
+            app.db['current'].bulk_write(update_alerts_query)
+            socketio.emit('update', parse_json(updated_alerts))
+        except pymongo.errors.PyMongoError as e:
+            raise InternalServerError("Failed to save alerts in MongoDB: %s" % e)
+        except socketio.exceptions.SocketIOError as e:
+            print("Warning: Failed to send update to connected socket.io clients: %s" % e)
+            pass
 
 
 #
@@ -274,16 +298,7 @@ def ack(user):
                     update_alerts_query.append(pymongo.UpdateOne({'_id': alert['_id']}, {"$set": {"responsibleUser": ''}}))
                     break
 
-    if updated_alerts:
-        try:
-            app.db['current'].bulk_write(update_alerts_query)
-            socketio.emit('update', parse_json(updated_alerts))
-        except pymongo.errors.PyMongoError as e:
-            raise InternalServerError("Failed to save alerts in MongoDB: %s" % e)
-        except socketio.exceptions.SocketIOError as e:
-            print("Warning: Failed to send update to connected socket.io clients: %s" % e)
-            pass
-
+    send_alerts(updated_alerts, update_alerts_query)
     return "OK", 200
 
 
@@ -299,13 +314,45 @@ def silence(user):
     except jsonschema.exceptions.ValidationError as e:
         raise BadRequest(e.message)
 
+    if not data['project'] and not data['alertName'] and not data['host']:
+        raise InternalServerError("Too broad regex pattern")
+
+    silence_rule = {
+        "project": re.escape(data['project']),
+        "host": re.escape(data['host']),
+        "alertName": re.escape(data['alertName']),
+        "startSilence": data['startSilence'],
+        "endSilence": data['endSilence'],
+        "comment": re.escape(data['comment'])
+    }
+
+    search_pattern = {
+        "alertName": data['alertName'],
+        "project": data['project'],
+        "host": data['host']
+    }
+
+    updated_alerts = []  # list of updated alerts
+    update_alerts_query = []  # list to hold MongoDB query to update 'current' collection
+    matched_alerts = regexp_alerts(alerts, search_pattern)
+
+    if matched_alerts:
+        for alert in matched_alerts:
+            alert["silence"] = True
+            alert["comment"] = data["comment"]
+            updated_alerts.append(alert)
+            update_alerts_query.append(pymongo.UpdateOne(
+                {'_id': alert['_id']}, {"$set": {"silenced": True, "comment": data["comment"]}})
+            )
+
     silence_user = user['email']
-    data["author"] = silence_user
+    silence_rule["author"] = silence_user
     try:
-        app.db['silence'].insert_one(data)
+        app.db['silence'].insert_one(silence_rule)
     except pymongo.errors.PyMongoError as e:
         raise InternalServerError("Failed to save silencer in MongoDB: %s" % e)
 
+    send_alerts(updated_alerts, update_alerts_query)
     return "OK", 200
 
 
