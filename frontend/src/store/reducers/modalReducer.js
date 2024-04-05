@@ -1,4 +1,11 @@
-import {ALERT_DETAILS, CLOSE_MODAL, ERROR_MESSAGE, LOGIN_MODAL, PROFILE_MODAL} from "../actions/MODAL_ACTIONS";
+import {
+    ALERT_DETAILS,
+    CLOSE_MODAL,
+    ERROR_MESSAGE,
+    LOGIN_MODAL,
+    PROFILE_MODAL,
+    SILENCE_MODAL
+} from "../actions/MODAL_ACTIONS";
 
 const modalState = {
     isOpened: false,
@@ -18,6 +25,8 @@ export const modalReducer = (state = modalState, action) => {
             return {...state,isOpened: true, content: ERROR_MESSAGE, customMessage: action.payload}
         case ALERT_DETAILS:
             return {...state, isOpened: true, content: ALERT_DETAILS}
+        case SILENCE_MODAL:
+            return {...state, isOpened: true, content: SILENCE_MODAL}
         default:
             return state
     }
@@ -42,4 +51,8 @@ export const switchErrorMessageModal = (message) => ({
 
 export const switchAlertDetailsModal = () => ({
     type: ALERT_DETAILS
+})
+
+export const switchSilenceModal = () => ({
+    type: SILENCE_MODAL
 })
