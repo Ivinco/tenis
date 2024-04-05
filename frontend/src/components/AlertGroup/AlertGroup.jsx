@@ -58,12 +58,12 @@ const AlertGroup = ({group, alertHeight}) => {
     const onAckClickHandle =  async () => {
         let response
         try {
-            // if all alerts are ached by current user, they will be unacked
+            // if all alerts are acked by current user, they will be unacked
             if (isOneGroupUser && group.alerts[0].responsibleUser === userEmail){
                 await AlertService.unack(ackedAlerts)
             } else {
-                //if only some of the alerts are acked by current user, they will not be changed
-                //all other alerts will be acked by current user
+                // if only some of the alerts are acked by current user, they will not be changed
+                // all other alerts will be acked by current user
                 const unackedAlerts = []
                 group.alerts.forEach(alert => {
                     if (alert.responsibleUser !== userEmail){
