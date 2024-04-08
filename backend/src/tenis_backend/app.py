@@ -121,11 +121,19 @@ schema = {
             "required": ["alertId"],
             "additionalProperties": False
         },
+        "unsilence_definition": {
+            "properties": {
+                "silenceId": {"type": "string"},
+            },
+            "required": ["silenceId"],
+            "additionalProperties": False
+        },
     },
 
 
     "type": "object",  # this is for the root element
     "anyOf": [
+        {"required": ["unsilence"]},
         {"required": ["update"]},
         {"required": ["reload"]},
         {"required": ["resolve"]},
@@ -147,6 +155,11 @@ schema = {
             "type": "array",
             "maxItems": 10000,
             "items": {"$ref": "#/definitions/ack_definition"}
+        },
+        "unsilence": {
+            "type": "array",
+            "maxItems": 10000,
+            "items": {"$ref": "#/definitions/unsilence_definition"}
         },
         "ack": {
             "type": "array",
@@ -306,7 +319,7 @@ def ack(user):
 @token_required()  # note () are required!
 def silence(user):
     """
-    Method to add silencers
+    Method to add silence rule and set 'silenced' field of all matched alerts to True
     """
     try:
         data = request.json
@@ -326,10 +339,14 @@ def silence(user):
         "comment": re.escape(data['comment'])
     }
 
+    # this part is needed to make re.escape explicitly for regexp_alerts function to pass CodeQL check
+    project = re.escape(data['project'])
+    alert = re.escape(data['alertName'])
+    host = re.escape(data['host'])
     search_pattern = {
-        "alertName": data['alertName'],
-        "project": data['project'],
-        "host": data['host']
+        "alertName": alert,
+        "project": project,
+        "host": host
     }
 
     updated_alerts = []  # list of updated alerts
@@ -338,7 +355,7 @@ def silence(user):
 
     if matched_alerts:
         for alert in matched_alerts:
-            alert["silence"] = True
+            alert["silenced"] = True
             alert["comment"] = data["comment"]
             updated_alerts.append(alert)
             update_alerts_query.append(pymongo.UpdateOne(
@@ -351,6 +368,50 @@ def silence(user):
         app.db['silence'].insert_one(silence_rule)
     except pymongo.errors.PyMongoError as e:
         raise InternalServerError("Failed to save silencer in MongoDB: %s" % e)
+
+    send_alerts(updated_alerts, update_alerts_query)
+    return "OK", 200
+
+
+@app.route('/unsilence', methods=['POST'])
+@token_required()  # note () are required!
+def unsilence(user):
+    """
+    Method to remove silence rule(s) and set 'silenced' field of all matched alerts to False
+    """
+    try:
+        data = request.json
+        jsonschema.validate(instance=data, schema=schema)
+    except jsonschema.exceptions.ValidationError as e:
+        raise BadRequest(e.message)
+
+    updated_alerts = []  # list of updated alerts
+    delete_rule_query = []  # list to hold MongoDB query to delete from 'silence' collection
+    update_alerts_query = []  # list to hold MongoDB query to update 'current' collection
+    obj_id_list = [ObjectId(item['silenceId']) for item in data['unsilence']]
+
+    try:
+        silence_rules = app.db['silence'].find({'_id': {'$in': obj_id_list}})
+    except pymongo.errors.PyMongoError as e:
+        raise InternalServerError("Failed to retrieve silence rules from MongoDB: %s" % e)
+
+    for item in silence_rules:
+        delete_rule_query.append(pymongo.DeleteOne({'_id': item['_id']}))
+        matched_alerts = regexp_alerts(alerts, item)
+        if matched_alerts:
+            print(matched_alerts)
+            for alert in matched_alerts:
+                alert["silenced"] = False
+                alert["comment"] = ""
+                updated_alerts.append(alert)
+                update_alerts_query.append(pymongo.UpdateOne(
+                    {'_id': alert['_id']}, {"$set": {"silenced": False, "comment": ""}})
+                )
+
+    try:
+        app.db['silence'].bulk_write(delete_rule_query)
+    except pymongo.errors.PyMongoError as e:
+        raise InternalServerError("Failed to delete silence rules from MongoDB: %s" % e)
 
     send_alerts(updated_alerts, update_alerts_query)
     return "OK", 200
