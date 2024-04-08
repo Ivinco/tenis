@@ -399,7 +399,6 @@ def unsilence(user):
         delete_rule_query.append(pymongo.DeleteOne({'_id': item['_id']}))
         matched_alerts = regexp_alerts(alerts, item)
         if matched_alerts:
-            print(matched_alerts)
             for alert in matched_alerts:
                 alert["silenced"] = False
                 alert["comment"] = ""
