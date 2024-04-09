@@ -391,7 +391,7 @@ def unsilence(user):
     obj_id_list = [ObjectId(item['silenceId']) for item in data['unsilence']]
 
     try:
-        silence_rules = app.db['silence'].find({'_id': {'$in': obj_id_list}})
+        silence_rules = list(app.db['silence'].find({'_id': {'$in': obj_id_list}}))
     except pymongo.errors.PyMongoError as e:
         raise InternalServerError("Failed to retrieve silence rules from MongoDB: %s" % e)
 
@@ -494,20 +494,31 @@ def inbound():
         raise BadRequest(e.message)
 
     if 'update' in data:
+        try:  # to check if new alert needs to be silenced
+            silence_rules = list(app.db['silence'].find({}))
+        except pymongo.errors.PyMongoError as e:
+            raise InternalServerError("Failed to retrieve silence rules from MongoDB: %s" % e)
+
         with alerts_lock:
-            new_alerts = [] # list of new alerts
-            updated_alerts = [] # list of updated alerts
-            update_alerts_query = [] # list to hold MongoDB query to update 'current' collection
-            new_history_entries = [] # list of entries to add to 'history' collection
+            new_alerts = []  # list of new alerts
+            updated_alerts = []  # list of updated alerts
+            update_alerts_query = []  # list to hold MongoDB query to update 'current' collection
+            new_history_entries = []  # list of entries to add to 'history' collection
             for a in data['update']:
-                if is_resolved(a): continue # do not process resolved alerts in 'update' section
+                if is_resolved(a): continue  # do not process resolved alerts in 'update' section
+
+                if silence_rules:
+                    for rule in silence_rules:
+                        if regexp_alerts([a], rule):
+                            a['silenced'] = True
+                            a['comment'] = rule['comment']
 
                 existing_alert = lookup_alert(alerts, a)
-                if existing_alert is None: # new alert
+                if existing_alert is None:  # new alert
                     new_alerts.append(a)
-                    continue # next 'a' from data['update]', please
+                    continue  # next 'a' from data['update]', please
 
-                existing_alert = existing_alert.copy() # we will update global list later
+                existing_alert = existing_alert.copy()  # we will update global list later
 
                 # if severity changed, this should be logged to history collection
                 if existing_alert['severity'] != a['severity']:
@@ -571,7 +582,7 @@ def inbound():
         with alerts_lock:
             for entry in data['resolve']:
                 a = lookup_alert(alerts, entry)
-                if a is None: continue # we don't have this alert in the global list, skip
+                if a is None: continue  # we don't have this alert in the global list, skip
                 resolved_alerts.append(a)
                 a['severity'] = 'RESOLVED'
                 resolved_history_entries.append(make_history_entry(a))

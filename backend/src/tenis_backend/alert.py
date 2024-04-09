@@ -27,8 +27,8 @@ def lookup_alert(alerts, alert):
 
 def regexp_alerts(alerts, rules):
     """
-    Get list of alerts via regexp rules
-    :param alerts: Global list of alerts
+    Get list of alerts matching by 'project', 'alertName' and 'host' fields via regex rules
+    :param alerts: List of alerts to check
     :param rules: Dictionary with regexp patterns for project, alertName and host to search matching alerts
     :return: List of alerts that matches, or None
     """
