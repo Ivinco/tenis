@@ -7,6 +7,7 @@ import {sha256} from "js-sha256";
 import AuthService from "../../services/AuthService";
 import {switchErrorMessageModal} from "../../store/reducers/modalReducer";
 import AlertService from "../../services/AlertService";
+import {setSilenceRules} from "../../store/reducers/silenceRulesReducer";
 
 function SilenceWindow() {
     const dispatch = useDispatch()
@@ -17,28 +18,30 @@ function SilenceWindow() {
     const [comment, setComment] = useState("")
     const [selectedRule, setSelectedRule] = useState("")
 
-    const rules = [
-        {
-            ruleId: "010b29c9-7a8f-4a70-ba4f-498d72e2da7c",
-            project: "Ivinco",
-            hostname: "repo01",
-            alertName: "disk space usage 90%",
-            startSilence : "1709213217",
-            endSilence: "1709386017",
-            comment: "Planned data migration",
-            author: "stanislav@ivinco.com"
-        },
-        {
-            ruleId: "3a0cbe28-6f5f-4093-8d9e-7074bf6eefef",
-            project: "Ivinco",
-            hostname: "monitor",
-            alertName: "High CPU load",
-            startSilence : "1709213217",
-            endSilence: "1709386017",
-            comment: "Planned data migration",
-            author: "sys@ivinco.com"
-        }
-    ]
+    const rules = useSelector(state => state.setSilenceRules.rules)
+
+    // const rules = [
+    //     {
+    //         ruleId: "010b29c9-7a8f-4a70-ba4f-498d72e2da7c",
+    //         project: "Ivinco",
+    //         hostname: "repo01",
+    //         alertName: "disk space usage 90%",
+    //         startSilence : "1709213217",
+    //         endSilence: "1709386017",
+    //         comment: "Planned data migration",
+    //         author: "stanislav@ivinco.com"
+    //     },
+    //     {
+    //         ruleId: "3a0cbe28-6f5f-4093-8d9e-7074bf6eefef",
+    //         project: "Ivinco",
+    //         hostname: "monitor",
+    //         alertName: "High CPU load",
+    //         startSilence : "1709213217",
+    //         endSilence: "1709386017",
+    //         comment: "Planned data migration",
+    //         author: "sys@ivinco.com"
+    //     }
+    // ]
 
     const onSilenceHandler =  async () => {
         let endSilenceTime
@@ -59,15 +62,28 @@ function SilenceWindow() {
              await AlertService.silence(silenceRule)
         }
         catch (e){
-            console.log(e)
             dispatch(switchErrorMessageModal("Oops. Something went wrong. Please, try a bit later"))
         }
+
         setProject("")
         setHostname("")
         setAlertName("")
         setSilenceDuration(0)
         setComment("")
-        console.log(silenceRule)
+
+        const newRules = []
+        try {
+            const response = await AlertService.getSileneced()
+            response.data.forEach((rule) => {
+                newRules.push(rule)
+            })
+
+
+        }
+        catch (e) {
+            dispatch(switchErrorMessageModal("Oops. Something went wrong. Please, try a bit later"))
+        }
+        dispatch(setSilenceRules(newRules))
     }
 
     const onRuleHandler = (rule) => {
@@ -76,7 +92,6 @@ function SilenceWindow() {
         } else {
             setSelectedRule(rule)
         }
-        console.log(selectedRule)
     }
 
 
@@ -142,18 +157,18 @@ function SilenceWindow() {
                     <tbody className={style.tableBody}>
                     {
                         rules.map(rule => (
-                            <tr className={`${style.tableRow} ${rule.ruleId === selectedRule ? style.tableRowSelected : null}`}
-                                key={rule.ruleId}
+                            <tr className={`${style.tableRow} ${rule._id === selectedRule ? style.tableRowSelected : null}`}
+                                key={rule._id}
                                 onClick={e => {
                                     e.preventDefault()
-                                    onRuleHandler(rule.ruleId)
+                                    onRuleHandler(rule._id)
                                 }}
                             >
                                 <td className={`${style.tableCell} ${style.ruleAuthor}`}
                                     style={{backgroundImage: `url(https://gravatar.com/avatar/${sha256(rule.author)}?s=150)`}}
                                 />
                                 <td className={style.tableCell}>{rule.project}</td>
-                                <td className={style.tableCell}>{rule.hostname}</td>
+                                <td className={style.tableCell}>{rule.host}</td>
                                 <td className={style.tableCell}>{rule.alertName}</td>
                                 <td className={style.tableCell}>{new Date(parseInt(rule.endSilence, 10) * 1000).toLocaleString()}</td>
                                 <td className={style.tableCell}>{rule.comment}</td>

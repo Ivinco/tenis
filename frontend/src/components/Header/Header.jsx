@@ -1,9 +1,16 @@
 import styles from './Header.module.css'
 import {useDispatch, useSelector} from "react-redux";
-import {switchLoginModal, switchProfileModal, switchSilenceModal} from "../../store/reducers/modalReducer";
+import {
+    switchErrorMessageModal,
+    switchLoginModal,
+    switchProfileModal,
+    switchSilenceModal
+} from "../../store/reducers/modalReducer";
 import FilterMenu from "../FilterMenu/FilterMenu";
 import {switchFilterMenu} from "../../store/reducers/hiddenMenuReducer";
 import {switchInspectMode} from "../../store/reducers/headerMenuReducer";
+import AlertService from "../../services/AlertService";
+import {setSilenceRules} from "../../store/reducers/silenceRulesReducer";
 
 const Header = () => {
     const dispatch = useDispatch()
@@ -29,7 +36,20 @@ const Header = () => {
         dispatch(switchFilterMenu())
     }
 
-    const onSilenceClick = () => {
+    const onSilenceClick =  async () => {
+        const rules = []
+        try {
+            const response = await AlertService.getSileneced()
+            response.data.forEach((rule) => {
+                rules.push(rule)
+            })
+
+
+        }
+        catch (e) {
+            dispatch(switchErrorMessageModal("Oops. Something went wrong. Please, try a bit later"))
+        }
+        dispatch(setSilenceRules(rules))
         dispatch(switchSilenceModal())
     }
 

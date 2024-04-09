@@ -12,4 +12,8 @@ export default class AlertService {
     static async silence (payload) {
         return api.post('/silence', payload)
     }
+
+    static async getSileneced () {
+        return api.get('/silenced')
+    }
 }

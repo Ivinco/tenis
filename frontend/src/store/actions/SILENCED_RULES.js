@@ -1,0 +1,1 @@
+export const SILENCED_RULES = 'SILENCED_RULES';
