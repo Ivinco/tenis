@@ -22,13 +22,13 @@
     background-color: white;
     border: darkgrey 2px solid;
     border-radius: 10px;
-    margin: auto 15px 30px auto;
+    margin: auto 0 30px 30px;
     padding: 0 10px;
     font-size: 1.5rem;
 }
 
 .onDutyPortalActive {
-    border: #05F0D2 2px solid;
+    border: #01a2d8 2px solid;
 }
 
 .alertsCount {
@@ -36,14 +36,11 @@
     flex-direction: column;
     width: 165px;
     height: 108px;
-    margin: 40px auto auto;
+    margin: 30px auto auto auto;
     padding: 27px;
     justify-content: center;
     align-items: center;
-    background-color: white;
-    border: #05F0D2 2px solid;
-    border-radius: 30px;
-
+    color: #01a2d8;
 }
 
 .alertsNumber {
@@ -59,33 +56,12 @@
 }
 
 
-
-.navbar {
-    display: flex;
-    margin: auto auto 30px auto;
-    width: 50%;
-}
-
-.itemsBlock {
-    display: flex;
-    width: 100%;
-    margin: 0;
-    padding: 0;
-    list-style: none;
-    justify-content: space-around;
-    align-items: center;
-}
-
-.navItem {
-    display: flex;
-}
-
 .headerButton {
     min-width: 135px;
     min-height: 50px;
     margin: auto auto;
     background-color: transparent;
-    border: #05F0D2 2px solid;
+    border: #01a2d8 2px solid;
     border-radius: 10px;
     font-size: 2rem;
     padding: 12px 15px;
@@ -115,7 +91,7 @@
     background-position: center;
     background-repeat: no-repeat;
     background-color: transparent;
-    margin: auto 0 30px auto;
+    margin: auto 30px 30px 0;
     border: none;
     filter: grayscale(100%);
 }
@@ -123,11 +99,19 @@
 .funcButtonEnabled {
     cursor: pointer;
     transition: transform 0.2s;
-    border: #05F0D2 2px solid;
     filter: none;
 }
 .funcButtonEnabled:hover {
     transform: scale(1.2);
+}
+
+.silenceButton {
+    border: none;
+    background-image: url("../../../public/images/mute-notification-color-svgrepo-com.svg");
+}
+
+.funcButton:focus{
+    outline: none;
 }
 
 .inspectButton {
@@ -135,6 +119,8 @@
     border-radius: 7px;
     background-image: url("../../../public/images/resize-button.svg");
 }
+
+
 
 .refreshButton {
     border: none;
@@ -152,7 +138,7 @@
     background-repeat: no-repeat;
     margin: auto 45px;
     border-radius: 50%;
-    border: 3px solid #05F0D2;
+    border: 3px solid #01a2d8;
     transition: transform 0.2s;
     position: relative;
 }

@@ -27,7 +27,7 @@
 .searchForm {
     display: flex;
     padding: 2px 4px 2px 2px;
-    border: rgba(5, 240, 210, 0.45) 2px solid;
+    border: #01A2D8 2px solid;
     border-radius: 10px;
     background-color: white;
 }
