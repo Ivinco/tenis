@@ -6,9 +6,10 @@ import ReactDOM from 'react-dom'
 import AuthForm from "../AuthForm/AuthForm";
 import UserInfo from "../UserInfo/UserInfo";
 import ErrorMessage from "../ErrorMessage/ErrorMessage";
-import {ALERT_DETAILS, LOGIN_MODAL, PROFILE_MODAL} from "../../store/actions/MODAL_ACTIONS";
+import {ALERT_DETAILS, LOGIN_MODAL, PROFILE_MODAL, SILENCE_MODAL} from "../../store/actions/MODAL_ACTIONS";
 import AlertsDetails from "../AlertsDetails/AlertsDetails";
 import {setDetailedAlert} from "../../store/reducers/alertReducer";
+import SilenceWindow from "../SilenceWindow/SilenceWindow";
 
 const Modal = (content) => {
     const portalElement = document.getElementById("portal")
@@ -45,7 +46,7 @@ const Modal = (content) => {
                     <button className={styles.closeButton}
                     onClick={(e) => onClose()}
                     />
-                    { modalContent === LOGIN_MODAL ? <AuthForm/> : modalContent === PROFILE_MODAL ? <UserInfo/> :  modalContent === ALERT_DETAILS ? <AlertsDetails/> : <ErrorMessage message={modalMessage}/>}
+                    { modalContent === LOGIN_MODAL ? <AuthForm/> : modalContent === PROFILE_MODAL ? <UserInfo/> :  modalContent === ALERT_DETAILS ? <AlertsDetails/> :  modalContent === SILENCE_MODAL ? <SilenceWindow/> : <ErrorMessage message={modalMessage}/> }
                 </div>
             </div>
     ), portalElement)

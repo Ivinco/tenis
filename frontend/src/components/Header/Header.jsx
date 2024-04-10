@@ -1,6 +1,6 @@
 import styles from './Header.module.css'
 import {useDispatch, useSelector} from "react-redux";
-import {switchLoginModal, switchProfileModal} from "../../store/reducers/modalReducer";
+import {switchLoginModal, switchProfileModal, switchSilenceModal} from "../../store/reducers/modalReducer";
 import FilterMenu from "../FilterMenu/FilterMenu";
 import {switchFilterMenu} from "../../store/reducers/hiddenMenuReducer";
 import {switchInspectMode} from "../../store/reducers/headerMenuReducer";
@@ -28,6 +28,11 @@ const Header = () => {
     const onFilterClick = () => {
         dispatch(switchFilterMenu())
     }
+
+    const onSilenceClick = () => {
+        dispatch(switchSilenceModal())
+    }
+
     return (
         <>
             <div className={styles.header}>
@@ -68,9 +73,11 @@ const Header = () => {
                         <li>
                             <button className={`${styles.headerButton} ${isLogged ? styles.headerButtonEnabled : styles.headerButtonDisabled}`}
                                     disabled={!isLogged}
-                                    onClick={() => {
+                                    onClick={(e) => {
+                                        e.preventDefault()
+                                        onSilenceClick()
                                         console.log("SCHEDULE DOWN TIME")
-                                    }}> Schedule DT</button>
+                                    }}> Silence </button>
                         </li>
                     </ul>
                 </nav>

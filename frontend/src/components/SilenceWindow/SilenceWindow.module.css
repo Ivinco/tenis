@@ -1,0 +1,195 @@
+.silenceBody {
+    display: flex;
+    flex-direction: column;
+}
+
+.silenceContent {
+    display: flex;
+    flex-direction: column;
+    max-height: 700px;
+    overflow: auto;
+
+}
+
+.silenceForm {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    justify-content: space-around;
+    margin: 20px auto;
+
+}
+
+.silenceInputField {
+    display: flex;
+    width: 70%;
+    margin: 10px auto 10px;
+    font-size: 1.5rem;
+    border: 2px solid #E4F0F5FF;
+}
+
+.silenceButton {
+    display: flex;
+    justify-content: center;
+    width: 20%;
+    margin: 10px auto;
+    padding: 5px;
+    font-size: 1.5rem;
+    text-align: center;
+    border-radius: 10px;
+}
+
+.silenceButtonDisabled {
+    background-color: #989898;
+    color: black;
+    border: 3px #989898 solid;
+}
+
+.silenceButtonEnabled {
+    background-color: #e1fafa;
+    border: 3px solid #C3FAFAFF;
+    transition: transform 0.15s;
+}
+
+.silenceButtonEnabled:hover {
+    cursor: pointer;
+    transform: scale(0.9);
+}
+
+.silenceTable {
+    width: 90%;
+    overflow: auto;
+    margin: 30px auto 50px;
+    border-collapse: collapse;
+    border: 2px solid #8C8C8CFF;
+    font-size: 1.5rem;
+}
+
+.cationContainer {
+    display: flex;
+    flex-direction: column;
+}
+
+.tableCaption {
+    font-size: 1.5rem;
+    margin: 10px auto;
+}
+
+.controlButtonsContainer {
+    display: flex;
+    width: 90%;
+    margin: auto;
+}
+
+.controlButton {
+    display: flex;
+    justify-content: center;
+    margin: 10px 20px 0 0;
+    padding: 10px 30px;
+    font-size: 1rem;
+    text-align: center;
+    border-radius: 10px;
+}
+
+.tableHeader {
+    background-color: #E4F0F5FF;
+}
+
+.tableHeaderElement {
+    border: 1px solid #A0A0A0FF;
+    padding: 8px 10px;
+}
+
+.tableBody {
+    max-height: 100px;
+    overflow: auto;
+}
+
+.tableRow {
+    background-color: transparent;
+}
+
+.tableRow:hover {
+    cursor: pointer;
+    background-color: lightgrey;
+}
+
+.tableRowSelected {
+    background-color: #9a9999;
+}
+.tableRowSelected:hover {
+    background-color: #9a9999;
+}
+
+
+
+.tableCell {
+    text-align: center;
+    border: 1px solid #3f3e3e;
+    padding: 8px 10px;
+}
+
+
+.ruleAuthor {
+    background-size: contain;
+    background-repeat: no-repeat;
+    margin: auto;
+    padding: 0;
+    background-position: center;
+}
+
+@media screen and (max-width: 2150px) {
+    .silenceContent {
+        max-height: 450px;
+    }
+
+    .silenceForm {
+        margin: 15px auto;
+    }
+    .silenceInputField {
+        font-size: 1rem;
+    }
+
+    .silenceButton {
+        font-size: 1rem;
+    }
+
+    .silenceTable {
+        margin: 20px auto 30px;
+        font-size: 1rem;
+    }
+
+    .tableCaption {
+        font-size: 1rem;
+    }
+
+
+}
+
+@media screen and (max-width: 1150px) {
+    .silenceContent {
+        max-height: 430px;
+    }
+
+    .silenceForm {
+        margin: 10px auto;
+    }
+    .silenceInputField {
+        font-size: 0.7rem;
+    }
+
+    .silenceButton {
+        font-size: 0.7rem;
+    }
+
+    .silenceTable {
+        margin: 15px auto 20px;
+        font-size: 0.7rem;
+    }
+
+    .tableCaption {
+        font-size: 0.7rem;
+    }
+
+
+}

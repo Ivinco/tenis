@@ -19,7 +19,6 @@ const AuthForm = () => {
         try {
             const response = await AuthService.login(email, password)
                     localStorage.setItem('token', response.data.access_token)
-                    console.log(`https://gravatar.com/avatar/${sha256(response.data.user.email)}?s=150`)
                     const user_raw = {
                         userName: response.data.user.name,
                         userId: response.data.user._id,

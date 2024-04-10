@@ -11,7 +11,10 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from bson.objectid import ObjectId
 from flask import Flask, request, jsonify, make_response
 from flask_cors import CORS
-from flask_socketio import SocketIO, emit
+from flask_socketio import SocketIO, emit, send, disconnect
+from apscheduler.schedulers.background import BackgroundScheduler
+from email_validator import validate_email, EmailNotValidError
+from bson import ObjectId
 from werkzeug.exceptions import HTTPException, Unauthorized, BadRequest, InternalServerError
 
 from .alert import load_alerts, lookup_alert, update_alerts, regexp_alerts, make_history_entry, is_resolved
@@ -509,6 +512,194 @@ def login():
         return resp, 200
     except Exception as e:
         raise InternalServerError("Failed to create JWT token")
+
+
+@app.route('/users')
+@token_required()
+def get_users(current_user):
+    """Return list of all users"""
+    try:
+        users = User().get_all()
+        return jsonify(users), 200
+    except Exception as e:
+        raise InternalServerError(f"Failed to retrieve users: {str(e)}")
+
+@app.route('/user', methods=['POST'])
+@token_required()
+def get_user_by_id(current_user):
+    """Return user by id"""
+    data = request.get_json(force=True, silent=False)
+    if not data or 'id' not in data:
+        return make_response(jsonify({"error": "Please provide user ID in JSON format"}), 400)
+    try:
+        user_id = data.get('id')
+        user = User().get_by_id(user_id)
+        if not user:
+            return make_response(jsonify({"error": "User not found"}), 404)
+        return jsonify(user), 200
+    except Exception as e:
+        raise InternalServerError(f"Failed to retrieve user: {str(e)}")
+
+
+@app.route('/user/get_by_email', methods=['POST'])
+@token_required()
+def get_user_by_email(current_user):
+    """Return user by email"""
+    data = request.get_json()
+    if not data or 'email' not in data:
+        return make_response(jsonify({"error": "Please provide email in JSON format"}), 400)
+    try:
+        email = data['email']
+        user = User().get_by_email(email)
+        if not user:
+            return make_response(jsonify({"error": "User not found"}), 404)
+        return jsonify(user), 200
+    except Exception as e:
+        raise InternalServerError(f"Failed to retrieve user: {str(e)}")
+
+
+@app.route('/user/add', methods=['POST'])
+@token_required()  # note () are required!
+def add_user(current_user):
+    """Create new User"""
+    data = request.get_json()
+
+    if not data or 'email' not in data or 'password' not in data:
+        return make_response(jsonify({"error": "Email and password are required"}), 400)
+    
+    try:
+        # email validation
+        valid_email = validate_email(data['email']).email
+    except EmailNotValidError as e:
+        return make_response(jsonify({"error": "Invalid email"}), 400)
+
+    email = valid_email # required
+    name = data.get('name', "") # optional
+    password = data.get('password') # required
+    avatar = data.get('avatar', "")
+
+    # Is it should be in mongo ? 
+    grouping = data.get('grouping', False) # optional 
+    timezone = data.get('timezone', "Browser") # optional 
+    projects = data.get('projects', "All") # optional
+
+    phone = data.get('phone', "") # optional 
+    active = data.get('active', True) # optional
+    is_admin = data.get('is_admin', True) # optional 
+
+    try:
+        user = User().create(name, email, password, avatar, grouping, timezone, projects, phone)
+        if user is None:
+            return make_response(jsonify({"error": "User with this email already exists"}), 409)  # Конфликт
+        return jsonify(user), 201  
+    except Exception as e:
+        return make_response(jsonify({"error": str(e)}), 500)
+
+
+@app.route('/user/del', methods=['POST'])
+@token_required() 
+def del_user(current_user):
+    """Removing user with id"""
+    data = request.get_json()
+    
+    if not data or 'id' not in data:
+        return make_response(jsonify({"error": "Please provide id in JSON format"}), 400)
+    
+    user_id = data['id']
+    
+    try:
+        valid_id = ObjectId(user_id)
+    except:
+        return make_response(jsonify({"error": "Invalid ID format"}), 400)
+
+    try:
+        result = User().delete(user_id)
+        if result is False:
+            return make_response(jsonify({"error": "User not found"}), 404)
+        return jsonify({"message": "User deleted successfully"}), 200
+    except Exception as e:
+        return make_response(jsonify({"error": str(e)}), 500)
+
+@app.route('/user/disable', methods=['POST'])
+@token_required() 
+def disable_user(current_user):
+    """Disable user by id"""
+    data = request.get_json()
+    
+    if not data or 'id' not in data:
+        return make_response(jsonify({"error": "Please provide id in JSON format"}), 400)
+    
+    user_id = data['id']
+    
+    try:
+        valid_id = ObjectId(user_id)
+    except:
+        return make_response(jsonify({"error": "Invalid ID format"}), 400)
+    
+    try:
+        result = User().disable_account(user_id)
+        if result is False:
+            return make_response(jsonify({"error": "User not found"}), 404)
+        return jsonify({"message": "User disabled successfully"}), 200
+    except Exception as e:
+        return make_response(jsonify({"error": str(e)}), 500)
+
+@app.route('/user/enable', methods=['POST'])
+@token_required() 
+def enable_user(current_user):
+    """Enable user by id"""
+    data = request.get_json()
+    
+    if not data or 'id' not in data:
+        return make_response(jsonify({"error": "Please provide id in JSON format"}), 400)
+    
+    user_id = data['id']
+    
+    try:
+        valid_id = ObjectId(user_id)
+    except:
+        return make_response(jsonify({"error": "Invalid ID format"}), 400)
+    
+    try:
+        result = User().enable_account(user_id)
+        if result is False:
+            return make_response(jsonify({"error": "User not found"}), 404)
+        return jsonify({"message": "User disabled successfully"}), 200
+    except Exception as e:
+        return make_response(jsonify({"error": str(e)}), 500)
+
+@app.route('/user/update', methods=['POST'])
+@token_required() 
+def update_user(current_user):
+    """Update user data"""
+    data = request.get_json()
+
+    if not data or 'id' not in data:
+        user_id = current_user['_id']
+    else:
+        user_id = data['id']
+        data.pop('id')  # removing ID from data
+
+    try:
+        valid_id = ObjectId(user_id)
+    except:
+        return make_response(jsonify({"error": "Invalid ID format"}), 400)
+
+    # removing Active from data, cause we have sepparate functions for it
+    if 'active' in data:
+        active = data.pop('active')
+    
+    # check if we have atleast one var for update
+    if not data:
+        return make_response(jsonify({"error": "No data provided for update"}), 400)
+    
+    try:
+        updated_user = User().update(user_id, data)
+        if updated_user is None:
+            return make_response(jsonify({"error": "User not found or data not changed"}), 404)
+        return jsonify(updated_user), 200
+    except Exception as e:
+        return make_response(jsonify({"error": str(e)}), 500)
 
 
 @app.route('/in', methods=['POST'])
