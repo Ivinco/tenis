@@ -20,7 +20,6 @@ function HeaderMenuItem({item}) {
     const subItemOnClickHandler = (action, subItemName) => {
         dispatch(action(subItemName))
         dispatch(switchActiveHeaderMenuItem(null))
-        console.log(`Selected ${subItemName} menu option`)
     }
 
     return (

@@ -116,7 +116,6 @@ const Alert = ({alert}) => {
             await AlertService.silence(silenceRule)
         }
         catch (e){
-            console.log(e)
             dispatch(switchErrorMessageModal("Oops. Something went wrong. Please, try a bit later"))
         }
 
@@ -125,7 +124,6 @@ const Alert = ({alert}) => {
         document.getElementById(`duration_${alert._id}`).value = ''
         document.getElementById(`comment_${alert._id}`).value = ''
         setEnabledSilenceWindow(false)
-        console.log(silenceRule)
     }
 
 

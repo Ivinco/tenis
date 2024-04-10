@@ -91,6 +91,23 @@
     border-radius: 10px;
 }
 
+.controlButtonDisabled {
+    background-color: #989898;
+    color: black;
+    border: 2px #989898 solid;
+}
+
+.controlButtonEnabled {
+    background-color: #e1fafa;
+    border: 2px solid #C3FAFAFF;
+    transition: transform 0.15s;
+}
+
+.controlButtonEnabled:hover {
+    cursor: pointer;
+    transform: scale(0.9);
+}
+
 .tableHeader {
     background-color: #E4F0F5FF;
 }
