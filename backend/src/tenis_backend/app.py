@@ -289,7 +289,8 @@ def add_user(current_user):
     projects = data.get('projects', "All") # optional
 
     phone = data.get('phone', "") # optional 
-    active = data.get('active', True) # optional 
+    active = data.get('active', True) # optional
+    is_admin = data.get('is_admin', True) # optional 
 
     try:
         user = User().create(name, email, password, avatar, grouping, timezone, projects, phone)
@@ -377,19 +378,18 @@ def enable_user(current_user):
 def update_user(current_user):
     """Update user data"""
     data = request.get_json()
-    
+
     if not data or 'id' not in data:
-        return make_response(jsonify({"error": "ID is required"}), 400)
-    
-    user_id = data['id']
+        user_id = current_user['_id']
+    else:
+        user_id = data['id']
+        data.pop('id')  # removing ID from data
 
     try:
         valid_id = ObjectId(user_id)
     except:
         return make_response(jsonify({"error": "Invalid ID format"}), 400)
 
-    user_id = data.pop('id')  # removing ID from data
-    
     # removing Active from data, cause we have sepparate functions for it
     if 'active' in data:
         active = data.pop('active')

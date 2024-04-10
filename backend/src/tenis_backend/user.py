@@ -9,7 +9,7 @@ class User:
         self.db = current_app.db
         return
 
-    def create(self, name="", email="", password="", avatar="", grouping=False, timezone="Browser", projects="All", phone=""):
+    def create(self, name="", email="", password="", avatar="", grouping=False, timezone="Browser", projects="All", phone="", is_admin=True):
         """Create a new user"""
         user = self.get_by_email(email)
         if user:
@@ -24,6 +24,7 @@ class User:
                 "timezone": timezone,
                 "projects": projects,
                 "phone": phone,
+                "is_admin": is_admin,
                 "active": True
             }
         )
