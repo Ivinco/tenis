@@ -7,14 +7,12 @@ import threading
 import pymongo
 
 from datetime import datetime, timezone, timedelta
-from apscheduler.schedulers.background import BackgroundScheduler
 from bson.objectid import ObjectId
 from flask import Flask, request, jsonify, make_response
 from flask_cors import CORS
 from flask_socketio import SocketIO, emit, send, disconnect
 from apscheduler.schedulers.background import BackgroundScheduler
 from email_validator import validate_email, EmailNotValidError
-from bson import ObjectId
 from werkzeug.exceptions import HTTPException, Unauthorized, BadRequest, InternalServerError
 
 from .alert import load_alerts, lookup_alert, update_alerts, regexp_alerts, make_history_entry, is_resolved
