@@ -1,7 +1,13 @@
-import os, atexit, jsonschema, jwt, threading
-from datetime import datetime, timezone, timedelta
-import pymongo
+import atexit
+import json
+import jsonschema
+import os
 import re
+import threading
+import pymongo
+
+from datetime import datetime, timezone, timedelta
+from apscheduler.schedulers.background import BackgroundScheduler
 from bson.objectid import ObjectId
 from flask import Flask, request, jsonify, make_response
 from flask_cors import CORS
@@ -10,10 +16,11 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from email_validator import validate_email, EmailNotValidError
 from bson import ObjectId
 from werkzeug.exceptions import HTTPException, Unauthorized, BadRequest, InternalServerError
-import json
+
+from .alert import load_alerts, lookup_alert, update_alerts, regexp_alerts, make_history_entry, is_resolved
 from .auth import create_token, token_required, token_required_ws
 from .user import User
-from .alert import load_alerts, lookup_alert, update_alerts, regexp_alerts, make_history_entry, is_resolved
+
 
 # Global vars init
 app = Flask(__name__)
@@ -32,6 +39,7 @@ app.config['LISTEN_HOST'] = os.getenv('LISTEN_HOST', '0.0.0.0')
 app.config['API_TOKEN'] = os.getenv('API_TOKEN', 'asdfg')
 app.config['HISTORY_RETENTION_DAYS'] = 30
 app.config['HISTORY_PERIOD_MINUTES'] = 15
+app.config['SILENCE_PERIOD_SECONDS'] = 10  # Silence rules check interval, checks that endSilence is <= current time
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 #
 # This can be useful for testing
@@ -42,13 +50,26 @@ app.config['JWT_REFRESH_TOKEN_EXPIRES'] = timedelta(days=30)
 
 # Load alerts from the DB
 alerts_lock = threading.Lock()
-alerts = list()
 with alerts_lock:
     alerts = load_alerts(app.db['current'])
 
 
-# Internal periodic tasks
-scheduler = BackgroundScheduler()
+# Internal periodic tasks via BackgroundScheduler
+def silence_scheduler():
+    """
+    Check if silence period is over
+    """
+    unsilence_list = []
+    silence_rules = list(app.db['silence'].find({}))
+    if silence_rules:
+        ts = datetime.now().timestamp()
+        for rule in silence_rules:
+            if rule['endSilence'] and rule['endSilence'] <= ts:
+                unsilence_list.append(rule)
+    if unsilence_list:
+        unsilence_matched_alerts(unsilence_list)
+
+
 def db_retention():
     """ Delete old history entries.
         Also, make intermediate record for each active alert in the DB to history table - needed for reports generation. """
@@ -75,7 +96,9 @@ def db_retention():
     return
 
 
+scheduler = BackgroundScheduler()
 job = scheduler.add_job(db_retention, 'interval', minutes=app.config['HISTORY_PERIOD_MINUTES'])
+job2 = scheduler.add_job(silence_scheduler, 'interval', seconds=app.config['SILENCE_PERIOD_SECONDS'])
 scheduler.start()
 
 
@@ -229,19 +252,23 @@ def parse_json(data):
 def send_alerts(updated_alerts, update_alerts_query):
     """
     Function to send updated alerts to clients and update DB
+    Used in /ack, /silence POST methods and in unsilence_matched_alerts function(/unsilence POST method)
+
     :param updated_alerts: List of updated alerts to send
     :param update_alerts_query: Queries to update DB
     :return: nothing
     """
     if updated_alerts:
         try:
-            app.db['current'].bulk_write(update_alerts_query)
             socketio.emit('update', parse_json(updated_alerts))
+        except socketio.exceptions.SocketIOError as e:
+            raise InternalServerError("Warning: Failed to send update to connected socket.io clients: %s" % e)
+
+    if update_alerts_query:
+        try:
+            app.db['current'].bulk_write(update_alerts_query)
         except pymongo.errors.PyMongoError as e:
             raise InternalServerError("Failed to save alerts in MongoDB: %s" % e)
-        except socketio.exceptions.SocketIOError as e:
-            print("Warning: Failed to send update to connected socket.io clients: %s" % e)
-            pass
 
 
 #
@@ -332,6 +359,7 @@ def silence(user):
     if not data['project'] and not data['alertName'] and not data['host']:
         raise InternalServerError("Too broad regex pattern")
 
+    ts = datetime.now().timestamp()
     silence_rule = {
         "project": re.escape(data['project']),
         "host": re.escape(data['host']),
@@ -340,6 +368,9 @@ def silence(user):
         "endSilence": data['endSilence'],
         "comment": re.escape(data['comment'])
     }
+
+    if silence_rule['endSilence'] and silence_rule['endSilence'] <= ts:
+        return "Too late :) endSilence time has passed already", 200
 
     # this part is needed to make re.escape explicitly for regexp_alerts function to pass CodeQL check
     project = re.escape(data['project'])
@@ -375,28 +406,15 @@ def silence(user):
     return "OK", 200
 
 
-@app.route('/unsilence', methods=['POST'])
-@token_required()  # note () are required!
-def unsilence(user):
+def unsilence_matched_alerts(silence_rules):
     """
-    Method to remove silence rule(s) and set 'silenced' field of all matched alerts to False
+    Function is used in /unsilence POST method and in background silence_scheduler
+    :param silence_rules: List of silence rules to check
+    :return: Nothing
     """
-    try:
-        data = request.json
-        jsonschema.validate(instance=data, schema=schema)
-    except jsonschema.exceptions.ValidationError as e:
-        raise BadRequest(e.message)
-
     updated_alerts = []  # list of updated alerts
     delete_rule_query = []  # list to hold MongoDB query to delete from 'silence' collection
     update_alerts_query = []  # list to hold MongoDB query to update 'current' collection
-    obj_id_list = [ObjectId(item['silenceId']) for item in data['unsilence']]
-
-    try:
-        silence_rules = list(app.db['silence'].find({'_id': {'$in': obj_id_list}}))
-    except pymongo.errors.PyMongoError as e:
-        raise InternalServerError("Failed to retrieve silence rules from MongoDB: %s" % e)
-
     for item in silence_rules:
         delete_rule_query.append(pymongo.DeleteOne({'_id': item['_id']}))
         matched_alerts = regexp_alerts(alerts, item)
@@ -415,6 +433,28 @@ def unsilence(user):
         raise InternalServerError("Failed to delete silence rules from MongoDB: %s" % e)
 
     send_alerts(updated_alerts, update_alerts_query)
+
+
+@app.route('/unsilence', methods=['POST'])
+@token_required()  # note () are required!
+def unsilence(user):
+    """
+    Method to remove silence rule(s) and set 'silenced' field of all matched alerts to False
+    """
+    try:
+        data = request.json
+        jsonschema.validate(instance=data, schema=schema)
+    except jsonschema.exceptions.ValidationError as e:
+        raise BadRequest(e.message)
+
+    obj_id_list = [ObjectId(item['silenceId']) for item in data['unsilence']]
+
+    try:
+        silence_rules = list(app.db['silence'].find({'_id': {'$in': obj_id_list}}))
+    except pymongo.errors.PyMongoError as e:
+        raise InternalServerError("Failed to retrieve silence rules from MongoDB: %s" % e)
+
+    unsilence_matched_alerts(silence_rules)
     return "OK", 200
 
 
@@ -422,10 +462,8 @@ def unsilence(user):
 @token_required()  # note () are required!
 def silenced(user):
     """
-    Method to return a list(json) of 'silence' objects
+    Method to return a json list of 'silence' rules
     """
-
-    silence_list = ()
     try:
         with alerts_lock:
             silence_list = load_alerts(app.db['silence'])
@@ -844,7 +882,7 @@ def refresh(user):
 #
 @socketio.on('connect')
 @token_required_ws
-def on_connect(user, data = None):
+def on_connect(user, data=None):
     global alerts
     with alerts_lock:
         emit('init', parse_json(alerts))
