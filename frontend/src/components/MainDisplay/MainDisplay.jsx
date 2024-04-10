@@ -14,12 +14,13 @@ export default function MainDisplay() {
     useConnectSocket(localStorage.getItem('token'))
     const dispatch = useDispatch()
     const isActiveSocket = useSelector(state => state.webSocket.isOpened)
-    const rawAlerts = useSelector(state => state.webSocket.alerts)
+    const allAlerts = useSelector(state => state.webSocket.alerts)
     const isInspectMode = useSelector(state => state.setHeaderMenuItemValue.inspectMode)
     const activeProject = useSelector(state => state.setHeaderMenuItemValue.project)
     const isGrouped = useSelector(state => state.setHeaderMenuItemValue.grouping)
     const foundAlerts = useSelector(state => state.setAlertReducer.foundAlerts)
     const [windowWidth, setWindowWidth] = useState(window.innerWidth)
+    const rawAlerts = allAlerts.filter((alert) => alert.silenced === false)
     let alertList
     let alertsToDisplay
     let rowHeight
