@@ -6,11 +6,13 @@ import {setDetailedAlert} from "../../store/reducers/alertReducer";
 import {switchAlertDetailsModal, switchErrorMessageModal} from "../../store/reducers/modalReducer";
 import {sha256} from "js-sha256";
 import AlertService from "../../services/AlertService";
+import {MAIN_DISPLAY} from "../../store/actions/DISPLAY_ACTIONS";
 
 const Alert = ({alert}) => {
     const dispatch = useDispatch()
     const isInspectMode = useSelector(state => state.setHeaderMenuItemValue.inspectMode)
     const userEmail = useSelector(state => state.authReducer.user.userEmail)
+    const displayMode = useSelector(state => state.setDisplay.display)
     const durationRef = useRef(null)
     const commentRef = useRef(null)
 
@@ -18,6 +20,7 @@ const Alert = ({alert}) => {
     const [isEnabledSilenceButton, setEnabledSilenceButton] = useState(false)
     const [silenceDuration, setSilenceDuration] = useState(null)
     const [silenceComment, setSilenceComment] = useState(null)
+
 
     useEffect(() => {
         if (silenceComment && silenceComment.length > 4 && silenceDuration && silenceDuration >= 0){
@@ -121,8 +124,6 @@ const Alert = ({alert}) => {
 
         setSilenceDuration(null)
         setSilenceComment(null)
-        document.getElementById(`duration_${alert._id}`).value = ''
-        document.getElementById(`comment_${alert._id}`).value = ''
         setEnabledSilenceWindow(false)
     }
 
@@ -181,12 +182,15 @@ const Alert = ({alert}) => {
                     Silence
                 </button>
             </div>
-            <div className={`${isInspectMode ? styles.controlButton : styles.controlButton_small} ${styles.silence}`}
-                 onClick={e => {
-                     e.preventDefault()
-                     handleSilenceButton()
-                 }}
-            />
+            {displayMode === MAIN_DISPLAY
+                ? <div className={`${isInspectMode ? styles.controlButton : styles.controlButton_small} ${styles.silence}`}
+                  onClick={e => {
+                      e.preventDefault()
+                      handleSilenceButton()
+                  }}
+                />
+            : null
+            }
             <div className={`${isInspectMode ? styles.controlButton : styles.controlButton_small} ${styles.refresh}`}/>
             <div className={`${isInspectMode ? styles.controlButton : styles.controlButton_small} ${styles.info}`}
                  onClick={(e) => {

@@ -9,6 +9,7 @@ import {setAlertsNumber} from "../../store/reducers/alertReducer";
 import AlertGroup from "../AlertGroup/AlertGroup";
 import {groupByField} from "../../utils/utils";
 import {alertNameGroups, alertsToGroup, hostNameGroups} from "../../utils/grouping";
+import {SILENCED_DISPLAY} from "../../store/actions/DISPLAY_ACTIONS";
 
 export default function MainDisplay() {
     useConnectSocket(localStorage.getItem('token'))
@@ -19,8 +20,15 @@ export default function MainDisplay() {
     const activeProject = useSelector(state => state.setHeaderMenuItemValue.project)
     const isGrouped = useSelector(state => state.setHeaderMenuItemValue.grouping)
     const foundAlerts = useSelector(state => state.setAlertReducer.foundAlerts)
+    const displayMode = useSelector(state => state.setDisplay.display)
     const [windowWidth, setWindowWidth] = useState(window.innerWidth)
-    const rawAlerts = allAlerts.filter((alert) => alert.silenced === false)
+    let rawAlerts
+    if (displayMode === SILENCED_DISPLAY){
+        rawAlerts = allAlerts.filter((alert) => alert.silenced === true)
+    } else {
+        rawAlerts = allAlerts.filter((alert) => alert.silenced === false)
+    }
+
     let alertList
     let alertsToDisplay
     let rowHeight

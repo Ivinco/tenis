@@ -13,7 +13,7 @@ function SilenceWindow() {
     const hostnameRef = useRef(null);
     const alertNameRef = useRef(null);
     const silenceDurationRef = useRef(null);
-    const commentRef = useRef(null);
+    const commentFieldRef = useRef(null);
     const [ruleId, setRuleId] = useState(null);
     const [project, setProject] = useState("")
     const [hostname, setHostname] = useState("")
@@ -171,14 +171,14 @@ function SilenceWindow() {
                     <input type="text" placeholder="Silence duration (min)" className={style.silenceInputField}
                            onChange={e => setSilenceDuration(e.target.value)}
                            value={silenceDuration}
-                           id={"silence_input_global"}
+                           id={"duration_input_global"}
                            ref={silenceDurationRef}
                            onKeyDown={handleEnterKeyDown}
                     />
                     <textarea placeholder="Comment" className={style.silenceInputField}
                               onChange={e => setComment(e.target.value)}
-                              id={"silenced_button"}
-                              ref={commentRef}
+                              id={"silenced_comment_input_global"}
+                              ref={commentFieldRef}
                               value={comment}
                               onKeyDown={handleEnterKeyDown}
                     />
