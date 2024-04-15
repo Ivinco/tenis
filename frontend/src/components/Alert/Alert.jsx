@@ -18,12 +18,12 @@ const Alert = ({alert}) => {
 
     const [isEnabledSilenceWindow, setEnabledSilenceWindow] = useState(false)
     const [isEnabledSilenceButton, setEnabledSilenceButton] = useState(false)
-    const [silenceDuration, setSilenceDuration] = useState(null)
+    const [silenceDuration, setSilenceDuration] = useState(undefined)
     const [silenceComment, setSilenceComment] = useState(null)
 
 
     useEffect(() => {
-        if (silenceComment && silenceComment.length > 4 && silenceDuration && silenceDuration >= 0){
+        if (silenceComment && silenceComment.length > 4){
             setEnabledSilenceButton(true)
         } else {
             setEnabledSilenceButton(false)

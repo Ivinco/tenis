@@ -183,7 +183,7 @@ function SilenceWindow() {
                               onKeyDown={handleEnterKeyDown}
                     />
                     <button className={`${style.silenceButton} 
-                ${hostname && alertName && silenceDuration && comment && comment.length > 4
+                ${hostname && alertName && comment && comment.length > 4
                         ? style.silenceButtonEnabled
                         : style.silenceButtonDisabled}`}
                             onClick={e => {
@@ -238,7 +238,7 @@ function SilenceWindow() {
                     <tbody className={style.tableBody}>
                     {
                         rules.map(rule => (
-                            <tr className={`${style.tableRow} ${ selectedRules.some(selectedRule => selectedRule._id === rule._id) ? style.tableRowSelected : null}`}
+                            <tr className={`${style.tableRow} ${selectedRules.some(selectedRule => selectedRule._id === rule._id) ? style.tableRowSelected : null}`}
                                 key={rule._id}
                                 onClick={e => {
                                     e.preventDefault()
@@ -251,7 +251,7 @@ function SilenceWindow() {
                                 <td className={style.tableCell}>{rule.project}</td>
                                 <td className={style.tableCell}>{rule.host}</td>
                                 <td className={style.tableCell}>{rule.alertName}</td>
-                                <td className={style.tableCell}>{new Date(parseInt(rule.endSilence, 10)).toLocaleString()}</td>
+                                <td className={style.tableCell}>{rule.silenced ? new Date(parseInt(rule.endSilence, 10)).toLocaleString() : "permanent"}</td>
                                 <td className={style.tableCell}>{rule.comment}</td>
                             </tr>
                         ))
