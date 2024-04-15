@@ -1,8 +1,9 @@
 import {setGroupingMenuValue, setProjectMenuValue, setTimeZoneValue} from "../store/reducers/headerMenuReducer";
-import {HISTORY_DISPLAY, MAIN_DISPLAY, STATS_DISPLAY} from "../store/actions/DISPLAY_ACTIONS";
+import {HISTORY_DISPLAY, MAIN_DISPLAY, SILENCED_DISPLAY, STATS_DISPLAY} from "../store/actions/DISPLAY_ACTIONS";
 
 export const sideBarMenuItems = [
     {value: 'Normal', action: MAIN_DISPLAY},
+    {value: 'Silenced', action: SILENCED_DISPLAY},
     {value: 'History', action: HISTORY_DISPLAY},
     {value: 'Stats', action: STATS_DISPLAY}
 

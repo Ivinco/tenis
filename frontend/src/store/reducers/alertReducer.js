@@ -3,7 +3,7 @@ import {DETAILED_ALERT, SET_ALERTS_NUMBER, SET_FOUND_ALERTS} from "../actions/AL
 
 const defaultdAlert = {
 alert: {
-    id: '',
+    _id: '',
     project: '',
     host: '',
     fired: '',
@@ -11,6 +11,8 @@ alert: {
     severity: '',
     msg: '',
     responsibleUser: '',
+    comment: '',
+    silenced: false,
     customField: {}
     },
     alertsNumber: 0,

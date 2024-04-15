@@ -6,11 +6,13 @@ import Alert from "../Alert/Alert";
 import {sha256} from "js-sha256";
 import AlertService from "../../services/AlertService";
 import {switchErrorMessageModal} from "../../store/reducers/modalReducer";
+import {MAIN_DISPLAY} from "../../store/actions/DISPLAY_ACTIONS";
 
 const AlertGroup = ({group, alertHeight}) => {
     const dispatch = useDispatch()
     const isInspectMode = useSelector(state => state.setHeaderMenuItemValue.inspectMode)
     const userEmail = useSelector(state => state.authReducer.user.userEmail)
+    const displayMode = useSelector(state => state.setDisplay.display)
     const [isAlertsBlockOpened, setIsAlertBlockOpened] = useState('false')
     const onAlertClickHandler = (e) => {
         e.preventDefault()
@@ -106,8 +108,12 @@ const AlertGroup = ({group, alertHeight}) => {
                      onClick={e => onAlertClickHandler(e)}>
                     {group.description}
                 </div>
-                <div className={`${isInspectMode ? alertStyles.refresh : alertStyles.refresh_small}`}/>
-                <div className={`${isInspectMode ? alertStyles.info : alertStyles.info_small}`}/>
+                {displayMode === MAIN_DISPLAY
+                    ? <div className={`${isInspectMode ? alertStyles.controlButton : alertStyles.controlButton_small}`}/>
+                    : null
+                }
+                <div className={`${isInspectMode ? alertStyles.controlButton : alertStyles.controlButton_small} ${alertStyles.refresh}`}/>
+                <div className={`${isInspectMode ? alertStyles.controlButton : alertStyles.controlButton_small} ${alertStyles.info}`}/>
 
         </div>
     <div className={`${styles.alertBlock} ${isAlertsBlockOpened ? styles.alertBlockHidden : ''}`}

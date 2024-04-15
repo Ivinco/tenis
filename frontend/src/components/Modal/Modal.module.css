@@ -15,7 +15,7 @@
     flex-direction: column;
     position: relative;
     margin: 52px auto auto auto;
-    width: 848px;
+    min-width: 1050px;
     max-width: 70%;
     min-height: 530px;
     max-height: 90vh;
