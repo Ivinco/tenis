@@ -26,7 +26,7 @@ function SilenceWindow() {
     const rules = useSelector(state => state.setSilenceRules.rules)
 
     useEffect(() => {
-        if (hostname && alertName && silenceDuration && comment && comment.length > 4) {
+        if ( comment && comment.length > 4 && (project || hostname || alertName)  ) {
             setActiveSilenceButton(true)
         } else {
             setActiveSilenceButton( false)
@@ -183,7 +183,7 @@ function SilenceWindow() {
                               onKeyDown={handleEnterKeyDown}
                     />
                     <button className={`${style.silenceButton} 
-                ${hostname && alertName && comment && comment.length > 4
+                ${comment && comment.length > 4 && (project || hostname || alertName) 
                         ? style.silenceButtonEnabled
                         : style.silenceButtonDisabled}`}
                             onClick={e => {
@@ -204,7 +204,7 @@ function SilenceWindow() {
                     <div className={style.controlButtonsContainer}>
                         <button
                             className={`${style.controlButton} ${selectedRules.length === 1 ? style.controlButtonEnabled : style.controlButtonDisabled}`}
-                            disabled={!selectedRules.length === 1}
+                            disabled={selectedRules.length !== 1}
                             onClick={e => {
                                 e.preventDefault()
                                 onEditHandler(selectedRules[0])
@@ -251,7 +251,13 @@ function SilenceWindow() {
                                 <td className={style.tableCell}>{rule.project}</td>
                                 <td className={style.tableCell}>{rule.host}</td>
                                 <td className={style.tableCell}>{rule.alertName}</td>
-                                <td className={style.tableCell}>{rule.silenced ? new Date(parseInt(rule.endSilence, 10)).toLocaleString() : "permanent"}</td>
+                                {/*<td className={style.tableCell}>{new Date(parseInt(rule.endSilence, 10)).toLocaleString()}</td>*/}
+                                <td className={style.tableCell}>
+                                    {rule.endSilence !== null
+                                        ? new Date(parseInt(rule.endSilence, 10)).toLocaleString()
+                                        : "permanent"
+                                    }
+                                </td>
                                 <td className={style.tableCell}>{rule.comment}</td>
                             </tr>
                         ))
