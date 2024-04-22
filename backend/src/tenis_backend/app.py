@@ -385,9 +385,17 @@ def silence(user):
 
     # check if we already have similar rule
     for rule in silence_rules:
-        test = silence_rule
-        test['_id'] = rule['_id']
-        test['author'] = rule['author']
+        test = {
+            '_id': rule['_id'],
+            'author': rule['author'],
+            'project': silence_rule['project'],
+            'host': silence_rule['host'],
+            'alertName': silence_rule['alertName'],
+            'startSilence': silence_rule['startSilence'],
+            'endSilence': silence_rule['endSilence'],
+            'comment': silence_rule['comment'],
+        }
+
         if rule == test:
             return "We already have similar rule", 200
 
@@ -409,7 +417,7 @@ def silence(user):
 
     try:
         res = app.db['silence'].insert_one(silence_rule)
-        silence_rule['_id'] = res.inserted_id
+        silence_rule['_id'] = str(res.inserted_id)
         silence_rules.append(silence_rule)
     except pymongo.errors.PyMongoError as e:
         raise InternalServerError("Failed to save silencer in MongoDB: %s" % e)
@@ -446,12 +454,15 @@ def unsilence_matched_alerts(list_of_rules):
                             alert["comment"] = other_rule["comment"]
                             break
                     updated_alerts.append(alert)
-    try:
-        app.db['silence'].bulk_write(delete_rule_query)
-    except pymongo.errors.PyMongoError as e:
-        raise InternalServerError("Failed to delete silence rules from MongoDB: %s" % e)
 
-    send_alerts(updated_alerts, [])
+    if delete_rule_query:
+        try:
+            app.db['silence'].bulk_write(delete_rule_query)
+        except pymongo.errors.PyMongoError as e:
+            raise InternalServerError("Failed to delete silence rules from MongoDB: %s" % e)
+
+    if updated_alerts:
+        send_alerts(updated_alerts, [])
 
 
 @app.route('/unsilence', methods=['POST'])
@@ -483,10 +494,18 @@ def silenced(user):
     """
     json_friendly_rules = []
     for rule in silence_rules:
-        json_friendly_rule = rule
-        json_friendly_rule['_id'] = str(rule['_id'])
-        json_friendly_rules.append(json_friendly_rule)
-
+        json_friendly_rules.append(
+            {
+                '_id': str(rule['_id']),
+                'author': rule['author'],
+                'project': rule['project'],
+                'host': rule['host'],
+                'alertName': rule['alertName'],
+                'startSilence': rule['startSilence'],
+                'endSilence': rule['endSilence'],
+                'comment': rule['comment'],
+            }
+        )
     return json.dumps(json_friendly_rules), 200
 
 
