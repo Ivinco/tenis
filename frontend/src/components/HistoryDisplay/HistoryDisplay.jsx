@@ -8,7 +8,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { MobileDateTimePicker } from '@mui/x-date-pickers/MobileDateTimePicker';
 
 
-function HistoryDisplay(props) {
+function HistoryDisplay() {
 
     const [startDate, setStartDate] = useState(new Date());
 
