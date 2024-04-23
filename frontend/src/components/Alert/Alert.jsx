@@ -7,8 +7,10 @@ import {switchAlertDetailsModal, switchErrorMessageModal} from "../../store/redu
 import {sha256} from "js-sha256";
 import AlertService from "../../services/AlertService";
 import {MAIN_DISPLAY} from "../../store/actions/DISPLAY_ACTIONS";
+import { useSearchParams } from "react-router-dom";
 
 const Alert = ({alert}) => {
+    const [searchParams, setSearchParams] = useSearchParams();
     const dispatch = useDispatch()
     const isInspectMode = useSelector(state => state.setHeaderMenuItemValue.inspectMode)
     const userEmail = useSelector(state => state.authReducer.user.userEmail)
@@ -96,6 +98,8 @@ const Alert = ({alert}) => {
     }
 
     const handleInfoButton = () => {
+        searchParams.set("alert", alert._id)
+        setSearchParams(searchParams)
         dispatch(setDetailedAlert({alert}))
         dispatch(switchAlertDetailsModal())
     }

@@ -10,9 +10,11 @@ import {ALERT_DETAILS, LOGIN_MODAL, PROFILE_MODAL, SILENCE_MODAL} from "../../st
 import AlertsDetails from "../AlertsDetails/AlertsDetails";
 import {setDetailedAlert} from "../../store/reducers/alertReducer";
 import SilenceWindow from "../SilenceWindow/SilenceWindow";
+import { useSearchParams } from "react-router-dom";
 
 const Modal = (content) => {
     const portalElement = document.getElementById("portal")
+    const [searchParams, setSearchParams] = useSearchParams();
     const dispatch = useDispatch()
     const isOpenedModal = useSelector(state => state.switchModal.isOpened)
     const modalContent = useSelector(state => state.switchModal.content)
@@ -21,6 +23,10 @@ const Modal = (content) => {
     const onClose = () => {
         dispatch(closeModal())
         dispatch(setDetailedAlert({}))
+        searchParams.delete("alert")
+        searchParams.delete("portal")
+        setSearchParams(searchParams)
+
     }
     const closeByEsc = (e) => {
         if (e.key === 'Escape') {
