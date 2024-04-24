@@ -417,7 +417,7 @@ def silence(user):
 
     try:
         res = app.db['silence'].insert_one(silence_rule)
-        silence_rule['_id'] = str(res.inserted_id)
+        silence_rule['_id'] = res.inserted_id
         silence_rules.append(silence_rule)
     except pymongo.errors.PyMongoError as e:
         raise InternalServerError("Failed to save silencer in MongoDB: %s" % e)
@@ -482,7 +482,8 @@ def unsilence(user):
     # select rules that match by ObjectIDs
     list_of_rules = [rule for rule in silence_rules if rule['_id'] in obj_id_list]
 
-    unsilence_matched_alerts(list_of_rules)
+    if list_of_rules:
+        unsilence_matched_alerts(list_of_rules)
     return "OK", 200
 
 
