@@ -19,6 +19,8 @@ const Modal = (content) => {
     const isOpenedModal = useSelector(state => state.switchModal.isOpened)
     const modalContent = useSelector(state => state.switchModal.content)
     const modalMessage = useSelector(state => state.switchModal.customMessage)
+    const portalParam = searchParams.get("portal")
+    const alertParam = searchParams.get("alert")
 
     const onClose = () => {
         dispatch(closeModal())
@@ -52,7 +54,11 @@ const Modal = (content) => {
                     <button className={styles.closeButton}
                     onClick={(e) => onClose()}
                     />
-                    { modalContent === LOGIN_MODAL ? <AuthForm/> : modalContent === PROFILE_MODAL ? <UserInfo/> :  modalContent === ALERT_DETAILS ? <AlertsDetails/> :  modalContent === SILENCE_MODAL ? <SilenceWindow/> : <ErrorMessage message={modalMessage}/> }
+                    {/*{ modalContent === LOGIN_MODAL ? <AuthForm/> : modalContent === PROFILE_MODAL ? <UserInfo/> :  modalContent === SILENCE_MODAL ? <SilenceWindow/> : <ErrorMessage message={modalMessage}/> }*/}
+                    {(modalContent === LOGIN_MODAL || portalParam === 'login') && <AuthForm/>}
+                    {alertParam && <AlertsDetails/>}
+                    {portalParam === 'userInfo' && <UserInfo/>}
+                    {portalParam === 'silenceRules' && <SilenceWindow/>}
                 </div>
             </div>
     ), portalElement)

@@ -24,6 +24,7 @@ const Alert = ({alert}) => {
     const [silenceComment, setSilenceComment] = useState(null)
 
 
+
     useEffect(() => {
         if (silenceComment && silenceComment.length > 4){
             setEnabledSilenceButton(true)

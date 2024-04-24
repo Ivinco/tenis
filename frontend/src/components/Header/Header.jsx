@@ -11,6 +11,7 @@ import {switchFilterMenu} from "../../store/reducers/hiddenMenuReducer";
 import {switchInspectMode} from "../../store/reducers/headerMenuReducer";
 import AlertService from "../../services/AlertService";
 import {setSilenceRules} from "../../store/reducers/silenceRulesReducer";
+import usePortalParam from "../../hooks/usePortalParam";
 
 const Header = () => {
     const dispatch = useDispatch()
@@ -18,12 +19,15 @@ const Header = () => {
     const userInfo = useSelector(state => state.authReducer.user)
     const alerts = useSelector(state => state.setAlertReducer.alertsNumber)
     const isInspectMode = useSelector(state => state.setHeaderMenuItemValue.inspectMode)
+    const setPortalParams = usePortalParam()
 
     const onAvatarClick = (e) => {
         e.preventDefault()
         if (!isLogged){
+            setPortalParams("login")
             dispatch(switchLoginModal())
         } else {
+            setPortalParams("userInfo")
             dispatch(switchProfileModal())
         }
 
@@ -51,6 +55,7 @@ const Header = () => {
         }
         dispatch(setSilenceRules(rules))
         dispatch(switchSilenceModal())
+        setPortalParams("silenceRules")
     }
 
     return (

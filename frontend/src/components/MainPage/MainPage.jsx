@@ -22,6 +22,7 @@ function MainPage(){
     const isLoggedIn = useSelector(state => state.authReducer.isLogged)
     const displayMode = useSelector(state => state.setDisplay.display)
 
+
     const onSideBarClick = () => {
         dispatch(switchSideBarState())
     }
