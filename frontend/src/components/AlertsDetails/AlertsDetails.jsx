@@ -140,6 +140,13 @@ const AlertsDetails = () => {
 
                         : <></>
                 }
+                <div>
+                    <div>
+                        <input type={"datetime-local"}/>
+                        <input type={"date"}/>
+                    </div>
+                    alert history block
+                </div>
 
             </div>
             
