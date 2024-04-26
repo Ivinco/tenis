@@ -493,21 +493,7 @@ def silenced(user):
     """
     Method to return a json list of 'silence' rules
     """
-    json_friendly_rules = []
-    for rule in silence_rules:
-        json_friendly_rules.append(
-            {
-                '_id': str(rule['_id']),
-                'author': rule['author'],
-                'project': rule['project'],
-                'host': rule['host'],
-                'alertName': rule['alertName'],
-                'startSilence': rule['startSilence'],
-                'endSilence': rule['endSilence'],
-                'comment': rule['comment'],
-            }
-        )
-    return json.dumps(json_friendly_rules), 200
+    return json.dumps(silence_rules, default=str), 200
 
 
 @app.route('/healz')
