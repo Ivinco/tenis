@@ -232,12 +232,12 @@ const AlertsDetails = () => {
                     <div className={styles.historyInputBlock}>
                         <div className={styles.historyInputElement}>
                             <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                <MobileDateTimePicker defaultValue={dayjs(historyStart)} onChange={e => setHistoryStart(e)}/>
+                                <MobileDateTimePicker defaultValue={dayjs(historyStart)} onChange={e => setHistoryStart(e)} ampm={false}/>
                             </LocalizationProvider>
                         </div>
                         <div className={styles.historyInputElement}>
                             <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                <MobileDateTimePicker defaultValue={dayjs(historyEnd)} onChange={e => setHistoryEnd(e)}/>
+                                <MobileDateTimePicker defaultValue={dayjs(historyEnd)} onChange={e => setHistoryEnd(e)} ampm={false}/>
                             </LocalizationProvider>
                         </div>
                         <button className={styles.historySearchButton} onClick={e => onHistorySearchClick(e)}></button>

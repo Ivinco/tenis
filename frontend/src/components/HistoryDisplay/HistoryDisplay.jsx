@@ -21,7 +21,7 @@ function HistoryDisplay() {
         <div className={commonStiles.mainDisplay}>
             <div className={styles.dateField}>
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
-                    <MobileDateTimePicker defaultValue={dayjs(startDate)} onChange={e => setStartDate(e)}/>
+                    <MobileDateTimePicker defaultValue={dayjs(startDate)} onChange={e => setStartDate(e)} ampm={false}/>
                 </LocalizationProvider>
                 <button className={styles.submitDateButton} onClick={e => onClickHander(e)}/>
             </div>
