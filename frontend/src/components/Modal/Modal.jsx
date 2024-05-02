@@ -10,17 +10,25 @@ import {ALERT_DETAILS, LOGIN_MODAL, PROFILE_MODAL, SILENCE_MODAL} from "../../st
 import AlertsDetails from "../AlertsDetails/AlertsDetails";
 import {setDetailedAlert} from "../../store/reducers/alertReducer";
 import SilenceWindow from "../SilenceWindow/SilenceWindow";
+import { useSearchParams } from "react-router-dom";
 
 const Modal = (content) => {
     const portalElement = document.getElementById("portal")
+    const [searchParams, setSearchParams] = useSearchParams();
     const dispatch = useDispatch()
     const isOpenedModal = useSelector(state => state.switchModal.isOpened)
     const modalContent = useSelector(state => state.switchModal.content)
     const modalMessage = useSelector(state => state.switchModal.customMessage)
+    const portalParam = searchParams.get("portal")
+    const alertParam = searchParams.get("alert")
 
     const onClose = () => {
         dispatch(closeModal())
         dispatch(setDetailedAlert({}))
+        searchParams.delete("alert")
+        searchParams.delete("portal")
+        setSearchParams(searchParams)
+
     }
     const closeByEsc = (e) => {
         if (e.key === 'Escape') {
@@ -46,7 +54,11 @@ const Modal = (content) => {
                     <button className={styles.closeButton}
                     onClick={(e) => onClose()}
                     />
-                    { modalContent === LOGIN_MODAL ? <AuthForm/> : modalContent === PROFILE_MODAL ? <UserInfo/> :  modalContent === ALERT_DETAILS ? <AlertsDetails/> :  modalContent === SILENCE_MODAL ? <SilenceWindow/> : <ErrorMessage message={modalMessage}/> }
+                    {/*{ modalContent === LOGIN_MODAL ? <AuthForm/> : modalContent === PROFILE_MODAL ? <UserInfo/> :  modalContent === SILENCE_MODAL ? <SilenceWindow/> : <ErrorMessage message={modalMessage}/> }*/}
+                    {(modalContent === LOGIN_MODAL || portalParam === 'login') && <AuthForm/>}
+                    {alertParam && <AlertsDetails/>}
+                    {portalParam === 'userInfo' && <UserInfo/>}
+                    {portalParam === 'silenceRules' && <SilenceWindow/>}
                 </div>
             </div>
     ), portalElement)

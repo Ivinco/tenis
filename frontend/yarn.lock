@@ -8021,7 +8021,7 @@ prompts@^2.0.1, prompts@^2.4.2:
     kleur "^3.0.3"
     sisteransi "^1.0.5"
 
-prop-types@^15.6.2, prop-types@^15.8.1:
+prop-types@^15.6.2, prop-types@^15.7.2, prop-types@^15.8.1:
   version "15.8.1"
   resolved "https://registry.yarnpkg.com/prop-types/-/prop-types-15.8.1.tgz#67d87bf1a694f48435cf332c24af10214a3140b5"
   integrity sha512-oj87CgZICdulUohogVAR7AjlC0327U4el4L6eAvOqCeudMDVU0NThNaV+b9Df4dXgSP1gXMTnPdhfe/2qDH5cg==
@@ -8159,6 +8159,11 @@ react-error-overlay@^6.0.11:
   resolved "https://registry.yarnpkg.com/react-error-overlay/-/react-error-overlay-6.0.11.tgz#92835de5841c5cf08ba00ddd2d677b6d17ff9adb"
   integrity sha512-/6UZ2qgEyH2aqzYZgQPxEnz33NJ2gNsnHA2o5+o4wW9bLM/JYQitNP9xPhsXwC08hMMovfGe/8retsdDsczPRg==
 
+react-google-charts@^4.0.1:
+  version "4.0.1"
+  resolved "https://registry.yarnpkg.com/react-google-charts/-/react-google-charts-4.0.1.tgz#b7713856a48009b77318f8951ddf2c3ba39f991b"
+  integrity sha512-V/hcMcNuBgD5w49BYTUDye+bUKaPmsU5vy/9W/Nj2xEeGn+6/AuH9IvBkbDcNBsY00cV9OeexdmgfI5RFHgsXQ==
+
 react-is@^16.13.1, react-is@^16.7.0:
   version "16.13.1"
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-16.13.1.tgz#789729a4dc36de2999dc156dd6c1d9c18cea56a4"
@@ -8265,6 +8270,13 @@ react-scripts@^5.0.1:
     workbox-webpack-plugin "^6.4.1"
   optionalDependencies:
     fsevents "^2.3.2"
+
+react-timelines@^2.6.1:
+  version "2.6.1"
+  resolved "https://registry.yarnpkg.com/react-timelines/-/react-timelines-2.6.1.tgz#28c0b2418519fb3967e48f0b862aaf1bca24510b"
+  integrity sha512-z22XOLp1a0iFIAneP6CxX1QasQL3t5BXsCW1LZeln/tQuJPyfYW8uZyCZSPYyRczenhXvUMmyNvHWrXkSI0DRA==
+  dependencies:
+    prop-types "^15.7.2"
 
 react-transition-group@^4.4.5:
   version "4.4.5"
