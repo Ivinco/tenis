@@ -82,6 +82,75 @@
         }
       }
     },
+    "/silence": {
+      "post":{
+        "summary": "Alert - Method to add silence rule and set 'silenced' field of all matched alerts to True",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "properties": {
+                  "project": "Ivinco",
+                  "host": "worker15",
+                  "alertName": "test",
+                  "startSilence": 1709044803,
+                  "endSilence": 1719962803,
+                  "comment": "bla-bla"
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Should return OK if everything is fine",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    
+    },
+    "/unsilence" :{
+      "post":{
+        "summary": "Alert - Method to remove silence rule(s) and set 'silenced' field of all matched alerts to False",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "properties": {
+                  "project": "Ivinco",
+                  "host": "worker15",
+                  "alertName": "test",
+                  "startSilence": 1709044803,
+                  "endSilence": 1719962803,
+                  "comment": "bla-bla"
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Should return OK if everything is fine",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
   },
   "components": {
     "schemas": {
