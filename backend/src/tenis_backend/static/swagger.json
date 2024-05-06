@@ -52,11 +52,6 @@
     "/ack": {
       "post":{
         "summary": "Alert - Method to set or unset responsible User for alerts",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -87,7 +82,6 @@
         }
       }
     },
-    ""
   },
   "components": {
     "schemas": {
