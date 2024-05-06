@@ -61,7 +61,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "type": "object",
+                "type": "array",
                 "properties": {
                   "ack": [
                     {
@@ -76,7 +76,7 @@
             "200": {
               "description": "Should return OK if everything is fine",
               "content": {
-                "application/html": {
+                "application/json": {
                   "schema": {
                     "type": "string"
                   }
@@ -86,7 +86,8 @@
           }
         }
       }
-    }
+    },
+    ""
   },
   "components": {
     "schemas": {
@@ -96,6 +97,16 @@
           "token": {
             "type": "string"
           }
+        }
+      },
+      "ack": {
+        "type": "object",
+        "properties": {
+          "ack": [
+            {
+              "alertId": "string"
+            }
+          ]
         }
       }
     }
