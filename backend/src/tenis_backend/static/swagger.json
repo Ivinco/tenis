@@ -63,9 +63,11 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "token": {
-                    "type": "string"
-                  }
+                  "ack": [
+                    {
+                        "alertId": "string"
+                    }
+                ]
                 }
               }
             }
