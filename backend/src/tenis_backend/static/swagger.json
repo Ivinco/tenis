@@ -56,29 +56,30 @@
           "content": {
             "application/json": {
               "schema": {
-                "type": "array",
+                "type": "object",
                 "properties": {
-                  "ack": [
-                    {
-                        "alertId": "string"
-                    }
-                ]
-                }
-              }
-            }
-          },
-          "responses": {
-            "200": {
-              "description": "Should return OK if everything is fine",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/ack"
+                  "email": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
                   }
                 }
               }
             }
           }
+        },
+        "responses": {
+          "200": {
+            "description": "Get Token for user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/auth"
+                }
+              }
+            }
+          }          
         }
       }
     },
@@ -89,33 +90,32 @@
           "content": {
             "application/json": {
               "schema": {
-                "type": "array",
+                "type": "object",
                 "properties": {
-                  "project": "Ivinco",
-                  "host": "worker15",
-                  "alertName": "test",
-                  "startSilence": 1709044803,
-                  "endSilence": 1719962803,
-                  "comment": "bla-bla"
-                }
-              }
-            }
-          },
-          "responses": {
-            "200": {
-              "description": "Should return OK if everything is fine",
-              "content": {
-                "application/json": {
-                  "schema": {
+                  "email": {
+                    "type": "string"
+                  },
+                  "password": {
                     "type": "string"
                   }
                 }
               }
             }
           }
+        },
+        "responses": {
+          "200": {
+            "description": "Get Token for user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/auth"
+                }
+              }
+            }
+          }          
         }
       }
-    
     },
     "/unsilence" :{
       "post":{
@@ -124,30 +124,319 @@
           "content": {
             "application/json": {
               "schema": {
-                "type": "array",
+                "type": "object",
                 "properties": {
-                  "project": "Ivinco",
-                  "host": "worker15",
-                  "alertName": "test",
-                  "startSilence": 1709044803,
-                  "endSilence": 1719962803,
-                  "comment": "bla-bla"
-                }
-              }
-            }
-          },
-          "responses": {
-            "200": {
-              "description": "Should return OK if everything is fine",
-              "content": {
-                "application/json": {
-                  "schema": {
+                  "email": {
+                    "type": "string"
+                  },
+                  "password": {
                     "type": "string"
                   }
                 }
               }
             }
           }
+        },
+        "responses": {
+          "200": {
+            "description": "Get Token for user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/auth"
+                }
+              }
+            }
+          }          
+        }
+      }
+    },
+    "/silenced" :{
+      "get":{
+        "summary": "Alert - Method to return a json list of 'silence' rules",
+        "responses": {
+          "200": {
+            "description": "Get Token for user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/auth"
+                }
+              }
+            }
+          }          
+        }
+      }
+    },
+    "/whoami" :{
+      "get":{
+        "summary": "User - get user's email",
+        "responses": {
+          "200": {
+            "description": "Get Token for user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/auth"
+                }
+              }
+            }
+          }          
+        }
+      }
+    },
+    "/users" :{
+      "get":{
+        "summary": "User - get list of all users",
+        "responses": {
+          "200": {
+            "description": "Get Token for user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/auth"
+                }
+              }
+            }
+          }          
+        }
+      }
+    },
+    "/user" :{
+      "post":{
+        "summary": "User - Return user by id",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Get Token for user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/auth"
+                }
+              }
+            }
+          }          
+        }
+      }
+    },
+    "/user/get_by_email" :{
+      "post":{
+        "summary": "User - Return user by email",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Get Token for user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/auth"
+                }
+              }
+            }
+          }          
+        }
+      }
+    },
+    "/user/add" :{
+      "post":{
+        "summary": "User - Create new User",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Get Token for user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/auth"
+                }
+              }
+            }
+          }          
+        }
+      }
+    },
+    "/user/del" :{
+      "post":{
+        "summary": "User - Removing user with id",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Get Token for user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/auth"
+                }
+              }
+            }
+          }          
+        }
+      }
+    },
+    "/user/disable" :{
+      "post":{
+        "summary": "User - Disable user by id",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Get Token for user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/auth"
+                }
+              }
+            }
+          }          
+        }
+      }
+    },
+    "/user/enable" :{
+      "post":{
+        "summary": "User - Enable user by id",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Get Token for user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/auth"
+                }
+              }
+            }
+          }          
+        }
+      }
+    },
+    "/user/update" :{
+      "post":{
+        "summary": "User - Update user data",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Get Token for user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/auth"
+                }
+              }
+            }
+          }          
         }
       }
     }
@@ -165,11 +454,17 @@
       "ack": {
         "type": "object",
         "properties": {
-          "ack": [
-            {
-              "alertId": "string"
-            }
-          ]
+          "token": {
+            "type": "string"
+          }
+        }
+      },
+      "silence": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string"
+          }
         }
       }
     }
