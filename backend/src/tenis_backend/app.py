@@ -19,6 +19,7 @@ from .alert import load_alerts, lookup_alert, update_alerts, regexp_alerts, make
 from .auth import create_token, token_required, token_required_ws
 from .user import User
 from .json_validation import schema, silence_schema, user_schema, user_add_schema, user_update_schema
+from flask_swagger_ui import get_swaggerui_blueprint
 
 # Global vars init
 app = Flask(__name__)
@@ -155,6 +156,20 @@ def send_alerts(updated_alerts, update_alerts_query):
             app.db['current'].bulk_write(update_alerts_query)
         except pymongo.errors.PyMongoError as e:
             raise InternalServerError("Failed to save alerts in MongoDB: %s" % e)
+
+
+# swagger specific
+SWAGGER_URL = '/swagger'
+API_URL = '/static/swagger.json'
+SWAGGERUI_BLUEPRINT = get_swaggerui_blueprint(
+    SWAGGER_URL,
+    API_URL,
+    config={
+        'app_name': "Ivinco Tenis API"
+    }
+)
+app.register_blueprint(SWAGGERUI_BLUEPRINT, url_prefix=SWAGGER_URL)
+
 
 
 #
