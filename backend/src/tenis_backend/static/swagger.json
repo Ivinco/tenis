@@ -51,6 +51,11 @@
     },
     "/ack": {
       "post":{
+        "security": [
+          {
+          "bearerAuth": []
+          }
+        ],
         "summary": "Alert - Method to set or unset responsible User for alerts",
         "requestBody": {
           "content": {
@@ -58,24 +63,31 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "email": {
-                    "type": "string"
-                  },
-                  "password": {
-                    "type": "string"
+                  "unack": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "alertId": {
+                          "type": "string"
+                        }
+                      },
+                      "required": ["alertId"]
+                    }
                   }
-                }
+                },
+                  "required": ["unack"]
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "Get Token for user",
+            "description": "Always return OK if alertID exists",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/auth"
+                  "$ref": "#/components/schemas/ack"
                 }
               }
             }
@@ -454,8 +466,8 @@
       "ack": {
         "type": "object",
         "properties": {
-          "token": {
-            "type": "string"
+          "unack": {
+            "type": "array"
           }
         }
       },
@@ -466,6 +478,13 @@
             "type": "string"
           }
         }
+      }
+    },
+   "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
       }
     }
   },
