@@ -17,7 +17,7 @@
   "paths":{
     "/auth":{
       "post":{
-        "summary": "Authenticates user",
+        "summary": "Auth - Get Token",
         "requestBody": {
           "content": {
             "application/json": {
@@ -46,6 +46,42 @@
               }
             }
           }          
+        }
+      }
+    },
+    "/ack": {
+      "post":{
+        "summary": "Alert - Method to set or unset responsible User for alerts",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "token": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Should return OK if everything is fine",
+              "content": {
+                "application/html": {
+                  "schema": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
         }
       }
     }
