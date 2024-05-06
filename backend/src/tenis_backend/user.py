@@ -3,6 +3,7 @@ from bson import ObjectId
 from flask import current_app
 from werkzeug.security import generate_password_hash, check_password_hash
 
+
 class User:
     """User Model, stolen from https://www.loginradius.com/blog/engineering/guest-post/securing-flask-api-with-jwt/ - beer to Babatunde Koiki"""
     def __init__(self):
