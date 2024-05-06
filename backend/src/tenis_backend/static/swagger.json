@@ -97,6 +97,11 @@
     },
     "/silence": {
       "post":{
+        "security": [
+          {
+          "bearerAuth": []
+          }
+        ],        
         "summary": "Alert - Method to add silence rule and set 'silenced' field of all matched alerts to True",
         "requestBody": {
           "content": {
@@ -104,12 +109,24 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "email": {
+                  "project": {
                     "type": "string"
                   },
-                  "password": {
+                  "host": {
                     "type": "string"
-                  }
+                  },
+                  "alertName": {
+                    "type": "string"
+                  },
+                  "startSilence": {
+                    "type": "integer"
+                  },
+                  "endSilence": {
+                    "type": "integer"
+                  },
+                  "comment": {
+                    "type": "string"
+                  }                  
                 }
               }
             }
@@ -131,6 +148,11 @@
     },
     "/unsilence" :{
       "post":{
+        "security": [
+          {
+          "bearerAuth": []
+          }
+        ],        
         "summary": "Alert - Method to remove silence rule(s) and set 'silenced' field of all matched alerts to False",
         "requestBody": {
           "content": {
@@ -138,12 +160,30 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "email": {
+                  "_id": {
                     "type": "string"
                   },
-                  "password": {
+                  "project": {
                     "type": "string"
-                  }
+                  },
+                  "host": {
+                    "type": "string"
+                  },
+                   "alertName": {
+                    "type": "string"
+                  },
+                   "startSilence": {
+                    "type": "integer"
+                  },
+                   "endSilence": {
+                    "type": "integer"
+                  },
+                  "comment": {
+                    "type": "string"
+                  },
+                 "author": {
+                    "type": "string"
+                  }                                                      
                 }
               }
             }
@@ -165,6 +205,11 @@
     },
     "/silenced" :{
       "get":{
+        "security": [
+          {
+          "bearerAuth": []
+          }
+        ], 
         "summary": "Alert - Method to return a json list of 'silence' rules",
         "responses": {
           "200": {
@@ -182,6 +227,11 @@
     },
     "/whoami" :{
       "get":{
+       "security": [
+          {
+          "bearerAuth": []
+          }
+        ],  
         "summary": "User - get user's email",
         "responses": {
           "200": {
