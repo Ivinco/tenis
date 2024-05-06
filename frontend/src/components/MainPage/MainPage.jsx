@@ -22,6 +22,7 @@ function MainPage(){
     const isLoggedIn = useSelector(state => state.authReducer.isLogged)
     const displayMode = useSelector(state => state.setDisplay.display)
 
+
     const onSideBarClick = () => {
         dispatch(switchSideBarState())
     }
@@ -52,9 +53,10 @@ function MainPage(){
                     ></button>
                 </div>
                 {
-                    isLoggedIn
-                        ? (displayMode === MAIN_DISPLAY || SILENCED_DISPLAY ? <MainDisplay/> : ( displayMode === HISTORY_DISPLAY ? <HistoryDisplay/> : <></>) )
-                        : (isOpenedModal ? <></> : <div className={styles.noLoginMainDisplay}/>)
+                    isLoggedIn && (
+                        (displayMode === MAIN_DISPLAY || displayMode === SILENCED_DISPLAY) ? <MainDisplay/> :
+                            (displayMode === HISTORY_DISPLAY ? <HistoryDisplay/> : null)
+                    )
                 }
 
             </div>

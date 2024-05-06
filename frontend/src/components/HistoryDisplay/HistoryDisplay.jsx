@@ -8,7 +8,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { MobileDateTimePicker } from '@mui/x-date-pickers/MobileDateTimePicker';
 
 
-function HistoryDisplay(props) {
+function HistoryDisplay() {
 
     const [startDate, setStartDate] = useState(new Date());
 
@@ -21,7 +21,7 @@ function HistoryDisplay(props) {
         <div className={commonStiles.mainDisplay}>
             <div className={styles.dateField}>
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
-                    <MobileDateTimePicker defaultValue={dayjs(startDate)} onChange={e => setStartDate(e)}/>
+                    <MobileDateTimePicker defaultValue={dayjs(startDate)} onChange={e => setStartDate(e)} ampm={false}/>
                 </LocalizationProvider>
                 <button className={styles.submitDateButton} onClick={e => onClickHander(e)}/>
             </div>

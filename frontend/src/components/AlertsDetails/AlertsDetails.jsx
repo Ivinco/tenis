@@ -2,6 +2,11 @@ import React, {useEffect, useRef, useState} from 'react';
 import styles from './AlertsDetails.module.css'
 import {useSelector} from "react-redux";
 import {processAlertComment, processDuration} from "../../utils/utils";
+import {Chart} from "react-google-charts";
+import {AdapterDayjs} from "@mui/x-date-pickers/AdapterDayjs";
+import {MobileDateTimePicker} from "@mui/x-date-pickers/MobileDateTimePicker";
+import dayjs from "dayjs";
+import {LocalizationProvider} from "@mui/x-date-pickers/LocalizationProvider";
 
 const AlertsDetails = () => {
     const alert = useSelector(state => state.setAlertReducer.alert)
@@ -9,6 +14,83 @@ const AlertsDetails = () => {
     const [commentFormContent, setCommentFormContent] = useState('')
     const user = useSelector( state => state.authReducer.user)
     const textareaRef = useRef(null)
+    const [historyStart, setHistoryStart] = useState(new Date(Date.now() - 24 * 60 * 60 * 1000))
+    const [historyEnd, setHistoryEnd] = useState(new Date(Date.now()))
+
+
+    //TODO change this data
+
+    //init data array
+    const data = [
+        [
+            {type: "string", id: "Title"},
+            {type: "string", id: "Severity"},
+            {type: "date", id: "Start"},
+            {type: "date", id: "End"},
+        ]
+    ]
+
+    //init colors array
+    const colors = []
+
+
+    //alert history data from backend
+    const rawData = {
+        history: [
+            [
+                "OK",
+                new Date (2024, 4, 30, 15, 42),
+                new Date(2024, 4, 30, 15, 52),
+            ],
+            [
+                "WARNING",
+                new Date (2024, 4, 30, 15, 52),
+                new Date(2024, 4, 30, 16, 7),
+            ],
+            [
+                "CRITICAL",
+                new Date (2024, 4, 30, 16, 7),
+                new Date(2024, 4, 30, 16, 58),
+            ],
+            [
+                "OK",
+                new Date (2024, 4, 30, 16, 58),
+                new Date(2024, 4, 30, 17, 40),
+            ],
+        ]
+    }
+
+
+
+    for (let item in rawData.history) {
+        rawData.history[item].unshift("STATUS")
+        data.push(rawData.history[item])
+        switch (rawData.history[item][1]){
+            case "OK":
+                colors.push("#aee238")
+                break
+            case "WARNING":
+                colors.push("#faeb2e")
+                break
+            case "CRITICAL":
+                colors.push("#fa2516")
+                break
+            default:
+                colors.push("#9f9c9c")
+        }
+    }
+
+
+    const options = {
+        timeline: {
+            groupByRowLabel: true,
+            barLabelStyle: {
+                fontSize: 25
+            },
+        },
+        backgroundColor: "#ebf8fa",
+        colors: colors
+    };
 
     const onCommentClick = () => {
         setCommentFormIsOpened(!commentFormIsOpened)
@@ -39,6 +121,11 @@ const AlertsDetails = () => {
             e.preventDefault()
             onSendCommentClick()
         }
+    }
+
+    const onHistorySearchClick = (e) => {
+        e.preventDefault()
+        console.log(`Get Alert status history from ${historyStart} to ${historyEnd}`)
     }
 
     let fontColor
@@ -140,6 +227,29 @@ const AlertsDetails = () => {
 
                         : <></>
                 }
+                <div className={styles.historyBlock}>
+                    <h3 className={styles.historyTitle}>Status history</h3>
+                    <div className={styles.historyInputBlock}>
+                        <div className={styles.historyInputElement}>
+                            <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                <MobileDateTimePicker defaultValue={dayjs(historyStart)} onChange={e => setHistoryStart(e)} ampm={false}/>
+                            </LocalizationProvider>
+                        </div>
+                        <div className={styles.historyInputElement}>
+                            <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                <MobileDateTimePicker defaultValue={dayjs(historyEnd)} onChange={e => setHistoryEnd(e)} ampm={false}/>
+                            </LocalizationProvider>
+                        </div>
+                        <button className={styles.historySearchButton} onClick={e => onHistorySearchClick(e)}></button>
+                    </div>
+                    <Chart
+                    chartType="Timeline"
+                    data={data}
+                    width="100%"
+                    height="200px"
+                    options={options}
+                    />
+                </div>
 
             </div>
             

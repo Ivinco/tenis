@@ -18,9 +18,8 @@ from werkzeug.exceptions import HTTPException, Unauthorized, BadRequest, Interna
 from .alert import load_alerts, lookup_alert, update_alerts, regexp_alerts, make_history_entry, is_resolved
 from .auth import create_token, token_required, token_required_ws
 from .user import User
-
+from .json_validation import schema, silence_schema, user_schema, user_add_schema, user_update_schema
 from flask_swagger_ui import get_swaggerui_blueprint
-
 
 # Global vars init
 app = Flask(__name__)
@@ -122,144 +121,6 @@ scheduler = BackgroundScheduler()
 job = scheduler.add_job(db_retention, 'interval', minutes=app.config['HISTORY_PERIOD_MINUTES'])
 job2 = scheduler.add_job(silence_scheduler, 'interval', seconds=app.config['SILENCE_PERIOD_SECONDS'])
 scheduler.start()
-
-
-# JSON schema to validate inbound JSON
-schema = {
-    "definitions": {
-        "custom_field_definition": {
-            "type": "object",
-            "additionalProperties": {
-                "type": "string"
-            }
-        },
-        "new_alert_definition": {
-            "properties": {
-                "project": {"type": "string", "maxLength": 255},
-                "host": {"type": "string", "maxLength": 255},
-                "fired": {"type": "integer"},
-                "alertName": {"type": "string", "maxLength": 1024},
-                "severity": {"type": "string", "maxLength": 255},
-                "msg": {"type": "string", "maxLength": 65536},
-                "responsibleUser": {"type": "string", "maxLength": 1024},
-                "comment": {"type": "string", "maxLength": 65536},
-                "silenced": {"type": "boolean"},
-                "customFields": {"type": "object", "$ref": "#/definitions/custom_field_definition"}
-            },
-            "anyOf": [
-                {"required": ["project", "host", "fired", "alertName", "severity", "msg", "responsibleUser", "comment", "silenced"]},
-                {"required": ["project", "host", "fired", "alertName", "severity", "msg", "responsibleUser", "comment", "silenced", "customFields"]}
-            ],
-            "additionalProperties": False
-        },
-        "resolved_alert_definition": {
-            "properties": {
-                "project": {"type": "string"},
-                "host": {"type": "string"},
-                "alertName": {"type": "string"},
-            },
-            "required": ["project", "host", "alertName"],
-            "additionalProperties": False
-        },
-        "ack_definition": {
-            "properties": {
-                "alertId": {"type": "string"},
-            },
-            "required": ["alertId"],
-            "additionalProperties": False
-        },
-        "unsilence_definition": {
-            "properties": {
-                "silenceId": {"type": "string"},
-            },
-            "required": ["silenceId"],
-            "additionalProperties": False
-        },
-    },
-
-
-    "type": "object",  # this is for the root element
-    "anyOf": [
-        {"required": ["unsilence"]},
-        {"required": ["update"]},
-        {"required": ["reload"]},
-        {"required": ["resolve"]},
-        {"required": ["unack"]},
-        {"required": ["ack"]},
-    ],
-    "properties": {
-        "update": {
-            "type": "array",
-            "maxItems": 10000,
-            "items": {"$ref": "#/definitions/new_alert_definition"}
-        },
-        "resolve": {
-            "type": "array",
-            "maxItems": 10000,
-            "items": {"$ref": "#/definitions/resolved_alert_definition"}
-        },
-        "unack": {
-            "type": "array",
-            "maxItems": 10000,
-            "items": {"$ref": "#/definitions/ack_definition"}
-        },
-        "unsilence": {
-            "type": "array",
-            "maxItems": 10000,
-            "items": {"$ref": "#/definitions/unsilence_definition"}
-        },
-        "ack": {
-            "type": "array",
-            "maxItems": 10000,
-            "items": {"$ref": "#/definitions/ack_definition"}
-        },
-        "reload": {
-            "type": "boolean"
-        },
-    },
-    "additionalProperties": False
-}
-
-# JSON schema to validate inbound silence JSON
-silence_schema = {
-    "required": [
-        "project",
-        "host",
-        "alertName",
-        "startSilence",
-        "endSilence",
-        "comment",
-    ],
-    "properties": {
-        "project": {
-            "type": "string",
-            "pattern": "^[ -~]*$",
-            "maxLength": 255
-        },
-        "host": {
-            "type": "string",
-            "pattern": "^[ -~]*$",
-            "maxLength": 255
-        },
-        "alertName": {
-            "type": "string",
-            "pattern": "^[ -~]*$",
-            "maxLength": 255
-        },
-        "startSilence": {
-            "type": "integer"
-        },
-        "endSilence": {
-            "type": ["integer", "null"]
-        },
-        "comment": {
-            "type": "string",
-            "pattern": "^[ -~]*$",
-            "maxLength": 255
-        }
-    },
-    "additionalProperties": False
-}
 
 
 def cleanup_on_shutdown():
@@ -535,6 +396,9 @@ def login():
     if not user:
         raise Unauthorized("Invalid credentials")
 
+    if not user['active']:
+        raise Unauthorized("User not active")
+
     try:
         now = datetime.now(timezone.utc)
         acccess_token_expires = now + app.config['JWT_ACCESS_TOKEN_EXPIRES']
@@ -556,15 +420,23 @@ def get_users(current_user):
     """Return list of all users"""
     try:
         users = User().get_all()
+        for user in users:
+            user.pop("password")
         return jsonify(users), 200
     except Exception as e:
         raise InternalServerError(f"Failed to retrieve users: {str(e)}")
+
 
 @app.route('/user', methods=['POST'])
 @token_required()
 def get_user_by_id(current_user):
     """Return user by id"""
-    data = request.get_json(force=True, silent=False)
+    try:
+        data = request.json
+        jsonschema.validate(instance=data, schema=user_schema)
+    except jsonschema.exceptions.ValidationError as e:
+        raise BadRequest(e.message)
+
     if not data or 'id' not in data:
         return make_response(jsonify({"error": "Please provide user ID in JSON format"}), 400)
     try:
@@ -581,12 +453,18 @@ def get_user_by_id(current_user):
 @token_required()
 def get_user_by_email(current_user):
     """Return user by email"""
-    data = request.get_json()
+    try:
+        data = request.json
+        jsonschema.validate(instance=data, schema=user_schema)
+    except jsonschema.exceptions.ValidationError as e:
+        raise BadRequest(e.message)
+
     if not data or 'email' not in data:
         return make_response(jsonify({"error": "Please provide email in JSON format"}), 400)
     try:
         email = data['email']
         user = User().get_by_email(email)
+        user.pop("password")
         if not user:
             return make_response(jsonify({"error": "User not found"}), 404)
         return jsonify(user), 200
@@ -598,30 +476,31 @@ def get_user_by_email(current_user):
 @token_required()  # note () are required!
 def add_user(current_user):
     """Create new User"""
-    data = request.get_json()
+    try:
+        data = request.json
+        jsonschema.validate(instance=data, schema=user_add_schema)
+    except jsonschema.exceptions.ValidationError as e:
+        raise BadRequest(e.message)
 
-    if not data or 'email' not in data or 'password' not in data:
-        return make_response(jsonify({"error": "Email and password are required"}), 400)
-    
     try:
         # email validation
         valid_email = validate_email(data['email']).email
     except EmailNotValidError as e:
         return make_response(jsonify({"error": "Invalid email"}), 400)
 
-    email = valid_email # required
-    name = data.get('name', "") # optional
-    password = data.get('password') # required
+    email = valid_email  # required
+    name = data.get('name', "")  # optional
+    password = data.get('password')  # required
     avatar = data.get('avatar', "")
 
     # Is it should be in mongo ? 
-    grouping = data.get('grouping', False) # optional 
-    timezone = data.get('timezone', "Browser") # optional 
-    projects = data.get('projects', "All") # optional
+    grouping = data.get('grouping', False)  # optional
+    timezone = data.get('timezone', "Browser")  # optional
+    projects = data.get('projects', "All")  # optional
 
-    phone = data.get('phone', "") # optional 
-    active = data.get('active', True) # optional
-    is_admin = data.get('is_admin', True) # optional 
+    phone = data.get('phone', "")  # optional
+    active = data.get('active', True)  # optional
+    is_admin = data.get('is_admin', True)  # optional
 
     try:
         user = User().create(name, email, password, avatar, grouping, timezone, projects, phone)
@@ -636,11 +515,15 @@ def add_user(current_user):
 @token_required() 
 def del_user(current_user):
     """Removing user with id"""
-    data = request.get_json()
-    
+    try:
+        data = request.json
+        jsonschema.validate(instance=data, schema=user_schema)
+    except jsonschema.exceptions.ValidationError as e:
+        raise BadRequest(e.message)
+
     if not data or 'id' not in data:
         return make_response(jsonify({"error": "Please provide id in JSON format"}), 400)
-    
+
     user_id = data['id']
     
     try:
@@ -661,7 +544,11 @@ def del_user(current_user):
 @token_required() 
 def disable_user(current_user):
     """Disable user by id"""
-    data = request.get_json()
+    try:
+        data = request.json
+        jsonschema.validate(instance=data, schema=user_schema)
+    except jsonschema.exceptions.ValidationError as e:
+        raise BadRequest(e.message)
     
     if not data or 'id' not in data:
         return make_response(jsonify({"error": "Please provide id in JSON format"}), 400)
@@ -686,7 +573,11 @@ def disable_user(current_user):
 @token_required() 
 def enable_user(current_user):
     """Enable user by id"""
-    data = request.get_json()
+    try:
+        data = request.json
+        jsonschema.validate(instance=data, schema=user_schema)
+    except jsonschema.exceptions.ValidationError as e:
+        raise BadRequest(e.message)
     
     if not data or 'id' not in data:
         return make_response(jsonify({"error": "Please provide id in JSON format"}), 400)
@@ -702,7 +593,7 @@ def enable_user(current_user):
         result = User().enable_account(user_id)
         if result is False:
             return make_response(jsonify({"error": "User not found"}), 404)
-        return jsonify({"message": "User disabled successfully"}), 200
+        return jsonify({"message": "User enabled successfully"}), 200
     except Exception as e:
         return make_response(jsonify({"error": str(e)}), 500)
 
@@ -711,7 +602,11 @@ def enable_user(current_user):
 @token_required() 
 def update_user(current_user):
     """Update user data"""
-    data = request.get_json()
+    try:
+        data = request.json
+        jsonschema.validate(instance=data, schema=user_update_schema)
+    except jsonschema.exceptions.ValidationError as e:
+        raise BadRequest(e.message)
 
     if not data or 'id' not in data:
         user_id = current_user['_id']
@@ -724,7 +619,7 @@ def update_user(current_user):
     except:
         return make_response(jsonify({"error": "Invalid ID format"}), 400)
 
-    # removing Active from data, cause we have sepparate functions for it
+    # removing Active from data, cause we have separate functions for it
     if 'active' in data:
         active = data.pop('active')
     
@@ -894,6 +789,12 @@ def inbound():
 @app.route('/refresh')
 @token_required(refresh=True)
 def refresh(user):
+    user = User().get_by_id(user["_id"])
+    if not user:
+        raise Unauthorized("User doesn't exist")
+    if not user['active']:
+        raise Unauthorized("User not active")
+
     try:
         now = datetime.now(timezone.utc)
         acccess_token_expires = now + app.config['JWT_ACCESS_TOKEN_EXPIRES']
