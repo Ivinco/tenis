@@ -138,8 +138,7 @@ silence_schema = {
 # JSON schema to validate inbound user JSON
 user_schema = {
     "anyOf": [
-        {"required": ["id"]},
-        {"required": ["email"]},
+        {"required": ["id", "email"]},
     ],
     "properties": {
         "id": {
