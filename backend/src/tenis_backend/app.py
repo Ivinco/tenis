@@ -18,7 +18,7 @@ from werkzeug.exceptions import HTTPException, Unauthorized, BadRequest, Interna
 from .alert import load_alerts, lookup_alert, update_alerts, regexp_alerts, make_history_entry, is_resolved
 from .auth import create_token, token_required, token_required_ws
 from .user import User
-from .json_validation import schema, silence_schema, user_schema, user_add_schema
+from .json_validation import schema, silence_schema, user_schema, user_add_schema, user_update_schema
 
 # Global vars init
 app = Flask(__name__)
@@ -578,7 +578,7 @@ def enable_user(current_user):
         result = User().enable_account(user_id)
         if result is False:
             return make_response(jsonify({"error": "User not found"}), 404)
-        return jsonify({"message": "User disabled successfully"}), 200
+        return jsonify({"message": "User enabled successfully"}), 200
     except Exception as e:
         return make_response(jsonify({"error": str(e)}), 500)
 
@@ -589,7 +589,7 @@ def update_user(current_user):
     """Update user data"""
     try:
         data = request.json
-        jsonschema.validate(instance=data, schema=user_schema)
+        jsonschema.validate(instance=data, schema=user_update_schema)
     except jsonschema.exceptions.ValidationError as e:
         raise BadRequest(e.message)
 
@@ -604,7 +604,7 @@ def update_user(current_user):
     except:
         return make_response(jsonify({"error": "Invalid ID format"}), 400)
 
-    # removing Active from data, cause we have sepparate functions for it
+    # removing Active from data, cause we have separate functions for it
     if 'active' in data:
         active = data.pop('active')
     

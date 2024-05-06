@@ -138,7 +138,8 @@ silence_schema = {
 # JSON schema to validate inbound user JSON
 user_schema = {
     "anyOf": [
-        {"required": ["id", "email"]},
+        {"required": ["id"]},
+        {"required": ["email"]},
     ],
     "properties": {
         "id": {
@@ -159,9 +160,68 @@ user_schema = {
 user_add_schema = {
     "allOf": [
         {"required": ["email", "password"]},
-        {"optional": ["name", "phone", "avatar", "grouping", "timezone", "projects"]},
+        {"optional": ["id", "name", "phone", "avatar", "grouping", "timezone", "projects"]},
     ],
     "properties": {
+        "id": {
+            "type": "string",
+            "pattern": "^[ -~]*$",
+            "maxLength": 255,
+        },
+        "email": {
+            "type": "string",
+            "pattern": "^[ -~]*$",
+            "maxLength": 255,
+        },
+        "password": {
+            "type": "string",
+            "pattern": "^[ -~]*$",
+            "maxLength": 255,
+        },
+        "name": {
+            "type": "string",
+            "pattern": "^[ -~]*$",
+            "maxLength": 255,
+        },
+        "phone": {
+            "type": "string",
+            "pattern": "^[ -~]*$",
+            "maxLength": 255,
+        },
+        "avatar": {
+            "type": "string",
+            "pattern": "^[ -~]*$",
+            "maxLength": 255,
+        },
+        "grouping": {
+            "type": "boolean",
+        },
+        "timezone": {
+            "type": "string",
+            "pattern": "^[ -~]*$",
+            "maxLength": 255,
+        },
+        "projects": {
+            "type": "string",
+            "pattern": "^[ -~]*$",
+            "maxLength": 255,
+        },
+    },
+    "additionalProperties": False
+}
+
+# JSON schema to validate inbound update user JSON
+user_update_schema = {
+    "allOf": [
+        {"required": ["id"]},
+        {"optional": ["email", "name", "phone", "avatar", "grouping", "timezone", "projects", "password"]},
+    ],
+    "properties": {
+        "id": {
+            "type": "string",
+            "pattern": "^[ -~]*$",
+            "maxLength": 255,
+        },
         "email": {
             "type": "string",
             "pattern": "^[ -~]*$",
