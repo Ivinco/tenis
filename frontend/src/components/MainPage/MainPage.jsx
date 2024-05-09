@@ -8,19 +8,20 @@ import {switchActiveHeaderMenuItem} from "../../store/reducers/headerMenuReducer
 import MainDisplay from "../MainDisplay/MainDisplay";
 import Modal from "../Modal/Modal";
 import {useEffect} from "react";
-import { switchLoginModal} from "../../store/reducers/modalReducer";
+import {openModal} from "../../store/reducers/modalReducer";
 import {HISTORY_DISPLAY, MAIN_DISPLAY, SILENCED_DISPLAY} from "../../store/actions/DISPLAY_ACTIONS";
 import HistoryDisplay from "../HistoryDisplay/HistoryDisplay";
+import usePortalParam from "../../hooks/usePortalParam";
 
 
 function MainPage(){
 
     const dispatch = useDispatch()
     const isOpenedSideBar = useSelector(state => state.hiddenMenu.isOpenedSideBar)
-    const isOpenedModal = useSelector(state => state.switchModal.isOpened)
     const modalContent = useSelector(state => state.switchModal.content)
     const isLoggedIn = useSelector(state => state.authReducer.isLogged)
     const displayMode = useSelector(state => state.setDisplay.display)
+    const setPortalParams = usePortalParam()
 
 
     const onSideBarClick = () => {
@@ -32,7 +33,8 @@ function MainPage(){
 
     useEffect(() => {
         if (!isLoggedIn){
-            dispatch(switchLoginModal())
+            dispatch(openModal())
+            setPortalParams("login")
         }
     }, [dispatch, isLoggedIn]);
 

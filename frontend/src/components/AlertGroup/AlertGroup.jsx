@@ -5,7 +5,7 @@ import {useDispatch, useSelector} from "react-redux";
 import Alert from "../Alert/Alert";
 import {sha256} from "js-sha256";
 import AlertService from "../../services/AlertService";
-import {switchErrorMessageModal} from "../../store/reducers/modalReducer";
+import {setModalError} from "../../store/reducers/modalReducer";
 import {MAIN_DISPLAY} from "../../store/actions/DISPLAY_ACTIONS";
 
 const AlertGroup = ({group, alertHeight}) => {
@@ -76,7 +76,7 @@ const AlertGroup = ({group, alertHeight}) => {
             }
         }
         catch (e) {
-            dispatch(switchErrorMessageModal("Oops. Something went wrong. Please, try a bit later"))
+            dispatch(setModalError("Oops. Something went wrong. Please, try a bit later"))
         }
     }
 

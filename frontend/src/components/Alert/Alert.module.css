@@ -54,6 +54,7 @@
     font-size: 1.3rem;
     border-left: slategrey solid 3px;
     border-right: slategrey solid 3px;
+    overflow: hidden;
 }
 
 .host_small {
@@ -67,6 +68,7 @@
     font-size: 0.7rem;
     border-left: slategrey solid 1px;
     border-right: slategrey solid 1px;
+    overflow: hidden;
 }
 
 .responsibleUser {
@@ -274,7 +276,7 @@
 
 .silenceWindow {
     display: flex;
-    padding: 13px 30px;
+    padding: 6px 30px;
     position: absolute;
     right: 300px;
     background-color: #708090EA;
@@ -282,7 +284,7 @@
 }
 
 .silenceWindow_small {
-    padding: 5px 14px;
+    padding: 3px 14px;
     right: 180px;
 }
 
