@@ -1,10 +1,8 @@
 import styles from './Header.module.css'
 import {useDispatch, useSelector} from "react-redux";
 import {
-    switchErrorMessageModal,
-    switchLoginModal,
-    switchProfileModal,
-    switchSilenceModal
+    openModal,
+    setModalError,
 } from "../../store/reducers/modalReducer";
 import FilterMenu from "../FilterMenu/FilterMenu";
 import {switchFilterMenu} from "../../store/reducers/hiddenMenuReducer";
@@ -25,10 +23,10 @@ const Header = () => {
         e.preventDefault()
         if (!isLogged){
             setPortalParams("login")
-            dispatch(switchLoginModal())
+            dispatch(openModal())
         } else {
             setPortalParams("userInfo")
-            dispatch(switchProfileModal())
+            dispatch(openModal())
         }
 
     }
@@ -51,11 +49,11 @@ const Header = () => {
 
         }
         catch (e) {
-            dispatch(switchErrorMessageModal("Oops. Something went wrong. Please, try a bit later"))
+            dispatch(setModalError("Oops. Something went wrong. Please, try a bit later"))
         }
         dispatch(setSilenceRules(rules))
-        dispatch(switchSilenceModal())
         setPortalParams("silenceRules")
+        dispatch(openModal())
     }
 
     return (

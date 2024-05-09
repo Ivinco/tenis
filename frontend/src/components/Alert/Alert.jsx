@@ -3,7 +3,7 @@ import styles from './Alert.module.css'
 import {processTimeStamp} from "../../utils/utils";
 import {useDispatch, useSelector} from "react-redux";
 import {setDetailedAlert} from "../../store/reducers/alertReducer";
-import {switchAlertDetailsModal, switchErrorMessageModal} from "../../store/reducers/modalReducer";
+import { setModalError, openModal} from "../../store/reducers/modalReducer";
 import {sha256} from "js-sha256";
 import AlertService from "../../services/AlertService";
 import {MAIN_DISPLAY} from "../../store/actions/DISPLAY_ACTIONS";
@@ -60,7 +60,7 @@ const Alert = ({alert}) => {
             }
         }
         catch (e) {
-            dispatch(switchErrorMessageModal("Oops. Something went wrong. Please, try a bit later"))
+            dispatch(setModalError("Oops. Something went wrong. Please, try a bit later"))
         }
     }
 
@@ -102,7 +102,7 @@ const Alert = ({alert}) => {
         searchParams.set("alert", alert._id)
         setSearchParams(searchParams)
         dispatch(setDetailedAlert({alert}))
-        dispatch(switchAlertDetailsModal())
+        dispatch(openModal())
     }
 
     const submitSilenceAlert = async () => {
@@ -124,7 +124,7 @@ const Alert = ({alert}) => {
             await AlertService.silence(silenceRule)
         }
         catch (e){
-            dispatch(switchErrorMessageModal("Oops. Something went wrong. Please, try a bit later"))
+            dispatch(setModalError("Oops. Something went wrong. Please, try a bit later"))
         }
 
         setSilenceDuration(null)

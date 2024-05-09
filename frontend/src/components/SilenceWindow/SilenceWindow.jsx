@@ -3,7 +3,7 @@ import style from "./SilenceWindow.module.css"
 import modalHeaderStyles from "../AlertsDetails/AlertsDetails.module.css"
 import {useDispatch, useSelector} from "react-redux";
 import {sha256} from "js-sha256";
-import {switchErrorMessageModal} from "../../store/reducers/modalReducer";
+import {setModalError} from "../../store/reducers/modalReducer";
 import AlertService from "../../services/AlertService";
 import {setSilenceRules} from "../../store/reducers/silenceRulesReducer";
 
@@ -49,7 +49,7 @@ function SilenceWindow() {
             })
         }
         catch (e) {
-            dispatch(switchErrorMessageModal("Oops. Something went wrong. Please, try a bit later"))
+            dispatch(setModalError("Oops. Something went wrong. Please, try a bit later"))
         }
         dispatch(setSilenceRules(newRules))
     }
@@ -69,7 +69,7 @@ function SilenceWindow() {
                 await AlertService.unsilence([{silenceId:ruleId}])
             }
             catch (e) {
-                dispatch(switchErrorMessageModal("Oops. Something went wrong. Please, try a bit later"))
+                dispatch(setModalError("Oops. Something went wrong. Please, try a bit later"))
             }
         }
         let endSilenceTime
@@ -90,7 +90,7 @@ function SilenceWindow() {
              await AlertService.silence(silenceRule)
         }
         catch (e){
-            dispatch(switchErrorMessageModal("Oops. Something went wrong. Please, try a bit later"))
+            dispatch(setModalError("Oops. Something went wrong. Please, try a bit later"))
         }
 
         setRuleId(null)
@@ -111,7 +111,7 @@ function SilenceWindow() {
             await AlertService.unsilence(unsilenceRules)
         }
         catch (e) {
-            dispatch(switchErrorMessageModal("Oops. Something went wrong. Please, try a bit later"))
+            dispatch(setModalError("Oops. Something went wrong. Please, try a bit later"))
         }
 
         setSelectedRules([])
