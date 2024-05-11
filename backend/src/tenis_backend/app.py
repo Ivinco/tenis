@@ -18,7 +18,8 @@ from werkzeug.exceptions import HTTPException, Unauthorized, BadRequest, Interna
 from .alert import load_alerts, lookup_alert, update_alerts, regexp_alerts, make_history_entry, is_resolved
 from .auth import create_token, token_required, token_required_ws
 from .user import User
-from .json_validation import schema, silence_schema, user_schema, user_add_schema, user_update_schema
+from .json_validation import schema, silence_schema, user_schema, user_add_schema, user_update_schema, \
+    history_request_schema
 from flask_swagger_ui import get_swaggerui_blueprint
 
 # Global vars init
@@ -156,6 +157,28 @@ def send_alerts(updated_alerts, update_alerts_query):
             app.db['current'].bulk_write(update_alerts_query)
         except pymongo.errors.PyMongoError as e:
             raise InternalServerError("Failed to save alerts in MongoDB: %s" % e)
+
+
+from datetime import datetime
+
+def get_history_alerts(start_datetime, end_datetime):
+    start_timestamp = datetime.utcfromtimestamp(start_datetime)
+    end_timestamp = datetime.utcfromtimestamp(end_datetime)
+    query = {'logged': {'$gt': start_timestamp, '$lte': end_timestamp}}
+    cursor = app.db['history'].find(query)
+
+    alerts_by_id = {}
+    for record in cursor:
+        alert_id = record['alert_id']
+        record['logged'] = record['logged'].timestamp()
+        if alert_id not in alerts_by_id or record['logged'] > alerts_by_id[alert_id]['logged']:
+            filtered_record = {key: value for key, value in record.items() if key not in ['_id', 'alert_id']}
+            filtered_record['logged'] = int(record['logged'])
+            alerts_by_id[alert_id] = filtered_record
+
+    result = list(alerts_by_id.values())
+    return result
+
 
 
 # swagger specific
@@ -373,6 +396,8 @@ def silenced(user):
     return json.dumps(silence_rules, default=str), 200
 
 
+
+
 @app.route('/healz')
 def healz():
     try:
@@ -412,6 +437,24 @@ def login():
         return resp, 200
     except Exception as e:
         raise InternalServerError("Failed to create JWT token")
+
+
+@app.route('/history')
+@token_required()
+def send_history_alerts(user):
+    """
+    Method to get all active alerts on requested timestamp
+    """
+    try:
+        data = request.json
+        jsonschema.validate(instance=data, schema=history_request_schema)
+    except jsonschema.exceptions.ValidationError as e:
+        raise BadRequest(e.message)
+    end_datetime = data.get("datetime")
+    start_datetime = end_datetime - 15 * 60
+    history_alerts = get_history_alerts(start_datetime, end_datetime)
+    resp = {'history': history_alerts}
+    return jsonify(resp), 200
 
 
 @app.route('/users')
