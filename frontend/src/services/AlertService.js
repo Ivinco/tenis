@@ -20,4 +20,16 @@ export default class AlertService {
     static async unsilence (payload) {
         return api.post('/unsilence', {unsilence: payload})
     }
+
+    static async getHistoryAlerts (datetime) {
+        const config = {
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            params: {
+                datetime: datetime
+            }
+        };
+        return api.get ('/history', config)
+    }
 }
