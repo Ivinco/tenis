@@ -445,13 +445,14 @@ def send_history_alerts(user):
     """
     Method to get all active alerts on requested timestamp
     """
+    history_period = app.config['HISTORY_PERIOD_MINUTES']
     try:
         data = request.json
         jsonschema.validate(instance=data, schema=history_request_schema)
     except jsonschema.exceptions.ValidationError as e:
         raise BadRequest(e.message)
     end_datetime = data.get("datetime")
-    start_datetime = end_datetime - 15 * 60
+    start_datetime = end_datetime - history_period * 60
     history_alerts = get_history_alerts(start_datetime, end_datetime)
     resp = {'history': history_alerts}
     return jsonify(resp), 200
