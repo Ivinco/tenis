@@ -447,13 +447,12 @@ def send_history_alerts(user):
     """
     history_period = app.config['HISTORY_PERIOD_MINUTES']
     try:
-        data = request.json
+        data = int(request.args.get("datetime"))
         jsonschema.validate(instance=data, schema=history_request_schema)
     except jsonschema.exceptions.ValidationError as e:
         raise BadRequest(e.message)
-    end_datetime = data.get("datetime")
-    start_datetime = end_datetime - history_period * 60
-    history_alerts = get_history_alerts(start_datetime, end_datetime)
+    start_datetime = data - history_period * 60
+    history_alerts = get_history_alerts(start_datetime, data)
     resp = {'history': history_alerts}
     return jsonify(resp), 200
 
