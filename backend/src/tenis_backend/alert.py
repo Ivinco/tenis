@@ -68,7 +68,11 @@ def make_history_entry(alert):
         'project': alert['project'],
         'host': alert['host'],
         'alertName': alert['alertName'],
-        'severity': alert['severity']
+        'severity': alert['severity'],
+        'responsibleUser': alert['responsibleUser'],
+        'fired': alert['fired'],
+        'msg': alert['msg'],
+        'silenced': alert['silenced']
     }
 
 def is_resolved(alert):
