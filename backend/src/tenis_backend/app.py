@@ -172,8 +172,9 @@ def get_history_alerts(start_datetime, end_datetime):
         alert_id = record['alert_id']
         record['logged'] = record['logged'].timestamp()
         if alert_id not in alerts_by_id or record['logged'] > alerts_by_id[alert_id]['logged']:
-            filtered_record = {key: value for key, value in record.items() if key not in ['_id', 'alert_id']}
+            filtered_record = {key: value for key, value in record.items() if key not in ['_id']}
             filtered_record['logged'] = int(record['logged'])
+            filtered_record['alert_id'] = str(record['alert_id'])
             alerts_by_id[alert_id] = filtered_record
 
     result = list(alerts_by_id.values())
