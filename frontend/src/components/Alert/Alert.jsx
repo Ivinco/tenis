@@ -6,7 +6,7 @@ import {setDetailedAlert} from "../../store/reducers/alertReducer";
 import { setModalError, openModal} from "../../store/reducers/modalReducer";
 import {sha256} from "js-sha256";
 import AlertService from "../../services/AlertService";
-import {MAIN_DISPLAY} from "../../store/actions/DISPLAY_ACTIONS";
+import {HISTORY_DISPLAY, MAIN_DISPLAY, SILENCED_DISPLAY} from "../../store/actions/DISPLAY_ACTIONS";
 import { useSearchParams } from "react-router-dom";
 
 const Alert = ({alert}) => {
@@ -143,7 +143,7 @@ const Alert = ({alert}) => {
             <div className={`${isInspectMode ? styles.host : styles.host_small}`}>
                 <p className={styles.textFields}>{alert.host}</p>
             </div>
-            <div className={`${isInspectMode ? styles.responsibleUser : styles.responsibleUser_small}`}
+            <button className={`${isInspectMode ? styles.responsibleUser : styles.responsibleUser_small}`}
                  style={{
                      backgroundImage: `url(${alert.responsibleUser
                          ? `https://gravatar.com/avatar/${sha256(alert.responsibleUser)}?s=150`
@@ -153,6 +153,7 @@ const Alert = ({alert}) => {
                      e.preventDefault()
                      onAckHandle(ackedAlert)
                  }}
+                    disabled={displayMode===HISTORY_DISPLAY || displayMode===SILENCED_DISPLAY}
             />
             <div className={`${isInspectMode ? styles.alertName : styles.alertName_small}`}>
                 <p className={styles.textFields}>{alert.alertName}</p>
@@ -188,7 +189,7 @@ const Alert = ({alert}) => {
                 </button>
             </div>
             {displayMode === MAIN_DISPLAY
-                ? <div className={`${isInspectMode ? styles.controlButton : styles.controlButton_small} ${styles.silence}`}
+                ? <button className={`${isInspectMode ? styles.controlButton : styles.controlButton_small} ${styles.silence}`}
                   onClick={e => {
                       e.preventDefault()
                       handleSilenceButton()
@@ -196,8 +197,8 @@ const Alert = ({alert}) => {
                 />
             : null
             }
-            <div className={`${isInspectMode ? styles.controlButton : styles.controlButton_small} ${styles.refresh}`}/>
-            <div className={`${isInspectMode ? styles.controlButton : styles.controlButton_small} ${styles.info}`}
+            <button className={`${isInspectMode ? styles.controlButton : styles.controlButton_small} ${styles.refresh}`}/>
+            <button className={`${isInspectMode ? styles.controlButton : styles.controlButton_small} ${styles.info}`}
                  onClick={(e) => {
                      e.preventDefault()
                      handleInfoButton()

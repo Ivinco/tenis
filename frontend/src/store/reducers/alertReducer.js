@@ -1,4 +1,3 @@
-import {ALERT_DETAILS} from "../actions/MODAL_ACTIONS";
 import {DETAILED_ALERT, SET_ALERTS_NUMBER, SET_FOUND_ALERTS} from "../actions/ALERT_ACTIONS";
 
 const defaultdAlert = {
