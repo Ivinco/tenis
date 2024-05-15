@@ -9,8 +9,6 @@ import MainDisplay from "../MainDisplay/MainDisplay";
 import Modal from "../Modal/Modal";
 import {useEffect} from "react";
 import {openModal} from "../../store/reducers/modalReducer";
-import {HISTORY_DISPLAY, MAIN_DISPLAY, SILENCED_DISPLAY} from "../../store/actions/DISPLAY_ACTIONS";
-import HistoryDisplay from "../HistoryDisplay/HistoryDisplay";
 import usePortalParam from "../../hooks/usePortalParam";
 
 
@@ -56,8 +54,7 @@ function MainPage(){
                 </div>
                 {
                     isLoggedIn && (
-                        (displayMode === MAIN_DISPLAY || displayMode === SILENCED_DISPLAY) ? <MainDisplay/> :
-                            (displayMode === HISTORY_DISPLAY ? <HistoryDisplay/> : null)
+                        <MainDisplay/>
                     )
                 }
 

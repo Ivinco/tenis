@@ -172,12 +172,15 @@ def get_history_alerts(start_datetime, end_datetime):
         alert_id = record['alert_id']
         record['logged'] = record['logged'].timestamp()
         if alert_id not in alerts_by_id or record['logged'] > alerts_by_id[alert_id]['logged']:
-            filtered_record = {key: value for key, value in record.items() if key not in ['_id', 'alert_id']}
+            filtered_record = {key: value for key, value in record.items()}
             filtered_record['logged'] = int(record['logged'])
+            filtered_record['alert_id'] = str(record['alert_id'])
+            filtered_record['_id'] = str(record['_id'])
             alerts_by_id[alert_id] = filtered_record
 
     result = list(alerts_by_id.values())
     return result
+
 
 
 
@@ -447,13 +450,12 @@ def send_history_alerts(user):
     """
     history_period = app.config['HISTORY_PERIOD_MINUTES']
     try:
-        data = request.json
+        data = int(request.args.get("datetime"))
         jsonschema.validate(instance=data, schema=history_request_schema)
     except jsonschema.exceptions.ValidationError as e:
         raise BadRequest(e.message)
-    end_datetime = data.get("datetime")
-    start_datetime = end_datetime - history_period * 60
-    history_alerts = get_history_alerts(start_datetime, end_datetime)
+    start_datetime = data - history_period * 60
+    history_alerts = get_history_alerts(start_datetime, data)
     resp = {'history': history_alerts}
     return jsonify(resp), 200
 

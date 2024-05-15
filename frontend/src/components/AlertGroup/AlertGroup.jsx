@@ -6,7 +6,7 @@ import Alert from "../Alert/Alert";
 import {sha256} from "js-sha256";
 import AlertService from "../../services/AlertService";
 import {setModalError} from "../../store/reducers/modalReducer";
-import {MAIN_DISPLAY} from "../../store/actions/DISPLAY_ACTIONS";
+import {HISTORY_DISPLAY, MAIN_DISPLAY, SILENCED_DISPLAY} from "../../store/actions/DISPLAY_ACTIONS";
 
 const AlertGroup = ({group, alertHeight}) => {
     const dispatch = useDispatch()
@@ -91,12 +91,13 @@ const AlertGroup = ({group, alertHeight}) => {
                      onClick={e => onAlertClickHandler(e)}>
                     {group.alerts.length}
                 </div>
-                <div className={`${isInspectMode ? alertStyles.responsibleUser : alertStyles.responsibleUser_small}`}
+                <button className={`${isInspectMode ? alertStyles.responsibleUser : alertStyles.responsibleUser_small}`}
                      style={{backgroundImage: `url(${groupUserImage})`}}
                      onClick={e => {
                          e.preventDefault()
                          onAckClickHandle()
                      }}
+                        disabled={displayMode===HISTORY_DISPLAY || displayMode===SILENCED_DISPLAY}
                 />
                 <div className={`${isInspectMode ? alertStyles.alertName : alertStyles.alertName_small}`}
                      onClick={e => onAlertClickHandler(e)}>{group.groupFactor}</div>

@@ -77,6 +77,8 @@
     height: 60px;
     margin: auto;
     padding: 10px;
+    border: none;
+    background-color: transparent;
     border-radius: 50%;
     background-size: cover;
     background-repeat: no-repeat;
@@ -248,6 +250,8 @@
     width: 60px;
     height: 60px;
     margin: auto 15px;
+    border: none;
+    background-color: transparent;
     background-size: contain;
     background-position: center;
     background-repeat: no-repeat;

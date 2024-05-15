@@ -72,7 +72,9 @@ def make_history_entry(alert):
         'responsibleUser': alert['responsibleUser'],
         'fired': alert['fired'],
         'msg': alert['msg'],
-        'silenced': alert['silenced']
+        'silenced': alert['silenced'],
+        'comment': alert['comment'],
+        'customFields': alert['customFields']
     }
 
 def is_resolved(alert):

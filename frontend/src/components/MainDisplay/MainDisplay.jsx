@@ -9,7 +9,13 @@ import {setAlertsNumber} from "../../store/reducers/alertReducer";
 import AlertGroup from "../AlertGroup/AlertGroup";
 import {groupByField} from "../../utils/utils";
 import {alertNameGroups, alertsToGroup, hostNameGroups} from "../../utils/grouping";
-import {SILENCED_DISPLAY} from "../../store/actions/DISPLAY_ACTIONS";
+import {HISTORY_DISPLAY, SILENCED_DISPLAY} from "../../store/actions/DISPLAY_ACTIONS";
+import {LocalizationProvider} from "@mui/x-date-pickers/LocalizationProvider";
+import {AdapterDayjs} from "@mui/x-date-pickers/AdapterDayjs";
+import {MobileDateTimePicker} from "@mui/x-date-pickers/MobileDateTimePicker";
+import dayjs from "dayjs";
+import AlertService from "../../services/AlertService";
+import {setModalError} from "../../store/reducers/modalReducer";
 
 export default function MainDisplay() {
     useConnectSocket(localStorage.getItem('token'))
@@ -22,12 +28,24 @@ export default function MainDisplay() {
     const foundAlerts = useSelector(state => state.setAlertReducer.foundAlerts)
     const displayMode = useSelector(state => state.setDisplay.display)
     const [windowWidth, setWindowWidth] = useState(window.innerWidth)
+    const [startDate, setStartDate] = useState(new Date());
+    const [historyAlertList, setHistoryAlertList] = useState([]);
     let rawAlerts
-    if (displayMode === SILENCED_DISPLAY){
-        rawAlerts = allAlerts.filter((alert) => alert.silenced === true)
-    } else {
-        rawAlerts = allAlerts.filter((alert) => alert.silenced === false)
+
+    switch(displayMode){
+        case SILENCED_DISPLAY:
+            rawAlerts = allAlerts.filter((alert) => alert.silenced === true)
+            break
+        case HISTORY_DISPLAY:
+            rawAlerts = historyAlertList
+            break
+        default:
+            rawAlerts = allAlerts.filter((alert) => alert.silenced === false)
     }
+
+
+
+
 
     let alertList
     let alertsToDisplay
@@ -105,13 +123,39 @@ export default function MainDisplay() {
         </div>
     )
 
+    const onClickHandler = async (e) => {
+        e.preventDefault()
+        const datetime = Date.parse(startDate) / 1000
+        try {
+            const response = await AlertService.getHistoryAlerts(datetime)
+            const historyAlerts = response.data.history
+            setHistoryAlertList(historyAlerts)
+        }
+        catch (e) {
+            dispatch(setModalError("Oops. Something went wrong. Please, try a bit later"))
+        }
+    }
+
 
 
     return (
         <div className={styles.mainDisplay}>
             {isActiveSocket ?
                 <>
-                    { alertGroups.length > 0
+                    {displayMode === HISTORY_DISPLAY
+                        ?
+                        <div className={styles.dateField}>
+                            <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                <MobileDateTimePicker defaultValue={dayjs(startDate)} onChange={e => setStartDate(e)}
+                                                      ampm={false}/>
+                            </LocalizationProvider>
+                            <button className={styles.submitDateButton} onClick={e => onClickHandler(e)}/>
+                        </div>
+                        :
+                        null
+                    }
+
+                    {alertGroups.length > 0
                         ?
                         alertGroups.map(group => (
                             <div className={
