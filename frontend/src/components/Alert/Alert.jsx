@@ -31,7 +31,7 @@ const Alert = ({alert}) => {
         } else {
             setEnabledSilenceButton(false)
         }
-    }, [silenceDuration, silenceComment]);
+    }, [silenceComment]);
 
     useEffect(() => {
         const handleEscape = (e) => {

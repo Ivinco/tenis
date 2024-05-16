@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import styles from './AlertGroup.module.css'
 import alertStyles from '../Alert/Alert.module.css'
 import {useDispatch, useSelector} from "react-redux";
@@ -13,7 +13,45 @@ const AlertGroup = ({group, alertHeight}) => {
     const isInspectMode = useSelector(state => state.setHeaderMenuItemValue.inspectMode)
     const userEmail = useSelector(state => state.authReducer.user.userEmail)
     const displayMode = useSelector(state => state.setDisplay.display)
+    const groupDurationRef = useRef(null)
+    const groupCommentRef = useRef(null)
+
     const [isAlertsBlockOpened, setIsAlertBlockOpened] = useState('false')
+    const [isEnabledSilenceWindow, setEnabledSilenceWindow] = useState(false)
+    const [isEnabledSilenceButton, setEnabledSilenceButton] = useState(false)
+    const [silenceDuration, setSilenceDuration] = useState(undefined)
+    const [silenceComment, setSilenceComment] = useState(null)
+
+    let alertBackground
+    let fontColor
+    let silenceRule
+    let silenceRuleHost = ""
+    let silenceRuleAlertName = ""
+
+    useEffect(() => {
+        if (silenceComment && silenceComment.length > 4){
+            setEnabledSilenceButton(true)
+        } else {
+            setEnabledSilenceButton(false)
+        }
+    }, [silenceComment]);
+
+    useEffect(() => {
+        const handleEscape = (e) => {
+            if (e.key === 'Escape' && isEnabledSilenceWindow) {
+                setEnabledSilenceWindow(false)
+            }
+        }
+        window.addEventListener('keydown', handleEscape)
+
+        return () => {
+            window.removeEventListener('keydown', handleEscape)
+        }
+
+    }, [isEnabledSilenceWindow]);
+
+
+
     const onAlertClickHandler = (e) => {
         e.preventDefault()
         setIsAlertBlockOpened(!isAlertsBlockOpened)
@@ -28,12 +66,6 @@ const AlertGroup = ({group, alertHeight}) => {
     const groupUserImage = (isOneGroupUser && group.alerts[0].responsibleUser !== "")
         ? `https://gravatar.com/avatar/${sha256(group.alerts[0].responsibleUser)}?s=150`
         : "/images/stop-sign.svg"
-
-
-
-    let alertBackground
-    let fontColor
-
 
     const ackedAlerts = group.alerts.map(alert => {
             return {"alertId": alert._id}
@@ -58,7 +90,6 @@ const AlertGroup = ({group, alertHeight}) => {
     }
 
     const onAckClickHandle =  async () => {
-        let response
         try {
             // if all alerts are acked by current user, they will be unacked
             if (isOneGroupUser && group.alerts[0].responsibleUser === userEmail){
@@ -79,6 +110,58 @@ const AlertGroup = ({group, alertHeight}) => {
             dispatch(setModalError("Oops. Something went wrong. Please, try a bit later"))
         }
     }
+
+
+    //Check groupfactor
+    if (group.groupFactor.startsWith('Host:')){
+        silenceRuleHost = group.groupFactor.substring('Host: '.length);
+    }
+
+    if (group.groupFactor.startsWith('Alert Name:')){
+        silenceRuleAlertName = group.groupFactor.substring('Alert Name: '.length);
+    }
+
+    const handleSilenceButton = () => {
+        setEnabledSilenceWindow(!isEnabledSilenceWindow)
+    }
+
+    const handleEnterKeyDown = (e) => {
+        if (e.keyCode === 13) {
+            e.preventDefault()
+            if (isEnabledSilenceButton) {
+                submitSilenceGroup()
+            }
+        }
+    }
+
+    const submitSilenceGroup = async () => {
+        let endSilenceTime
+        if (silenceDuration > 0) {
+            endSilenceTime = Date.now() + Number(silenceDuration) * 60000
+        } else {
+            endSilenceTime = null
+        }
+            silenceRule = {
+                project: "",
+                host: silenceRuleHost,
+                alertName: silenceRuleAlertName,
+                startSilence: Date.now(),
+                endSilence: endSilenceTime,
+                comment: silenceComment
+
+        }
+        try {
+            await AlertService.silence(silenceRule)
+        }
+        catch (e){
+            dispatch(setModalError("Oops. Something went wrong. Please, try a bit later"))
+        }
+
+        setSilenceDuration(null)
+        setSilenceComment(null)
+        setEnabledSilenceWindow(false)
+    }
+
 
     return (
         <div className={styles.groupSection} key={group.id}>
@@ -109,19 +192,55 @@ const AlertGroup = ({group, alertHeight}) => {
                      onClick={e => onAlertClickHandler(e)}>
                     {group.description}
                 </div>
+                <div
+                    className={`${alertStyles.silenceWindow} ${isEnabledSilenceWindow ? alertStyles.silenceWindowActive : alertStyles.silenceWindowDisabled} ${isInspectMode ? null : alertStyles.silenceWindow_small}`}>
+                    <input type="text"
+                           className={`${alertStyles.silenceDuration} ${isInspectMode ? null : alertStyles.silenceDuration_small}`}
+                           placeholder="duration mins."
+                           id={`duration_${group.id}`}
+                           ref={groupDurationRef}
+                           onKeyDown={handleEnterKeyDown}
+                           onChange={e => setSilenceDuration(e.target.value)}
+                    />
+                    <textarea
+                        className={`${alertStyles.silenceComment} ${isInspectMode ? null : alertStyles.silenceComment_small}`}
+                        placeholder="comment"
+                        id={`comment_${group.id}`}
+                        ref={groupCommentRef}
+                        onKeyDown={handleEnterKeyDown}
+                        onChange={e => setSilenceComment(e.target.value)}
+                    />
+                    <button disabled={!isEnabledSilenceButton}
+                            className={`${isEnabledSilenceButton ? alertStyles.silenceButtonEnabled : alertStyles.silenceButtonDisabled} ${alertStyles.silenceButton} ${isInspectMode ? null : alertStyles.silenceButton_small}`}
+                            onClick={(e) => {
+                                e.preventDefault()
+                                submitSilenceGroup()
+                            }}
+                    >
+                        Silence
+                    </button>
+                </div>
                 {displayMode === MAIN_DISPLAY
-                    ? <div className={`${isInspectMode ? alertStyles.controlButton : alertStyles.controlButton_small}`}/>
+                    ? <div
+                        className={`${isInspectMode ? alertStyles.controlButton : alertStyles.controlButton_small} ${alertStyles.silence}`}
+                        onClick={(e) => {
+                            e.preventDefault()
+                            handleSilenceButton()
+                        }}
+                    />
                     : null
                 }
-                <div className={`${isInspectMode ? alertStyles.controlButton : alertStyles.controlButton_small} ${alertStyles.refresh}`}/>
-                <div className={`${isInspectMode ? alertStyles.controlButton : alertStyles.controlButton_small} ${alertStyles.info}`}/>
+                <div
+                    className={`${isInspectMode ? alertStyles.controlButton : alertStyles.controlButton_small} ${alertStyles.refresh}`}/>
+                <div
+                    className={`${isInspectMode ? alertStyles.controlButton : alertStyles.controlButton_small} ${alertStyles.info}`}/>
 
-        </div>
-    <div className={`${styles.alertBlock} ${isAlertsBlockOpened ? styles.alertBlockHidden : ''}`}
-         style={{height: `${alertHeight * group.alerts.length}px`, transition: "height 0.3s"}}>
-        {
-            group.alerts.map(alert => (
-                <div style={{height: `${alertHeight}px`}}>
+            </div>
+            <div className={`${styles.alertBlock} ${isAlertsBlockOpened ? styles.alertBlockHidden : ''}`}
+                 style={{height: `${alertHeight * group.alerts.length}px`, transition: "height 0.3s"}}>
+                {
+                    group.alerts.map(alert => (
+                        <div style={{height: `${alertHeight}px`}}>
                             <Alert alert={alert}/>
                         </div>
                     ))
