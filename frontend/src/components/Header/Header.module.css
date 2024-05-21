@@ -5,7 +5,7 @@
 }
 .logo {
     width: 120px;
-    height: 100px;
+    height: 43px;
     background-image: url("../../../public/images/ivinco.svg");
     background-size: contain;
     background-repeat: no-repeat;
@@ -14,6 +14,7 @@
 }
 
 .onDutyPortal {
+    visibility: hidden;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -22,7 +23,7 @@
     background-color: white;
     border: darkgrey 2px solid;
     border-radius: 10px;
-    margin: auto 0 30px 30px;
+    margin: auto 0 0 30px;
     padding: 0 10px;
     font-size: 1.5rem;
 }
@@ -36,8 +37,7 @@
     flex-direction: column;
     width: 165px;
     height: 108px;
-    margin: 30px auto auto auto;
-    padding: 27px;
+    margin: auto auto 0;
     justify-content: center;
     align-items: center;
     color: #01a2d8;
@@ -45,13 +45,14 @@
 
 .alertsNumber {
     display: flex;
-    font-size: 3.6rem;
+    font-size: 2.2rem;
     margin: 0;
 }
 
 .alertsCountTitle {
     display: flex;
-    font-size: 1.5rem;
+    font-size: 1rem;
+    text-align: center;
     margin: 10px auto 0;
 }
 
@@ -59,7 +60,7 @@
 .headerButton {
     min-width: 135px;
     min-height: 50px;
-    margin: auto auto;
+    margin: auto;
     background-color: transparent;
     border: #01a2d8 2px solid;
     border-radius: 10px;
@@ -91,7 +92,7 @@
     background-position: center;
     background-repeat: no-repeat;
     background-color: transparent;
-    margin: auto 30px 30px 0;
+    margin: auto 30px 0 0;
     border: none;
     filter: grayscale(100%);
 }
@@ -132,11 +133,11 @@
 }
 
 .avatar {
-    width: 100px;
-    height: 100px;
+    width: 75px;
+    height: 75px;
     background-size: cover;
     background-repeat: no-repeat;
-    margin: auto 45px;
+    margin: auto 45px 0;
     border-radius: 50%;
     border: 3px solid #01a2d8;
     transition: transform 0.2s;
@@ -151,7 +152,6 @@
 @media screen and (max-width: 2150px) {
     .logo {
         width: 80px;
-        height: 66px;
         margin-left: 30px;
     }
 
@@ -163,7 +163,7 @@
     .avatar {
         width: 66px;
         height: 66px;
-        margin: 20px 30px 21px auto;
+        margin: auto 30px 0 auto;
         border: 2px solid slategrey;
     }
 
@@ -187,14 +187,14 @@
     .alertsCount {
         width: 110px;
         height: 72px;
-        margin: 27px auto auto;
+        margin: auto auto 0;
         padding: 18px;
         border-radius: 20px;
 
     }
 
     .alertsNumber {
-        font-size: 2.4rem;
+        font-size: 2rem;
     }
 
     .alertsCountTitle {
@@ -207,7 +207,6 @@
 @media screen and (max-width: 1150px) {
     .logo {
         width: 53px;
-        height: 44px;
         margin-left: 20px;
     }
     .onDutyPortal {
@@ -218,7 +217,7 @@
     .avatar {
         width: 44px;
         height: 44px;
-        margin: 14px 20px 15px auto;
+        margin: auto 20px 0 auto;
         border: 1px solid slategrey;
     }
 
@@ -241,7 +240,7 @@
     .alertsCount {
         width: 73px;
         height: 48px;
-        margin: 18px auto auto;
+        margin: 18px auto 0;
         padding: 12px;
         border-radius: 14px;
 

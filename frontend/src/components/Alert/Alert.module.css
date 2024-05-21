@@ -29,6 +29,7 @@
     border: 2px solid black;
     border-radius: 10%;
     padding: 10px;
+    align-content: center;
 }
 
 .projectName_small {
@@ -40,6 +41,7 @@
     text-align: center;
     border: 1px solid black;
     border-radius: 10%;
+    align-content: center;
 }
 
 .host {
@@ -97,6 +99,8 @@
     height: 20px;
     margin: 4px;
     padding: 2px;
+    border: none;
+    background-color: transparent;
     border-radius: 50%;
     background-size: cover;
     background-repeat: no-repeat;
@@ -267,6 +271,8 @@
     width: 23px;
     height: 23px;
     margin: auto 6px;
+    border: none;
+    background-color: transparent;
     background-size: contain;
     background-position: center;
     background-repeat: no-repeat;
