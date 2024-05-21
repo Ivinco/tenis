@@ -5,7 +5,7 @@ export const sideBarMenuItems = [
     {value: 'Normal', action: MAIN_DISPLAY},
     {value: 'Silenced', action: SILENCED_DISPLAY},
     {value: 'History', action: HISTORY_DISPLAY},
-    {value: 'Stats', action: STATS_DISPLAY}
+    // {value: 'Stats', action: STATS_DISPLAY}
 
 ]
 export const headerMenuItems = [
@@ -18,11 +18,11 @@ export const headerMenuItems = [
         buttons: ["Disabled", "Enabled"],
         action: setGroupingMenuValue
     },
-    {
-        name: "TZ",
-        buttons: ["Browser", "Data Center", "UTC"],
-        action: setTimeZoneValue
-    }
+    // {
+    //     name: "TZ",
+    //     buttons: ["Browser", "Data Center", "UTC"],
+    //     action: setTimeZoneValue
+    // }
 ]
 export const BACKEND_SERVER = process.env.REACT_APP_SERVER || "https://api.tenis-dev-2.k8s-test.ivinco.com"
 export const PORT = process.env.REACT_APP_PORT || '443'

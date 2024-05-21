@@ -1,9 +1,9 @@
 .menuSpace {
     display: flex;
     width: 100%;
-    height: 162px;
+    height: 100px;
     background-color: #e1fafa;
-    margin: 0 0 20px 0;
+    margin: 0 0 10px 0;
     padding: 0;
     overflow: visible;
     opacity: 1;
@@ -94,7 +94,7 @@ input[type="search"]::-webkit-search-cancel-button {
 .filterMenu {
     display: flex;
     list-style: none;
-    height: 100px;
+    height: 60px;
     padding: 0;
     margin: auto;
     justify-content: space-between;
@@ -102,10 +102,10 @@ input[type="search"]::-webkit-search-cancel-button {
 
 @media screen and (max-width: 2150px) {
     .menuSpace {
-        max-height: 108px;
+        max-height: 66px;
     }
     .filterMenu {
-        height: 57px;
+        height: 45px;
     }
     .menuItem {
         min-width: 167px;
@@ -131,10 +131,10 @@ input[type="search"]::-webkit-search-cancel-button {
 
 @media screen and (max-width: 1150px) {
     .menuSpace {
-        max-height: 72px;
+        max-height: 44px;
     }
     .filterMenu {
-        height: 33px;
+        height: 30px;
     }
 
     .menuItem {
