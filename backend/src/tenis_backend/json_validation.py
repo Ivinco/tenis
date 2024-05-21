@@ -17,12 +17,13 @@ schema = {
                 "msg": {"type": "string", "maxLength": 65536},
                 "responsibleUser": {"type": "string", "maxLength": 1024},
                 "comment": {"type": "string", "maxLength": 65536},
+                "plugin_id": {"type": "string", "maxLength": 255},
                 "silenced": {"type": "boolean"},
                 "customFields": {"type": "object", "$ref": "#/definitions/custom_field_definition"}
             },
             "anyOf": [
-                {"required": ["project", "host", "fired", "alertName", "severity", "msg", "responsibleUser", "comment", "silenced"]},
-                {"required": ["project", "host", "fired", "alertName", "severity", "msg", "responsibleUser", "comment", "silenced", "customFields"]}
+                {"required": ["project", "host", "fired", "alertName", "severity", "msg", "responsibleUser", "comment", "silenced", "plugin_id"]},
+                {"required": ["project", "host", "fired", "alertName", "severity", "msg", "responsibleUser", "comment", "silenced", "plugin_id", "customFields"]}
             ],
             "additionalProperties": False
         },

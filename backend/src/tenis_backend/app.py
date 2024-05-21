@@ -159,8 +159,6 @@ def send_alerts(updated_alerts, update_alerts_query):
             raise InternalServerError("Failed to save alerts in MongoDB: %s" % e)
 
 
-from datetime import datetime
-
 def get_history_alerts(start_datetime, end_datetime):
     start_timestamp = datetime.utcfromtimestamp(start_datetime)
     end_timestamp = datetime.utcfromtimestamp(end_datetime)
@@ -397,8 +395,6 @@ def silenced(user):
     Method to return a json list of 'silence' rules
     """
     return json.dumps(silence_rules, default=str), 200
-
-
 
 
 @app.route('/healz')
@@ -680,6 +676,32 @@ def update_user(current_user):
         return jsonify(updated_user), 200
     except Exception as e:
         return make_response(jsonify({"error": str(e)}), 500)
+
+
+@app.route('/out', methods=['GET'])
+def output():
+    """
+    Method to get the list of active alerts for plugins to check if they are still actual
+
+    :return: json list of alerts
+    """
+
+    try:
+        token = request.headers['X-Tenis-Token']
+    except Exception:
+        raise Unauthorized("Missing API token")
+    if token != app.config['API_TOKEN']:
+        raise Unauthorized("Invalid API token")
+
+    plugin_id = request.args.get("pid")
+    if plugin_id:
+        sorted_alerts = []
+        for alert in alerts:
+            if alert['plugin_id'] == plugin_id:
+                sorted_alerts.append(alert)
+        return json.dumps(sorted_alerts, default=str), 200
+    else:
+        return json.dumps(alerts, default=str), 200
 
 
 @app.route('/in', methods=['POST'])
