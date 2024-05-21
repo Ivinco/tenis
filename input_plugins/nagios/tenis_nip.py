@@ -228,7 +228,7 @@ def parse_status_dat(dat, project, events, objects):
     # Alternate method to grep only actual alerts, the fastest method
     grep1 = 'current_state=[1-9]'
     grep2 = fr'{grep1}|(service|host)status\s|time_up=|host_name=|service_description=|hard_state_change=|\splugin_output='
-    cmd = [f"grep -E '{grep1}' -B16 -A15 status.dat | grep -E '{grep2}'"]
+    cmd = [f"grep -E '{grep1}' -B16 -A15 {dat} | grep -E '{grep2}'"]
     data = []
     try:
         data = subprocess.run(cmd, shell=True, stdout=subprocess.PIPE).stdout.decode('utf-8').split('\n')
@@ -333,9 +333,9 @@ def main():
     load_objects(obj, objects)
     dump = {'update': [], 'resolve': []}
     events = {'update': [], 'resolve': []}
-    parse_status_dat(dat, args.project, events, objects)
 
     while 1:  # Main loop to reopen nagios.log file if it was recreated
+        parse_status_dat(dat, args.project, events, objects)
         while not os.path.exists(log):  # wait until log file is ready
             sleep(1)
 
