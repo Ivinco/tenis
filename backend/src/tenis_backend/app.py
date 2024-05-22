@@ -16,7 +16,7 @@ from email_validator import validate_email, EmailNotValidError
 from werkzeug.exceptions import HTTPException, Unauthorized, BadRequest, InternalServerError
 
 from .alert import load_alerts, lookup_alert, update_alerts, regexp_alerts, make_history_entry, is_resolved
-from .auth import create_token, token_required, token_required_ws
+from .auth import create_token, token_required, token_required_ws, plugin_token_required
 from .user import User
 from .json_validation import schema, silence_schema, user_schema, user_add_schema, user_update_schema, \
     history_request_schema
@@ -158,8 +158,6 @@ def send_alerts(updated_alerts, update_alerts_query):
         except pymongo.errors.PyMongoError as e:
             raise InternalServerError("Failed to save alerts in MongoDB: %s" % e)
 
-
-from datetime import datetime
 
 def get_history_alerts(start_datetime, end_datetime):
     start_timestamp = datetime.utcfromtimestamp(start_datetime)
@@ -397,8 +395,6 @@ def silenced(user):
     Method to return a json list of 'silence' rules
     """
     return json.dumps(silence_rules, default=str), 200
-
-
 
 
 @app.route('/healz')
@@ -682,18 +678,30 @@ def update_user(current_user):
         return make_response(jsonify({"error": str(e)}), 500)
 
 
+@app.route('/out', methods=['GET'])
+@plugin_token_required(app.config['API_TOKEN'])
+def output():
+    """
+    Method to get the list of active alerts for plugins to check if they are still actual
+
+    :return: json list of alerts
+    """
+    plugin_id = request.args.get("pid")
+    if plugin_id:
+        sorted_alerts = []
+        for alert in alerts:
+            if alert['plugin_id'] == plugin_id:
+                sorted_alerts.append(alert)
+        return json.dumps(sorted_alerts, default=str), 200
+    else:
+        return json.dumps(alerts, default=str), 200
+
+
 @app.route('/in', methods=['POST'])
+@plugin_token_required(app.config['API_TOKEN'])
 def inbound():
     """ Inbound API calls to inject alerts and updates """
     global alerts
-
-    # This is separate from the frontend auth - just standard API token check
-    try:
-        token = request.headers['X-Tenis-Token']
-    except Exception:
-        raise Unauthorized("Missing API token")
-    if token != app.config['API_TOKEN']:
-        raise Unauthorized("Invalid API token")
 
     try:
         data = request.json

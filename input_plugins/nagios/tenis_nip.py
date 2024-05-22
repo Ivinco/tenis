@@ -10,12 +10,14 @@ from time import sleep
 from argparse import ArgumentParser
 
 access_token = ''   # TENIS Access token, it's more secure to write it here or as env var instead of adding through args
-check_timeout = 60  # Main files check timeout in sec, if files where deleted or recreated we have to reopen them
+check_files = 60    # Main files check timeout in sec, if files where deleted or recreated we have to reopen them
+check_alerts = 10   # Check alerts timeout, list of alerts will be collected from Tenis and checked if alerts are actual
 nagios_obj = '/var/log/nagios/objects.cache'  # Default Nagios' active objects cache file path
 nagios_log = '/var/log/nagios/nagios.log'     # Default Nagios' event log file path to parse
 nagios_dat = '/var/log/nagios/status.dat'     # Default Nagios' status file path to parse
 nagios_cfg = '/etc/nagios/nagios.cfg'         # Default Nagios' config file path to parse
 plugin_log = '/var/log/nip.log'               # Default log file path for this script
+plugin_pid = 'NIP'                            # Default plugin ID string to match alerts
 project_name = 'main'                         # Default project name
 max_send = 5000                               # Send max 5000 events at once
 # -------------------------------------------------------------------------------------------------------------------- #
@@ -28,6 +30,7 @@ def args_parser():
     parser.add_argument('-d', '--debug',   help='Print some debug data',      action='store_true')
     parser.add_argument('-c', '--cfg',     help='Path to Nagios config file', default=nagios_cfg)
     parser.add_argument('-l', '--log',     help='Path to NIP log file',       default=plugin_log)
+    parser.add_argument('-i', '--pid',     help='NIP id to match alerts',     default=plugin_pid)
     parser.add_argument('-s', '--server',  help='TENIS server url',           required=True)
     parser.add_argument('-t', '--token',   help='Access token',               default=token)
     return parser.parse_args()
@@ -156,7 +159,7 @@ def parse_nagios_config(cfg, log, obj, dat):
     return log, obj, dat
 
 
-def add_events(project, event, events, objects):
+def add_events(project, event, events, pid, objects):
     """
     Append the list of alerts with new items.
 
@@ -200,6 +203,7 @@ def add_events(project, event, events, objects):
             "responsibleUser": "",
             "comment": "",
             "silenced": False,
+            "plugin_id": pid,
             "customFields": {
                 "fixInstructions": notes_url,
             }
@@ -209,7 +213,7 @@ def add_events(project, event, events, objects):
     events.append(event_template[event['type']])
 
 
-def parse_status_dat(dat, project, events, objects):
+def parse_status_dat(dat, project, events, pid, objects):
     """
     Parse status.dat to get alerts that already fired or resolved long ago before NIP service (re)start
 
@@ -277,7 +281,7 @@ def parse_status_dat(dat, project, events, objects):
                 if event['severity'] == 'OK' or event['severity'] == 'UP':
                     event['type'] = 'resolve'
 
-                add_events(project, event, events[event['type']], objects)
+                add_events(project, event, events[event['type']], pid, objects)
             except Exception as e:
                 logging.warning(f"Error reading data from {dat}: {str(e)}")
 
@@ -335,11 +339,12 @@ def main():
     events = {'update': [], 'resolve': []}
 
     while 1:  # Main loop to reopen nagios.log file if it was recreated
-        parse_status_dat(dat, args.project, events, objects)
+        parse_status_dat(dat, args.project, events, args.pid, objects)
         while not os.path.exists(log):  # wait until log file is ready
             sleep(1)
 
-        timer = 0
+        timer_files = 0
+        timer_alerts = 0
         log_id = check_file_id(log)
         obj_id = check_file_id(obj)
         logging.info(f"Start reading file {log}")
@@ -379,7 +384,7 @@ def main():
                             if re.match(r'OK|UP', event['severity']):  # it's Resolve
                                 event['type'] = 'resolve'
 
-                            add_events(args.project, event, events[event['type']], objects)
+                            add_events(args.project, event, events[event['type']], args.pid, objects)
 
                     else:  # If string is empty it means we reached the end of file, send collected events, renew events
                         if events['update'] or events['resolve']:
@@ -393,12 +398,25 @@ def main():
 
                 except Exception as e:  # Logg all errors
                     logging.critical(f"Some error occurred: {str(e)}")
-                    sleep(check_timeout)
+                    sleep(check_files)
 
                 sleep(n)  # To keep CPU load low
-                timer += n
-                if timer >= check_timeout:
-                    timer = 0
+                timer_files += n
+                timer_alerts += n
+                if timer_alerts >= check_alerts:  # It's time to check alerts
+                    timer_alerts = 0
+                    try:
+                        resp = tenis.get(args.server + f'/out?pid={args.pid}', headers={'Accept': 'application/json'})
+                        for item in resp.json():
+                            if f"host_name\t{item['host']}" not in objects or item['alertName'] not in objects:
+                                event = {'type': 'resolve', 'host': item['host'], 'name': item['alertName'],
+                                         'fired': item['fired'], 'severity': 'OK', 'message': ''}
+                                add_events(args.project, event, events[event['type']], args.pid, objects)
+                    except Exception as e:  # Logg all errors
+                        logging.critical(f"Some error occurred: {str(e)}")
+
+                if timer_files >= check_files:  # It's time to check Nagios' files
+                    timer_files = 0
                     obj_id_new = check_file_id(obj)  # Check that objects file is not deleted/recreated
                     if obj_id_new != obj_id:
                         objects = {}

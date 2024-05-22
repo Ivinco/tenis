@@ -9,16 +9,18 @@ Options:
     -c Path to Nagios config file (default value '/etc/nagios/nagios.cfg')
     -l Path to NIP log file (default value /var/log/nip.log')
     -p Project within TENIS (default value 'main')
+    -i Plugin ID string to match alerts
     -s TENIS server url (required)
     -t Access token (optional)
 "
 
 #Get opts
-while getopts ":l:p:c:s:t:" opt; do
+while getopts ":l:p:c:s:t:i:" opt; do
     case "$opt" in
            (p)  opts+=("--project '$OPTARG'");;
            (l)  opts+=("--log '$OPTARG'");;
            (c)  opts+=("--cfg '$OPTARG'");;
+           (i)  opts+=("--pid '$OPTARG'");;
            (s)  srv=$OPTARG; opts+=("--server '$srv'");;
            (t)  printf -v token -- '\nEnvironment="NIP_TOKEN=%s"' "$OPTARG";;
            (*)  printf -- "$help"; exit 1;;
