@@ -13,11 +13,11 @@ def create_token(user_id, secret, token_type, expires):
     """ Create token with given content, type, expiration timestamp """
     now = datetime.now(timezone.utc)
     token_data = {
-        "iat": now, # Issued at
-        "jti": str(uuid.uuid4()), # JSON Token ID
-        "type": token_type, # 'refresh' or 'access'
+        "iat": now,  # Issued at
+        "jti": str(uuid.uuid4()),  # JSON Token ID
+        "type": token_type,  # 'refresh' or 'access'
         "exp": expires,
-        "sub": user_id # token subject
+        "sub": user_id  # token subject
     }
     return jwt.encode(
         token_data,
@@ -26,7 +26,7 @@ def create_token(user_id, secret, token_type, expires):
     )
 
 
-def decode_token(token, secret_key, token_type = "access"):
+def decode_token(token, secret_key, token_type="access"):
     """ Decode token, raise exception from werkzeug.exceptions if something is wrong """
     try:
         if not token:
@@ -96,3 +96,19 @@ def token_required_ws(fn):
             disconnect()
         return fn(current_user, *args, **kwargs)
     return decorator
+
+
+def plugin_token_required(api_token):
+    """ Decorator to check X-Tenis-Token """
+    def wrapper(fn):
+        @wraps(fn)
+        def decorator(*args, **kwargs):
+            try:
+                token = request.headers['X-Tenis-Token']
+            except Exception:
+                raise Unauthorized("Missing API token")
+            if token != api_token:
+                raise Unauthorized("Invalid API token")
+            return fn(*args, **kwargs)
+        return decorator
+    return wrapper
