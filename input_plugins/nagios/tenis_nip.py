@@ -227,9 +227,17 @@ def parse_status_dat(dat, project, pid, objects):
 
     alerts = []
     # Grep only actual alerts, the fastest method
-    grep1 = 'current_state=[1-9]'
-    grep2 = fr'{grep1}|(service|host)status\s|time_up=|host_name=|service_description=|hard_state_change=|\splugin_output='
-    cmd = [f"grep -E '{grep1}' -B16 -A16 {dat} | grep -E '{grep2}'"]
+    greps = [
+        'current_state=[1-9]',
+        r'(service|host)status\s',
+        'last_time_up=',
+        'host_name=',
+        'last_hard_state_change=',
+        'service_description=',
+        r'\splugin_output=',
+    ]
+    full_grep = '|'.join(greps)
+    cmd = [f"grep -E '{greps[0]}' -B16 -A17 {dat} | grep -E '{full_grep}'"]
     data = []
     try:
         data = subprocess.run(cmd, shell=True, stdout=subprocess.PIPE).stdout.decode('utf-8').split('\n')
@@ -261,8 +269,7 @@ def parse_status_dat(dat, project, pid, objects):
             try:
                 event = {'type': 'update'}
                 raw = data[i:i + step]
-                typ = raw[0]
-                raw.pop(0)
+                typ = raw.pop(0)
                 for j in range(0, len(raw)):
                     parameter_name = host_map[j]
                     if re.match(r'service', typ):
@@ -277,11 +284,10 @@ def parse_status_dat(dat, project, pid, objects):
                     event['name'] = f"host_name\t{event['host']}"
                 if event['severity'] == 'OK' or event['severity'] == 'UP':
                     event['type'] = 'resolve'
-
                 add_events(project, event, alerts, pid, objects)
-                return alerts
             except Exception as e:
                 logging.warning(f"Error reading data from {dat}: {str(e)}")
+    return alerts
 
 
 def main():
@@ -339,7 +345,6 @@ def main():
     while 1:  # Main loop to reopen nagios.log file if it was recreated
         alerts = parse_status_dat(dat, args.project, args.pid, objects)
         if alerts:
-            print(alerts)
             events['update'].extend(alerts)
         while not os.path.exists(log):  # wait until log file is ready
             sleep(1)
@@ -410,14 +415,21 @@ def main():
                         alerts = parse_status_dat(dat, args.project, args.pid, objects)
                         resp = tenis.get(args.server + f'/out?pid={args.pid}', headers={'Accept': 'application/json'})
                         for item in resp.json():
-                            event = {'type': 'resolve', 'host': item['host'], 'name': item['alertName'],
-                                         'fired': item['fired'], 'severity': 'OK', 'message': ''}
+                            event = {
+                                'name': item['alertName'],
+                                'fired': item['fired'],
+                                'host': item['host'],
+                                'type': 'resolve',
+                                'severity': 'OK',
+                                'message': ''
+                            }
                             if not alerts:
                                 add_events(args.project, event, events[event['type']], args.pid, objects)
                             else:
                                 tmp = [z for z in alerts if z['host'] == item['host'] and z['alertName'] == item['alertName']]
                                 if not tmp:
                                     add_events(args.project, event, events[event['type']], args.pid, objects)
+
                     except Exception as e:  # Logg all errors
                         logging.critical(f"Some error occurred: {str(e)}")
 
