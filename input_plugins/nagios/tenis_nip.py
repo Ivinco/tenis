@@ -166,6 +166,7 @@ def add_events(project, event, events, pid, objects):
     :param project: Project name
     :param event: Dictionary with Alert parameters
     :param events: Lists of updates and resolves to append too
+    :param pid: Plugin ID
     :param objects: Dictionary with services info, needed to parse fix_instruction url
     :return: nothing
     """
@@ -213,26 +214,22 @@ def add_events(project, event, events, pid, objects):
     events.append(event_template[event['type']])
 
 
-def parse_status_dat(dat, project, events, pid, objects):
+def parse_status_dat(dat, project, pid, objects):
     """
     Parse status.dat to get alerts that already fired or resolved long ago before NIP service (re)start
 
     :param dat: Path to Nagios' status.dat file
     :param project: Project name
-    :param events: Global List of alerts and resolves
+    :param pid: Plugin ID
     :param objects: Dictionary with services info, needed to parse fix_instruction url
-    :return: Nothing
+    :return: list of alert items(dictionary)
     """
 
-    # Grep only needed values to ease the process
-    # grep1 = '(service|host)status {'
-    # grep2 = fr'{grep1}|time_up=|host_name=|service_description=|current_state=|hard_state_change=|\splugin_output='
-    # cmd = [f"grep -E '{grep1}' -A32 {dat} | grep -E '{grep2}'"]
-
-    # Alternate method to grep only actual alerts, the fastest method
+    alerts = []
+    # Grep only actual alerts, the fastest method
     grep1 = 'current_state=[1-9]'
     grep2 = fr'{grep1}|(service|host)status\s|time_up=|host_name=|service_description=|hard_state_change=|\splugin_output='
-    cmd = [f"grep -E '{grep1}' -B16 -A15 {dat} | grep -E '{grep2}'"]
+    cmd = [f"grep -E '{grep1}' -B16 -A16 {dat} | grep -E '{grep2}'"]
     data = []
     try:
         data = subprocess.run(cmd, shell=True, stdout=subprocess.PIPE).stdout.decode('utf-8').split('\n')
@@ -281,7 +278,8 @@ def parse_status_dat(dat, project, events, pid, objects):
                 if event['severity'] == 'OK' or event['severity'] == 'UP':
                     event['type'] = 'resolve'
 
-                add_events(project, event, events[event['type']], pid, objects)
+                add_events(project, event, alerts, pid, objects)
+                return alerts
             except Exception as e:
                 logging.warning(f"Error reading data from {dat}: {str(e)}")
 
@@ -339,7 +337,10 @@ def main():
     events = {'update': [], 'resolve': []}
 
     while 1:  # Main loop to reopen nagios.log file if it was recreated
-        parse_status_dat(dat, args.project, events, args.pid, objects)
+        alerts = parse_status_dat(dat, args.project, args.pid, objects)
+        if alerts:
+            print(alerts)
+            events['update'].extend(alerts)
         while not os.path.exists(log):  # wait until log file is ready
             sleep(1)
 
@@ -406,12 +407,17 @@ def main():
                 if timer_alerts >= check_alerts:  # It's time to check alerts
                     timer_alerts = 0
                     try:
+                        alerts = parse_status_dat(dat, args.project, args.pid, objects)
                         resp = tenis.get(args.server + f'/out?pid={args.pid}', headers={'Accept': 'application/json'})
                         for item in resp.json():
-                            if f"host_name\t{item['host']}" not in objects or item['alertName'] not in objects:
-                                event = {'type': 'resolve', 'host': item['host'], 'name': item['alertName'],
+                            event = {'type': 'resolve', 'host': item['host'], 'name': item['alertName'],
                                          'fired': item['fired'], 'severity': 'OK', 'message': ''}
+                            if not alerts:
                                 add_events(args.project, event, events[event['type']], args.pid, objects)
+                            else:
+                                tmp = [z for z in alerts if z['host'] == item['host'] and z['alertName'] == item['alertName']]
+                                if not tmp:
+                                    add_events(args.project, event, events[event['type']], args.pid, objects)
                     except Exception as e:  # Logg all errors
                         logging.critical(f"Some error occurred: {str(e)}")
 
