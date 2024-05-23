@@ -1,6 +1,7 @@
 import React, {useEffect, useRef, useState} from 'react';
 import styles from './AlertGroup.module.css'
 import alertStyles from '../Alert/Alert.module.css'
+import commonStyles from '../../styles/common.module.css'
 import {useDispatch, useSelector} from "react-redux";
 import Alert from "../Alert/Alert";
 import {sha256} from "js-sha256";
@@ -222,7 +223,8 @@ const AlertGroup = ({group, alertHeight}) => {
                 </div>
                 {displayMode === MAIN_DISPLAY
                     ? <div
-                        className={`${isInspectMode ? alertStyles.controlButton : alertStyles.controlButton_small} ${alertStyles.silence}`}
+                        className={`${isInspectMode ? alertStyles.controlButton : alertStyles.controlButton_small} ${alertStyles.silence} ${commonStyles.buttonHint}`}
+                        data-tooltip="silence group"
                         onClick={(e) => {
                             e.preventDefault()
                             handleSilenceButton()
@@ -231,7 +233,9 @@ const AlertGroup = ({group, alertHeight}) => {
                     : null
                 }
                 <div
-                    className={`${isInspectMode ? alertStyles.controlButton : alertStyles.controlButton_small} ${alertStyles.refresh}`}/>
+                    className={`${isInspectMode ? alertStyles.controlButton : alertStyles.controlButton_small} ${alertStyles.refresh} ${commonStyles.buttonHint}`}
+                    data-tooltip="recheck group"
+                />
                 <div
                     className={`${isInspectMode ? alertStyles.controlButton : alertStyles.controlButton_small} ${alertStyles.info} ${styles.tempHiddenButton}`}/>
 
