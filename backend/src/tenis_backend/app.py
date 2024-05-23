@@ -687,6 +687,8 @@ def output():
     :return: json list of alerts
     """
     plugin_id = request.args.get("pid")
+    if not plugin_id:
+        raise BadRequest('Plugin ID required')
     if plugin_id:
         sorted_alerts = []
         for alert in alerts:
