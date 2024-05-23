@@ -122,7 +122,7 @@
     justify-content: center;
     margin: auto 6px;
     padding: 0 10px;
-    font-size: 1.5rem;
+    font-size: 1.2rem;
     overflow: hidden;
     border-left: slategrey solid 3px;
     border-right: slategrey solid 3px;
@@ -201,7 +201,7 @@
     white-space: pre-line;
     visibility: hidden;
     opacity: 0;
-    transition: visibility 0s, opacity 0.5s ease 1s;
+    transition: visibility 0s, opacity 0.5s ease 1.5s;
 }
 
 .message:hover::after {
@@ -241,7 +241,7 @@
     white-space: pre-line;
     visibility: hidden;
     opacity: 0;
-    transition: visibility 0s, opacity 0.5s ease 1s;
+    transition: visibility 0s, opacity 0.5s ease 1.5s;
 }
 
 .message_small:hover::after {
@@ -285,17 +285,20 @@
 }
 
 .silenceWindow {
+    z-index: 10;
     display: flex;
     padding: 6px 30px;
     position: absolute;
     right: 300px;
+    top: 15px;
     background-color: #708090EA;
     border-radius: 20px;
 }
 
 .silenceWindow_small {
-    padding: 3px 14px;
-    right: 180px;
+    padding: 5px 14px;
+    right: 7%;
+    top: 1px;
 }
 
 .silenceWindowActive {
@@ -307,26 +310,35 @@
 }
 
 .silenceComment {
-    resize: none;
     overflow: auto;
-    font-size: 1.5rem;
+    font-size: 1rem;
+    text-align: center;
     margin-right: 30px;
+    width: 250px;
     border-radius: 10px;
     outline: none;
 }
 
+.silenceComment::placeholder {
+    font-size: 1rem;
+}
+
+
+
 .silenceComment_small {
-    padding: 2px 5px 0;
-    font-size: 0.9rem;
-    max-height: 17px;
+    font-size: 0.7rem;
     margin-right: 14px;
 }
 
+.silenceComment_small::placeholder {
+    font-size: 0.7rem;
+}
+
 .silenceDuration {
-    font-size: 1.5rem;
+    font-size: 1rem;
     text-align: center;
     margin-right: 30px;
-    width: 100px;
+    width: 150px;
     border-radius: 10px;
     outline: none;
 }
@@ -335,7 +347,7 @@
 }
 
 .silenceDuration_small {
-    font-size: 0.9rem;
+    font-size: 0.7rem;
     margin-right: 14px;
     width: 70px;
 }
@@ -351,7 +363,7 @@
 }
 
 .silenceButton_small {
-    font-size: 0.9rem;
+    font-size: 0.7rem;
 }
 
 .silenceButtonDisabled {
@@ -416,7 +428,7 @@
     .alertName {
         margin: auto 10px;
         padding: 0 6px;
-        font-size: 1rem;
+        font-size: 0.8rem;
         border-left: slategrey solid 2px;
         border-right: slategrey solid 2px;
     }
@@ -441,7 +453,7 @@
     }
 
     .silenceWindow {
-        padding: 9px 20px;
+        padding: 2px 20px;
         right: 200px;
     }
 
@@ -458,6 +470,9 @@
 
     .silenceButton {
         font-size: 1rem;
+    }
+    .silenceButton_small {
+        font-size: 0.7rem;
     }
 
 }
@@ -518,8 +533,12 @@
     }
 
     .silenceWindow {
-        padding: 7px 14px;
+        padding: 1px 14px;
         right: 120px;
+    }
+
+    .silenceWindow_small {
+        padding: 1px 14px;
     }
 
     .silenceComment {

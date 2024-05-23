@@ -89,7 +89,7 @@ const Alert = ({alert}) => {
             fontColor = 'black'
             break
         default:
-            alertBackground = '#858585'
+            alertBackground = '#bab8b8'
             fontColor = 'black'
     }
 
@@ -171,7 +171,7 @@ const Alert = ({alert}) => {
                        onKeyDown={handleKeyDown}
                        onChange={ e => setSilenceDuration(e.target.value)}
                 />
-                <textarea className={`${styles.silenceComment} ${isInspectMode ? null : styles.silenceComment_small}`}
+                <input type="text" className={`${styles.silenceComment} ${isInspectMode ? null : styles.silenceComment_small}`}
                           placeholder="comment"
                           id={`comment_${alert._id}`}
                           ref={commentRef}

@@ -202,7 +202,7 @@ const AlertGroup = ({group, alertHeight}) => {
                            onKeyDown={handleEnterKeyDown}
                            onChange={e => setSilenceDuration(e.target.value)}
                     />
-                    <textarea
+                    <input type="text"
                         className={`${alertStyles.silenceComment} ${isInspectMode ? null : alertStyles.silenceComment_small}`}
                         placeholder="comment"
                         id={`comment_${group.id}`}
@@ -233,7 +233,7 @@ const AlertGroup = ({group, alertHeight}) => {
                 <div
                     className={`${isInspectMode ? alertStyles.controlButton : alertStyles.controlButton_small} ${alertStyles.refresh}`}/>
                 <div
-                    className={`${isInspectMode ? alertStyles.controlButton : alertStyles.controlButton_small} ${alertStyles.info}`}/>
+                    className={`${isInspectMode ? alertStyles.controlButton : alertStyles.controlButton_small} ${alertStyles.info} ${styles.tempHiddenButton}`}/>
 
             </div>
             <div className={`${styles.alertBlock} ${isAlertsBlockOpened ? styles.alertBlockHidden : ''}`}
