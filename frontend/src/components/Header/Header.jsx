@@ -1,4 +1,5 @@
 import styles from './Header.module.css'
+import commonStyles from '../../styles/common.module.css'
 import {useDispatch, useSelector} from "react-redux";
 import {
     openModal,
@@ -79,8 +80,9 @@ const Header = () => {
                 </div>
 
                 <button
-                    className={`${styles.funcButton} ${styles.silenceButton} ${isLogged ? styles.funcButtonEnabled : null}`}
+                    className={`${styles.funcButton} ${styles.silenceButton} ${isLogged ? styles.funcButtonEnabled : null} ${commonStyles.buttonHint}`}
                     disabled={!isLogged}
+                    data-tooltip="silence rules"
                     onClick={(e) => {
                         e.preventDefault()
                         onSilenceClick()
@@ -88,8 +90,9 @@ const Header = () => {
                 />
 
                 <button
-                    className={`${styles.funcButton} ${styles.inspectButton} ${isLogged ? styles.funcButtonEnabled : null}`}
+                    className={`${styles.funcButton} ${styles.inspectButton} ${isLogged ? styles.funcButtonEnabled : null} ${commonStyles.buttonHint}`}
                     style={!isInspectMode ? {backgroundColor: "#a0f1e2"} : {}}
+                    data-tooltip="inspect mode"
                     disabled={!isLogged}
                     onClick={(e) => {
                         e.preventDefault()
@@ -98,18 +101,22 @@ const Header = () => {
                 />
 
                 <button
-                    className={`${styles.funcButton} ${styles.refreshButton} ${isLogged ? styles.funcButtonEnabled : null}`}/>
+                    className={`${styles.funcButton} ${styles.refreshButton} ${isLogged ? styles.funcButtonEnabled : null} ${commonStyles.buttonHint}`}
+                    data-tooltip="recheck all alerts"
+                />
 
                 <button
-                    className={`${styles.funcButton} ${styles.filterButton} ${isLogged ? styles.funcButtonEnabled : null}`}
+                    className={`${styles.funcButton} ${styles.filterButton} ${isLogged ? styles.funcButtonEnabled : null} ${commonStyles.buttonHint}`}
+                    data-tooltip="filters"
                     disabled={!isLogged}
                     onClick={e => {
                         e.preventDefault()
                         onFilterClick()
                     }}
                 />
-                <div className={styles.avatar}
+                <div className={`${styles.avatar} ${commonStyles.buttonHint}`}
                      style={{backgroundImage: `url(${isLogged ? userInfo.userImage : process.env.PUBLIC_URL + "/images/avatar.svg"})`}}
+                     data-tooltip="userinfo"
                      onClick={e => {
                          onAvatarClick(e)
                      }}/>

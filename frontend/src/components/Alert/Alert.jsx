@@ -1,5 +1,6 @@
 import React, {useEffect, useRef, useState} from 'react';
 import styles from './Alert.module.css'
+import commonStyles from '../../styles/common.module.css'
 import {processTimeStamp} from "../../utils/utils";
 import {useDispatch, useSelector} from "react-redux";
 import {setDetailedAlert} from "../../store/reducers/alertReducer";
@@ -189,16 +190,20 @@ const Alert = ({alert}) => {
                 </button>
             </div>
             {displayMode === MAIN_DISPLAY
-                ? <button className={`${isInspectMode ? styles.controlButton : styles.controlButton_small} ${styles.silence}`}
-                  onClick={e => {
+                ? <button className={`${isInspectMode ? styles.controlButton : styles.controlButton_small} ${styles.silence} ${commonStyles.buttonHint}`}
+                  data-tooltip="silence alert"
+                          onClick={e => {
                       e.preventDefault()
                       handleSilenceButton()
                   }}
                 />
             : null
             }
-            <button className={`${isInspectMode ? styles.controlButton : styles.controlButton_small} ${styles.refresh}`}/>
-            <button className={`${isInspectMode ? styles.controlButton : styles.controlButton_small} ${styles.info}`}
+            <button className={`${isInspectMode ? styles.controlButton : styles.controlButton_small} ${styles.refresh} ${commonStyles.buttonHint}`}
+            data-tooltip="recheck alert"
+            />
+            <button className={`${isInspectMode ? styles.controlButton : styles.controlButton_small} ${styles.info}  ${commonStyles.buttonHint}`}
+                    data-tooltip="alert info"
                  onClick={(e) => {
                      e.preventDefault()
                      handleInfoButton()

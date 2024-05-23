@@ -1,0 +1,20 @@
+.buttonHint::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 10%;
+    transform: translateX(-50%);
+    padding: 5px;
+    background-color: rgba(246, 243, 243, 0.78);
+    color: #000000;
+    font-size: 0.6rem;
+    white-space: nowrap;
+    border-radius: 5px;
+    visibility: hidden;
+    opacity: 0;
+    transition: visibility 0s, opacity 0.5s ease 1s;
+}
+
+.buttonHint:hover::after {
+    visibility: visible;
+    opacity: 1;
+}
