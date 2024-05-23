@@ -289,7 +289,7 @@
     display: flex;
     padding: 6px 30px;
     position: absolute;
-    right: 300px;
+    right: 10%;
     top: 15px;
     background-color: #708090EA;
     border-radius: 20px;
@@ -297,7 +297,6 @@
 
 .silenceWindow_small {
     padding: 5px 14px;
-    right: 7%;
     top: 1px;
 }
 
