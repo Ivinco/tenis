@@ -453,8 +453,14 @@
     }
 
     .silenceWindow {
-        padding: 2px 20px;
+        padding: 8px 20px;
         right: 200px;
+        top: 5px;
+    }
+
+    .silenceWindow_small {
+        padding: 1px 14px;
+        top: 2px;
     }
 
     .silenceComment {
@@ -535,10 +541,6 @@
     .silenceWindow {
         padding: 1px 14px;
         right: 120px;
-    }
-
-    .silenceWindow_small {
-        padding: 1px 14px;
     }
 
     .silenceComment {
