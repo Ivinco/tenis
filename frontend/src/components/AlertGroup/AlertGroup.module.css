@@ -71,6 +71,10 @@
     display: none;
 }
 
+.tempHiddenButton {
+    visibility: hidden;
+}
+
 
 @media screen and (max-width: 2150px) {
     .alertsNumber {
