@@ -412,9 +412,14 @@ def main():
                 if timer_alerts >= check_alerts:  # It's time to check alerts
                     timer_alerts = 0
                     try:
-                        alerts = parse_status_dat(dat, args.project, args.pid, objects)
-                        resp = tenis.get(args.server + f'/out?pid={args.pid}', headers={'Accept': 'application/json'})
-                        for item in resp.json():
+                        n_alerts = parse_status_dat(dat, args.project, args.pid, objects)
+                        t_alerts = tenis.get(args.server + f'/out?pid={args.pid}', headers={'Accept': 'application/json'}).json()
+                        if len(t_alerts) < len(n_alerts):
+                            for item in n_alerts:
+                                tmp = [z for z in t_alerts if z['host'] == item['host'] and z['alertName'] == item['alertName']]
+                                if not tmp:
+                                    events['update'].append(item)
+                        for item in t_alerts:
                             event = {
                                 'name': item['alertName'],
                                 'fired': item['fired'],
@@ -423,13 +428,12 @@ def main():
                                 'severity': 'OK',
                                 'message': ''
                             }
-                            if not alerts:
-                                add_events(args.project, event, events[event['type']], args.pid, objects)
+                            if not n_alerts:
+                                add_events(args.project, event, events['resolve'], args.pid, objects)
                             else:
-                                tmp = [z for z in alerts if z['host'] == item['host'] and z['alertName'] == item['alertName']]
+                                tmp = [z for z in n_alerts if z['host'] == item['host'] and z['alertName'] == item['alertName']]
                                 if not tmp:
-                                    add_events(args.project, event, events[event['type']], args.pid, objects)
-
+                                    add_events(args.project, event, events['resolve'], args.pid, objects)
                     except Exception as e:  # Logg all errors
                         logging.critical(f"Some error occurred: {str(e)}")
 
