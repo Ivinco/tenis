@@ -35,7 +35,6 @@ function MainPage(){
             setPortalParams("login")
         }
         else {
-            console.log("Reset search param")
             setPortalParams()
         }
     }, [dispatch, isLoggedIn]);
