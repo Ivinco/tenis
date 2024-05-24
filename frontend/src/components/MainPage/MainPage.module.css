@@ -47,11 +47,11 @@
 }
 
 .menuArrowClosed {
-    background-image: url("../../../public/images/white-arrow-left.png");
+    background-image: url("../../../public/images/white-arrow-right.png");
 }
 
 .menuArrowOpened {
-    background-image: url("../../../public/images/white-arrow-right.png");
+    background-image: url("../../../public/images/white-arrow-left.png");
 }
 
 .menuArrow:hover {

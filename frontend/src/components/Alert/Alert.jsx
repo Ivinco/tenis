@@ -51,6 +51,7 @@ const Alert = ({alert}) => {
 
 
 
+    const ackButtonHint = alert.responsibleUser ? "unhandle alert" : "handle alert";
     const ackedAlert = {"alertId": alert._id}
     const onAckHandle = async (ackedAlert) => {
         try {
@@ -144,12 +145,13 @@ const Alert = ({alert}) => {
             <div className={`${isInspectMode ? styles.host : styles.host_small}`}>
                 <p className={styles.textFields}>{alert.host}</p>
             </div>
-            <button className={`${isInspectMode ? styles.responsibleUser : styles.responsibleUser_small}`}
+            <button className={`${isInspectMode ? styles.responsibleUser : styles.responsibleUser_small} ${commonStyles.buttonHint}`}
                  style={{
                      backgroundImage: `url(${alert.responsibleUser
                          ? `https://gravatar.com/avatar/${sha256(alert.responsibleUser)}?s=150`
                          : process.env.PUBLIC_URL + "/images/stop-sign.svg"})`
                  }}
+                    data-tooltip={ackButtonHint}
                  onClick={e => {
                      e.preventDefault()
                      onAckHandle(ackedAlert)
