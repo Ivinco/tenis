@@ -6,13 +6,14 @@ import re
 import logging
 import requests
 import subprocess
-from time import sleep
+from time import sleep, time
 from argparse import ArgumentParser
 
 access_token = ''   # TENIS Access token, it's more secure to write it here or as env var instead of adding through args
 check_files = 60    # Main files check timeout in sec, if files where deleted or recreated we have to reopen them
 check_alerts = 10   # Check alerts timeout, list of alerts will be collected from Tenis and checked if alerts are actual
-nagios_obj = '/var/log/nagios/objects.cache'  # Default Nagios' active objects cache file path
+nagios_obj = '/var/log/nagios/objects.cache'  # Default Nagios' active objects cache file
+nagios_cmd = '/var/log/nagios/rw/nagios.cmd'  # Default Nagios' command file path to send commands
 nagios_log = '/var/log/nagios/nagios.log'     # Default Nagios' event log file path to parse
 nagios_dat = '/var/log/nagios/status.dat'     # Default Nagios' status file path to parse
 nagios_cfg = '/etc/nagios/nagios.cfg'         # Default Nagios' config file path to parse
@@ -125,7 +126,7 @@ def send_events(args, events, dump, tenis):
     return can_clear_data
 
 
-def parse_nagios_config(cfg, log, obj, dat):
+def parse_nagios_config(cfg, log, obj, dat, cmd):
     """
     Parse Nagios' config file to get paths to nagios.log, status.dat and object.cache
 
@@ -136,13 +137,15 @@ def parse_nagios_config(cfg, log, obj, dat):
     :return: renewed log, obj, dat
     """
 
-    new_log, new_dat, new_obj = '', '', ''
+    new_log, new_dat, new_obj, new_cmd = '', '', '', ''
     with open(cfg) as f:
         line = 1
         while line:
             line = f.readline()
             if re.match(r'^log_file=.+', line):
                 new_log = line.split('=')[1].strip()
+            if re.match(r'^command_file=.+', line):
+                new_cmd = line.split('=')[1].strip()
             if re.match(r'^status_file=.+', line):
                 new_dat = line.split('=')[1].strip()
             if re.match(r'^object_cache_file=.+', line):
@@ -155,63 +158,10 @@ def parse_nagios_config(cfg, log, obj, dat):
         dat = new_dat
     if new_obj:
         obj = new_obj
+    if new_cmd:
+        cmd = new_cmd
 
-    return log, obj, dat
-
-
-def add_events(project, event, events, pid, objects):
-    """
-    Append the list of alerts with new items.
-
-    :param project: Project name
-    :param event: Dictionary with Alert parameters
-    :param events: Lists of updates and resolves to append too
-    :param pid: Plugin ID
-    :param objects: Dictionary with services info, needed to parse fix_instruction url
-    :return: nothing
-    """
-
-    try:
-        notes_url = objects[event['name']]['notes_url']
-    except KeyError:
-        notes_url = ''
-
-    # Check for INFO alerts
-    # If alert name starts with '_' change severity to INFO and remove '_' from name
-    # or if alert message started from 'INFO:', change severity to INFO
-    if event['type'] == 'update':
-        if re.match(r'^INFO:.*', event['message']):
-            event['severity'] = 'INFO'
-    # Note that we need to change names for resolves too, otherwise they won't work
-    if re.match(r'^_', event['name']):
-        event['name'] = re.sub(r'^_', '', event['name'])
-        event['severity'] = 'INFO'
-
-    event_template = {
-        'resolve': {
-            "project": project,
-            "host": event['host'],
-            "alertName": event['name']
-        },
-
-        'update': {
-            "project": project,
-            "host": event['host'],
-            "fired": event['fired'],
-            "alertName": event['name'],
-            "severity": event['severity'],
-            "msg": event['message'],
-            "responsibleUser": "",
-            "comment": "",
-            "silenced": False,
-            "plugin_id": pid,
-            "customFields": {
-                "fixInstructions": notes_url,
-            }
-        }
-    }
-
-    events.append(event_template[event['type']])
+    return log, obj, dat, cmd
 
 
 def parse_status_dat(dat, project, pid, objects):
@@ -281,13 +231,84 @@ def parse_status_dat(dat, project, pid, objects):
                     event['severity'] = srv_sev_map[int(event['severity'])]
                 if re.match(r'host', typ):
                     event['severity'] = hst_sev_map[int(event['severity'])]
-                    event['name'] = f"host_name\t{event['host']}"
+                    event['name'] = 'HOST DOWN'
                 if event['severity'] == 'OK' or event['severity'] == 'UP':
                     event['type'] = 'resolve'
                 add_events(project, event, alerts, pid, objects)
             except Exception as e:
                 logging.warning(f"Error reading data from {dat}: {str(e)}")
     return alerts
+
+
+def add_events(project, event, events, pid, objects):
+    """
+    Append the list of alerts with new items.
+
+    :param project: Project name
+    :param event: Dictionary with Alert parameters
+    :param events: Lists of updates and resolves to append too
+    :param pid: Plugin ID
+    :param objects: Dictionary with services info, needed to parse fix_instruction url
+    :return: nothing
+    """
+
+    try:
+        notes_url = objects[event['name']]['notes_url']
+    except KeyError:
+        notes_url = ''
+
+    # Check for INFO alerts
+    # If alert name starts with '_' change severity to INFO and remove '_' from name
+    # or if alert message started from 'INFO:', change severity to INFO
+    if event['type'] == 'update':
+        if re.match(r'^INFO:.*', event['message']):
+            event['severity'] = 'INFO'
+    # Note that we need to change names for resolves too, otherwise they won't work
+    if re.match(r'^_', event['name']):
+        event['name'] = re.sub(r'^_', '', event['name'])
+        event['severity'] = 'INFO'
+
+    event_template = {
+        'resolve': {
+            "project": project,
+            "host": event['host'],
+            "alertName": event['name']
+        },
+
+        'update': {
+            "project": project,
+            "host": event['host'],
+            "fired": event['fired'],
+            "alertName": event['name'],
+            "severity": event['severity'],
+            "msg": event['message'],
+            "responsibleUser": "",
+            "comment": "",
+            "silenced": False,
+            "plugin_id": pid,
+            "customFields": {
+                "fixInstructions": notes_url,
+            }
+        }
+    }
+
+    events.append(event_template[event['type']])
+
+
+def recheck(command, cmd):
+    """
+    Schedule force recheck for service or host
+    :param command: { 'cmd': 'command_name', 'host': 'host_name', 'alertName': 'alert_name' }
+    :param cmd: Path to the Nagios' command file
+    :return: nothing
+    """
+    ts = int(time())
+    nag_cmd = f"[{ts}] SCHEDULE_FORCED_SVC_CHECK;{command['host']};{command['alertName']};{ts}\n"
+    if command['alertName'] == 'HOST DOWN':
+        nag_cmd = f"[{ts}] SCHEDULE_FORCED_HOST_CHECK;{command['host']};{ts}\n"
+
+    with open(cmd, 'a') as cmd_file:
+        cmd_file.write(nag_cmd)
 
 
 def main():
@@ -301,7 +322,7 @@ def main():
     """
 
     args = args_parser()
-    log, obj, dat = parse_nagios_config(args.cfg, nagios_log, nagios_obj, nagios_dat)
+    log, obj, dat, cmd = parse_nagios_config(args.cfg, nagios_log, nagios_obj, nagios_dat, nagios_cmd)
     # Nagios' log data example, we need strings with '^\[[0-9]+].*(SERVICE|HOST)\sALERT:.*' pattern:
     # N of index in lst:       0            1        2      3   4       5
     # [1705421869] SERVICE ALERT: host;Alert name;CRITICAL;SOFT;1;Alert message
@@ -376,7 +397,7 @@ def main():
                                         event['host'] = parameter_value.split(' ')[-1]
                                     else:
                                         event[parameter_name] = parameter_value.strip()
-                                event['name'] = f"host_name\t{event['host']}"
+                                event['name'] = 'HOST DOWN'
                             else:  # it's Service alert
                                 for i in range(0, len(raw_alert_split)):
                                     parameter_name = service_map[i]
@@ -409,11 +430,18 @@ def main():
                 sleep(n)  # To keep CPU load low
                 timer_files += n
                 timer_alerts += n
-                if timer_alerts >= check_alerts:  # It's time to check alerts
+                if timer_alerts >= check_alerts:  # It's time to check alerts and commands
                     timer_alerts = 0
                     try:
+                        json_hdr = {'Accept': 'application/json'}
                         n_alerts = parse_status_dat(dat, args.project, args.pid, objects)
-                        t_alerts = tenis.get(args.server + f'/out?pid={args.pid}', headers={'Accept': 'application/json'}).json()
+                        t_alerts = tenis.get(args.server + f'/out?pid={args.pid}', headers=json_hdr).json()
+                        commands = tenis.get(args.server + f'/out?pid={args.pid}&type=cmd', headers=json_hdr).json()
+
+                        for command in commands:
+                            if command['cmd'] == 'recheck':
+                                recheck(command, cmd)
+
                         if len(t_alerts) < len(n_alerts):
                             for item in n_alerts:
                                 tmp = [z for z in t_alerts if z['host'] == item['host'] and z['alertName'] == item['alertName']]

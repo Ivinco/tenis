@@ -136,6 +136,25 @@ silence_schema = {
     "additionalProperties": False
 }
 
+# JSON schema to validate inbound plugin command JSON
+command_schema = {
+    "type": "array",
+    "maxItems": 3,
+    "additionalProperties": False,
+    "items": {
+        "type": "array",
+        "maxItems": 2,
+        "minItems": 2,
+        "additionalProperties": False,
+        "items": {
+            "type": "string",
+            "pattern": "^[ -~]*$",
+            "maxLength": 255,
+            "additionalProperties": False,
+        }
+    }
+}
+
 # JSON schema to validate inbound user JSON
 user_schema = {
     "anyOf": [
