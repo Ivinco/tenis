@@ -34,6 +34,9 @@ function MainPage(){
             dispatch(openModal())
             setPortalParams("login")
         }
+        else {
+            setPortalParams()
+        }
     }, [dispatch, isLoggedIn]);
 
     return (
