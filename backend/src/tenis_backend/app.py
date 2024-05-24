@@ -846,8 +846,11 @@ def inbound():
             if len(resolved_alerts) == 0:
                 return 'OK', 200  # submitted alerts list does not match a single alert from the global list
 
-            for a in resolved_alerts:
-                alerts.remove(a) # remove from global in-mem list
+            try:
+                for a in resolved_alerts:
+                    alerts.remove(a)  # remove from global in-mem list
+            except ValueError:
+                pass
 
             try:
                 app.db['current'].delete_many({'_id': {'$in': resolved_ids}})
