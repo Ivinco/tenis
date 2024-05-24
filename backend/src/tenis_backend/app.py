@@ -19,7 +19,7 @@ from .alert import load_alerts, lookup_alert, update_alerts, regexp_alerts, make
 from .auth import create_token, token_required, token_required_ws, plugin_token_required
 from .user import User
 from .json_validation import schema, silence_schema, user_schema, user_add_schema, user_update_schema, \
-    history_request_schema
+    history_request_schema, command_schema
 from flask_swagger_ui import get_swaggerui_blueprint
 
 # Global vars init
@@ -52,6 +52,16 @@ app.config['JWT_REFRESH_TOKEN_EXPIRES'] = timedelta(days=30)
 alerts_lock = threading.Lock()
 with alerts_lock:
     alerts = load_alerts(app.db['current'])
+
+# Dick of commands to run through plugins, like 'force recheck alert'
+# Data example:
+# commands = {
+#  plugin_ID |{ command_name    | alert_name                | host_name         }, ... ]
+#     'NIP': [{'cmd': 'recheck', 'alertName': 'alert_name1', 'host': 'hostname1'}, ... ]
+#     'PIP': [{'cmd': 'recheck', 'alertName': 'alert_name2', 'host': 'hostname2'}, ... ]
+#      ...
+# }
+commands = {}
 
 
 def check_silence(list_of_alerts, list_of_rules):
@@ -180,8 +190,6 @@ def get_history_alerts(start_datetime, end_datetime):
     return result
 
 
-
-
 # swagger specific
 SWAGGER_URL = '/swagger'
 API_URL = '/static/swagger.json'
@@ -193,7 +201,6 @@ SWAGGERUI_BLUEPRINT = get_swaggerui_blueprint(
     }
 )
 app.register_blueprint(SWAGGERUI_BLUEPRINT, url_prefix=SWAGGER_URL)
-
 
 
 #
@@ -228,6 +235,38 @@ def whoami(user):
     """
     resp = make_response(jsonify(user=user))
     return resp, 200
+
+
+@app.route('/cmd', methods=['POST'])
+@token_required()  # note () are required!
+def cmd(user):
+    """
+    Method to get commands to run through plugins
+    Data example:
+        [['command_name', 'alert_id'], ... ]
+    """
+    try:
+        data = request.json
+        jsonschema.validate(instance=data, schema=command_schema)
+    except jsonschema.exceptions.ValidationError as e:
+        raise BadRequest(e.message)
+
+    for item in data:
+        cmd, alert_id = item
+        for alert in alerts:
+            if str(alert['_id']) == alert_id:
+                try:
+                    commands[alert['plugin_id']]
+                except KeyError:
+                    commands[alert['plugin_id']] = []
+                commands[alert['plugin_id']].append({
+                    'cmd': cmd,
+                    'host': alert['host'],
+                    'alertName': alert['alertName'],
+                })
+                break
+
+    return "OK", 200
 
 
 @app.route('/ack', methods=['POST'])
@@ -682,21 +721,27 @@ def update_user(current_user):
 @plugin_token_required(app.config['API_TOKEN'])
 def output():
     """
-    Method to get the list of active alerts for plugins to check if they are still actual
+    Method to get the list of active alerts for plugins to check if they are still actual.
+    Or the list of commands to run through plugin.
 
-    :return: json list of alerts
+    :return: json the list of alerts or the list of commands
     """
+    data_type = request.args.get("type")
     plugin_id = request.args.get("pid")
     if not plugin_id:
         raise BadRequest('Plugin ID required')
-    if plugin_id:
-        sorted_alerts = []
-        for alert in alerts:
-            if alert['plugin_id'] == plugin_id:
-                sorted_alerts.append(alert)
-        return json.dumps(sorted_alerts, default=str), 200
-    else:
-        return json.dumps(alerts, default=str), 200
+
+    if data_type == 'cmd':
+        cmd_list = []
+        try:
+            cmd_list = commands[plugin_id]
+            commands[plugin_id] = []
+        except:
+            pass
+        return json.dumps(cmd_list, default=str), 200
+
+    sorted_alerts = [z for z in alerts if z['plugin_id'] == plugin_id]
+    return json.dumps(sorted_alerts, default=str), 200
 
 
 @app.route('/in', methods=['POST'])
