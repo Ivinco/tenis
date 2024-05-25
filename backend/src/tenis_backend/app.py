@@ -18,8 +18,7 @@ from werkzeug.exceptions import HTTPException, Unauthorized, BadRequest, Interna
 from .alert import load_alerts, lookup_alert, update_alerts, regexp_alerts, make_history_entry, is_resolved
 from .auth import create_token, token_required, token_required_ws, plugin_token_required
 from .user import User
-from .json_validation import schema, silence_schema, user_schema, user_add_schema, user_update_schema, \
-    history_request_schema, command_schema
+from .json_validation import schema, silence_schema, user_schema, user_add_schema, user_update_schema, command_schema
 from flask_swagger_ui import get_swaggerui_blueprint
 
 # Global vars init
@@ -48,11 +47,6 @@ app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=1)
 app.config['JWT_REFRESH_TOKEN_EXPIRES'] = timedelta(days=30)
 
-# Load alerts from the DB
-alerts_lock = threading.Lock()
-with alerts_lock:
-    alerts = load_alerts(app.db['current'])
-
 # Dick of commands to run through plugins, like 'force recheck alert'
 # Data example:
 # commands = {
@@ -79,9 +73,10 @@ def check_silence(list_of_alerts, list_of_rules):
                 alert["silenced"] = True
                 alert["comment"] = rule["comment"]
 
-
-# Load silence rules from the DB
+# Load alerts and silence rules from the DB
+alerts_lock = threading.Lock()
 with alerts_lock:
+    alerts = load_alerts(app.db['current'])
     silence_rules = load_alerts(app.db['silence'])
     # check if alerts needs to be silenced
     check_silence(alerts, silence_rules)
@@ -169,26 +164,59 @@ def send_alerts(updated_alerts, update_alerts_query):
             raise InternalServerError("Failed to save alerts in MongoDB: %s" % e)
 
 
-def get_history_alerts(start_datetime, end_datetime):
-    start_timestamp = datetime.utcfromtimestamp(start_datetime)
-    end_timestamp = datetime.utcfromtimestamp(end_datetime)
-    query = {'logged': {'$gt': start_timestamp, '$lte': end_timestamp}}
-    cursor = app.db['history'].find(query)
+def get_all_alerts(ts):
+    """
+    Function to get all alerts triggered at a specific UNIX timestamp
 
-    alerts_by_id = {}
-    for record in cursor:
-        alert_id = record['alert_id']
-        record['logged'] = record['logged'].timestamp()
-        if alert_id not in alerts_by_id or record['logged'] > alerts_by_id[alert_id]['logged']:
-            filtered_record = {key: value for key, value in record.items()}
-            filtered_record['logged'] = int(record['logged'])
-            filtered_record['alert_id'] = str(record['alert_id'])
-            filtered_record['_id'] = str(record['_id'])
-            alerts_by_id[alert_id] = filtered_record
+    :param ts: UNIX timestamp that specifies point in time to get the list of alerts for
+    :return: list of alerts triggered at the specified timestamp
+    """
+    # Note that we save intermediate alert status each HISTORY_PERIOD_MINUTES
+    # so to produce a consistent list of alerts for the given ts, we should
+    # start looking from (ts - 60 * HISTORY_PERIOD_MINUTES)
+    period = app.config['HISTORY_PERIOD_MINUTES', 60]
+    result = {}
+    with alerts_lock:
+        cursor = app.db['history'].find({
+            'logged': {
+                '$gt': datetime.utcfromtimestamp(ts - period * 60),
+                '$lte': datetime.utcfromtimestamp(ts)
+            }
+        })
+        for record in cursor:
+            alert_id = record['alert_id']
+            record['logged'] = record['logged'].timestamp()
+            if alert_id not in result or record['logged'] > result[alert_id]['logged']:
+                filtered_record = {key: value for key, value in record.items()}
+                filtered_record['logged'] = int(record['logged'])
+                filtered_record['alert_id'] = str(record['alert_id'])
+                filtered_record['_id'] = str(record['_id'])
+                result[alert_id] = filtered_record
 
-    result = list(alerts_by_id.values())
+    return list(result.values())
+
+def get_single_alert_history(alert_id, start, end):
+    """
+    Function to get a single alert history between specified UNIX timestamps
+
+    :param alert_id: Mongo ObjectID - ID of the alert
+    :param start: UNIX timestamp, start of the history interval
+    :param end: UNIX timestamp, end of the history interval
+    """
+    period = app.config['HISTORY_PERIOD_MINUTES', 60]
+    result = []
+    with alerts_lock:
+        cursor = app.db['history'].find({
+            '_id': bson.ObjectId(alert_id),
+            'logged': {
+                '$gt': datetime.utcfromtimestamp(start - period * 60),
+                '$lte': datetime.utcfromtimestamp(end)
+            }
+        })
+        # XXX: some deduplication here?
+        for record in cursor:
+            result.append(record)
     return result
-
 
 # swagger specific
 SWAGGER_URL = '/swagger'
@@ -479,20 +507,28 @@ def login():
 
 @app.route('/history')
 @token_required()
-def send_history_alerts(user):
+def history(user):
     """
     Method to get all active alerts on requested timestamp
     """
-    history_period = app.config['HISTORY_PERIOD_MINUTES']
     try:
-        data = int(request.args.get("datetime"))
-        jsonschema.validate(instance=data, schema=history_request_schema)
-    except jsonschema.exceptions.ValidationError as e:
-        raise BadRequest(e.message)
-    start_datetime = data - history_period * 60
-    history_alerts = get_history_alerts(start_datetime, data)
-    resp = {'history': history_alerts}
-    return jsonify(resp), 200
+        # got alert_id, should send history for the given alert only
+        alert_id = request.args.get("alert_id")
+        try:
+            start = int(request.args.get("start"))
+            end = int(request.args.get("end"))
+            result = get_single_alert_history(alert_id, start, end)
+            return jsonify({'history': result}), 200
+        except Exception as e:
+            raise BadRequest(e.message)
+    except KeyError:
+        # No alert_id passed, return "all alerts snapshot" for the given point in time
+        try:
+            when = int(request.args.get("timestamp"))
+            result = get_all_alerts(when)
+            return jsonify({'history': result}), 200
+        except Exception as e:
+            raise BadRequest(e.message)
 
 
 @app.route('/users')
