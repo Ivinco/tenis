@@ -210,7 +210,7 @@ def get_single_alert_history(alert_id, start, end):
     result = []
     with alerts_lock:
         cursor = app.db['history'].find({
-            '_id': bson.ObjectId(alert_id),
+            '_id': ObjectId(alert_id),
             'logged': {
                 '$gt': datetime.utcfromtimestamp(start - period * 60),
                 '$lte': datetime.utcfromtimestamp(end)

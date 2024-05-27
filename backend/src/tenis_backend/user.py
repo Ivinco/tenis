@@ -1,4 +1,3 @@
-import bson
 from bson import ObjectId
 from flask import current_app
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -38,7 +37,7 @@ class User:
 
     def get_by_id(self, user_id):
         """Get a user by id"""
-        user = self.db.users.find_one({"_id": bson.ObjectId(user_id), "active": True})
+        user = self.db.users.find_one({"_id": ObjectId(user_id), "active": True})
         if not user:
             return
         user["_id"] = str(user["_id"])
@@ -80,7 +79,7 @@ class User:
     def disable_account(self, user_id):
         """Disable a user account"""
         result = self.db.users.update_one(
-            {"_id": bson.ObjectId(user_id)},
+            {"_id": ObjectId(user_id)},
             {
                 "$set": {"active": False}
             }
@@ -94,7 +93,7 @@ class User:
     def enable_account(self, user_id):
         """Disable a user account"""
         result = self.db.users.update_one(
-            {"_id": bson.ObjectId(user_id)},
+            {"_id": ObjectId(user_id)},
             {
                 "$set": {"active": True}
             }
