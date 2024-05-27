@@ -18,7 +18,6 @@ function MainPage(){
     const isOpenedSideBar = useSelector(state => state.hiddenMenu.isOpenedSideBar)
     const modalContent = useSelector(state => state.switchModal.content)
     const isLoggedIn = useSelector(state => state.authReducer.isLogged)
-    const displayMode = useSelector(state => state.setDisplay.display)
     const setPortalParams = usePortalParam()
 
 

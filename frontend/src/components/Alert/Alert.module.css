@@ -174,9 +174,7 @@
     height: 100%;
     width: 52%;
     align-items: center;
-    justify-content: center;
     font-size: 1.2rem;
-    text-align: center;
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
@@ -215,8 +213,6 @@
     height: 100%;
     width: 52%;
     align-items: center;
-    justify-content: center;
-    text-align: center;
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;

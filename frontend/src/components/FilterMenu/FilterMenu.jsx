@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import styles from './FilterMenu.module.css'
 import {headerMenuItems} from "../../utils/vars";
 import HeaderMenuItem from "../HeaderMenuItem/HeaderMenuItem";
@@ -12,9 +12,22 @@ const FilterMenu = () => {
     const alerts = useSelector(state => state.webSocket.alerts)
     const [searchPhrase, setSearchPhrase] = useState('')
     const projects = useSelector(state => state.authReducer.user.userProjects)
+    const activeProject = useSelector(state => state.setHeaderMenuItemValue.project)
+    const grouping = useSelector(state => state.setHeaderMenuItemValue.grouping)
+    const inspectMode = useSelector(state => state.setHeaderMenuItemValue.inspectMode)
+    const [isSavedSettings, setIsSavedSettings] = useState(false)
     const menuItems = headerMenuItems.map((item, index) =>
         index === 0 ? { ...item, buttons: projects } : item
     );
+
+    useEffect(() => {
+        const userPreferences = {
+            inspectMode: inspectMode,
+            grouping: grouping,
+            project: activeProject,
+            isSavedSettings: isSavedSettings
+        }
+    }, [inspectMode, grouping, activeProject, isSavedSettings]);
 
     const submitAction = (searchString) => {
         const foundAlerts = []
@@ -35,6 +48,10 @@ const FilterMenu = () => {
         dispatch(setFoundAlerts(null))
         setSearchPhrase('')
     }
+
+
+
+
     return (
         <>
             <div className={`${styles.menuSpace} ${isOpened ? null : styles.menuClosed}`}>
@@ -72,12 +89,18 @@ const FilterMenu = () => {
                         )
 
                     }
+                    <li key="searchSeveTumbler"  className={styles.menuItem}>
+                        <label className={styles.settingsTumbler}>
+                            <input type="checkbox" className={styles.settingsSaver}/>
+                            <span className={styles.settingsSlider}/>
+                        </label>
+                    </li>
 
                 </ul>
             </div>
 
         </>
-);
+    );
 };
 
 export default FilterMenu;
