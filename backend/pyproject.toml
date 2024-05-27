@@ -28,7 +28,8 @@ dependencies = [
     "jsonschema >= 2.5",
     "apscheduler >= 3.10",
     "email-validator",
-    "flask-swagger-ui >= 4.11.1"
+    "flask-swagger-ui >= 4.11.1",
+    "flask-restx"
 ]
 [project.urls]
 Homepage = "https://github.com/Ivinco/tenis/backend"

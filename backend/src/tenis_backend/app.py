@@ -20,12 +20,18 @@ from .auth import create_token, token_required, token_required_ws, plugin_token_
 from .user import User
 from .json_validation import schema, silence_schema, user_schema, user_add_schema, user_update_schema, \
     history_request_schema, command_schema
+
 from flask_swagger_ui import get_swaggerui_blueprint
+from flask_restx import Api, Resource, Namespace
 
 # Global vars init
 app = Flask(__name__)
 CORS(app, supports_credentials=True)
 socketio = SocketIO(app, cors_allowed_origins="*")
+
+api = Api()
+api.init_app(app)
+ns = Namespace("api")
 
 # App configuration parameters
 mongo_host = os.getenv('MONGO_HOST', 'localhost')  # Default to 'localhost' if not set
@@ -225,16 +231,17 @@ def handle_exception(e):
 def index():
     return "Hello, world!\n", 200
 
-
-@app.route('/whoami')
+@ns.route("/whoami")
+#@app.route('/whoami')
 @token_required()  # note () are required!
-def whoami(user):
-    """ 
-    Method that just returns user's email
-    We use @token_required with no parameters, this is enough to make sure the user is authenticated
-    """
-    resp = make_response(jsonify(user=user))
-    return resp, 200
+class Whoami(Resource):
+    def whoami(user):
+        """ 
+        Method that just returns user's email
+        We use @token_required with no parameters, this is enough to make sure the user is authenticated
+        """
+        resp = make_response(jsonify(user=user))
+        return resp, 200
 
 
 @app.route('/cmd', methods=['POST'])
