@@ -849,8 +849,8 @@ def inbound():
             try:
                 for a in resolved_alerts:
                     alerts.remove(a)  # remove from global in-mem list
-            except ValueError:
-                pass
+            except ValueError as e:
+                raise InternalServerError("Failed to resolve an alert, possible project_name/plugin_id mismatch: %s" % e)
 
             try:
                 app.db['current'].delete_many({'_id': {'$in': resolved_ids}})
