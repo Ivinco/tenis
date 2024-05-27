@@ -64,11 +64,11 @@ export default function MainDisplay() {
         };
     }, []);
 
-    if(windowWidth > 2150 && isInspectMode){
+    if(windowWidth > 2150 && !isInspectMode){
         rowHeight = 95
-    } else if ((1150 < windowWidth && windowWidth <= 2150) && isInspectMode) {
+    } else if ((1150 < windowWidth && windowWidth <= 2150) && !isInspectMode) {
         rowHeight = 60
-    } else if (!isInspectMode){
+    } else if (isInspectMode){
         rowHeight = 32
     }
 
@@ -160,7 +160,7 @@ export default function MainDisplay() {
                         alertGroups.map(group => (
                             <div className={
                                 `${styles.groupWrapper} 
-                                ${isInspectMode ? null : styles.groupWrapper_small}`
+                                ${!isInspectMode ? null : styles.groupWrapper_small}`
                             } key={group.id}>
                                 <AlertGroup group={group} alertHeight={rowHeight}/>
                             </div>

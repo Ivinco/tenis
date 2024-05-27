@@ -9,11 +9,13 @@ const defaultActiveHeaderMenuItem = {
     activeHeaderMenuItem: null
 }
 
+const localPreferences = JSON.parse(localStorage.getItem('userPreferences'))
+
 const defaultHeaderMenuValues = {
-    project: 'All',
-    grouping: 'Disabled',
+    project: localPreferences ? localPreferences.project : 'All',
+    grouping: localPreferences ? localPreferences.grouping : 'Disabled',
     tz: 'Browser',
-    inspectMode: true
+    inspectMode: localPreferences ? localPreferences.inspectMode : false
 }
 
 

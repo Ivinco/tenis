@@ -167,15 +167,15 @@ const AlertGroup = ({group, alertHeight}) => {
     return (
         <div className={styles.groupSection} key={group.id}>
             <div
-                className={`${alertStyles.alertBody} ${styles.groupBody} ${isInspectMode ? null : alertStyles.alertBody_small && styles.groupBodyInspected}`}
+                className={`${alertStyles.alertBody} ${styles.groupBody} ${!isInspectMode ? null : alertStyles.alertBody_small && styles.groupBodyInspected}`}
                 style={{backgroundColor: alertBackground, color: fontColor, height: `${alertHeight * 0.9}px`, cursor: 'pointer'}}>
-                <div className={`${isInspectMode ? alertStyles.projectName : alertStyles.projectName_small}`}
+                <div className={`${!isInspectMode ? alertStyles.projectName : alertStyles.projectName_small}`}
                      onClick={e => onAlertClickHandler(e)}>{group.project[0].toUpperCase()}</div>
-                <div className={`${isInspectMode ? alertStyles.host : alertStyles.host_small} ${isInspectMode ? styles.alertsNumber : styles.alertsNumber_small}`}
+                <div className={`${!isInspectMode ? alertStyles.host : alertStyles.host_small} ${!isInspectMode ? styles.alertsNumber : styles.alertsNumber_small}`}
                      onClick={e => onAlertClickHandler(e)}>
                     {group.alerts.length}
                 </div>
-                <button className={`${isInspectMode ? alertStyles.responsibleUser : alertStyles.responsibleUser_small}`}
+                <button className={`${!isInspectMode ? alertStyles.responsibleUser : alertStyles.responsibleUser_small}`}
                      style={{backgroundImage: `url(${groupUserImage})`}}
                      onClick={e => {
                          e.preventDefault()
@@ -183,20 +183,20 @@ const AlertGroup = ({group, alertHeight}) => {
                      }}
                         disabled={displayMode===HISTORY_DISPLAY || displayMode===SILENCED_DISPLAY}
                 />
-                <div className={`${isInspectMode ? alertStyles.alertName : alertStyles.alertName_small}`}
+                <div className={`${!isInspectMode ? alertStyles.alertName : alertStyles.alertName_small}`}
                      onClick={e => onAlertClickHandler(e)}>{group.groupFactor}</div>
                 <div
-                    className={`${isInspectMode ? alertStyles.alertTime : alertStyles.alertTime_small}`}
+                    className={`${!isInspectMode ? alertStyles.alertTime : alertStyles.alertTime_small}`}
                     onClick={e => onAlertClickHandler(e)}>
                 </div>
-                <div className={`${isInspectMode ? styles.alertsGroupMessage : styles.alertsGroupMessage_small}`}
+                <div className={`${!isInspectMode ? styles.alertsGroupMessage : styles.alertsGroupMessage_small}`}
                      onClick={e => onAlertClickHandler(e)}>
                     {group.description}
                 </div>
                 <div
-                    className={`${alertStyles.silenceWindow} ${isEnabledSilenceWindow ? alertStyles.silenceWindowActive : alertStyles.silenceWindowDisabled} ${isInspectMode ? null : alertStyles.silenceWindow_small}`}>
+                    className={`${alertStyles.silenceWindow} ${isEnabledSilenceWindow ? alertStyles.silenceWindowActive : alertStyles.silenceWindowDisabled} ${!isInspectMode ? null : alertStyles.silenceWindow_small}`}>
                     <input type="text"
-                           className={`${alertStyles.silenceDuration} ${isInspectMode ? null : alertStyles.silenceDuration_small}`}
+                           className={`${alertStyles.silenceDuration} ${!isInspectMode ? null : alertStyles.silenceDuration_small}`}
                            placeholder="duration mins."
                            id={`duration_${group.id}`}
                            ref={groupDurationRef}
@@ -204,7 +204,7 @@ const AlertGroup = ({group, alertHeight}) => {
                            onChange={e => setSilenceDuration(e.target.value)}
                     />
                     <input type="text"
-                        className={`${alertStyles.silenceComment} ${isInspectMode ? null : alertStyles.silenceComment_small}`}
+                        className={`${alertStyles.silenceComment} ${!isInspectMode ? null : alertStyles.silenceComment_small}`}
                         placeholder="comment"
                         id={`comment_${group.id}`}
                         ref={groupCommentRef}
@@ -212,7 +212,7 @@ const AlertGroup = ({group, alertHeight}) => {
                         onChange={e => setSilenceComment(e.target.value)}
                     />
                     <button disabled={!isEnabledSilenceButton}
-                            className={`${isEnabledSilenceButton ? alertStyles.silenceButtonEnabled : alertStyles.silenceButtonDisabled} ${alertStyles.silenceButton} ${isInspectMode ? null : alertStyles.silenceButton_small}`}
+                            className={`${isEnabledSilenceButton ? alertStyles.silenceButtonEnabled : alertStyles.silenceButtonDisabled} ${alertStyles.silenceButton} ${!isInspectMode ? null : alertStyles.silenceButton_small}`}
                             onClick={(e) => {
                                 e.preventDefault()
                                 submitSilenceGroup()
@@ -223,7 +223,7 @@ const AlertGroup = ({group, alertHeight}) => {
                 </div>
                 {displayMode === MAIN_DISPLAY
                     ? <div
-                        className={`${isInspectMode ? alertStyles.controlButton : alertStyles.controlButton_small} ${alertStyles.silence} ${commonStyles.buttonHint}`}
+                        className={`${!isInspectMode ? alertStyles.controlButton : alertStyles.controlButton_small} ${alertStyles.silence} ${commonStyles.buttonHint}`}
                         data-tooltip="silence group"
                         onClick={(e) => {
                             e.preventDefault()
@@ -233,11 +233,11 @@ const AlertGroup = ({group, alertHeight}) => {
                     : null
                 }
                 <div
-                    className={`${isInspectMode ? alertStyles.controlButton : alertStyles.controlButton_small} ${alertStyles.refresh} ${commonStyles.buttonHint}`}
+                    className={`${!isInspectMode ? alertStyles.controlButton : alertStyles.controlButton_small} ${alertStyles.refresh} ${commonStyles.buttonHint}`}
                     data-tooltip="recheck group"
                 />
                 <div
-                    className={`${isInspectMode ? alertStyles.controlButton : alertStyles.controlButton_small} ${alertStyles.info} ${styles.tempHiddenButton}`}/>
+                    className={`${!isInspectMode ? alertStyles.controlButton : alertStyles.controlButton_small} ${alertStyles.info} ${styles.tempHiddenButton}`}/>
 
             </div>
             <div className={`${styles.alertBlock} ${isAlertsBlockOpened ? styles.alertBlockHidden : ''}`}
