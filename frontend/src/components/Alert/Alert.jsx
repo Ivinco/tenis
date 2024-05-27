@@ -137,15 +137,15 @@ const Alert = ({alert}) => {
 
 
     return (
-        <div className={`${isInspectMode ? styles.alertBody : styles.alertBody_small}`} key={alert._id}
+        <div className={`${!isInspectMode ? styles.alertBody : styles.alertBody_small}`} key={alert._id}
              style={{backgroundColor: alertBackground, color: fontColor}}
         >
             <div
-                className={`${isInspectMode ? styles.projectName : styles.projectName_small}`}>{alert.project[0].toUpperCase()}</div>
-            <div className={`${isInspectMode ? styles.host : styles.host_small}`}>
+                className={`${!isInspectMode ? styles.projectName : styles.projectName_small}`}>{alert.project[0].toUpperCase()}</div>
+            <div className={`${!isInspectMode ? styles.host : styles.host_small}`}>
                 <p className={styles.textFields}>{alert.host}</p>
             </div>
-            <button className={`${isInspectMode ? styles.responsibleUser : styles.responsibleUser_small} ${commonStyles.buttonHint}`}
+            <button className={`${!isInspectMode ? styles.responsibleUser : styles.responsibleUser_small} ${commonStyles.buttonHint}`}
                  style={{
                      backgroundImage: `url(${alert.responsibleUser
                          ? `https://gravatar.com/avatar/${sha256(alert.responsibleUser)}?s=150`
@@ -158,23 +158,23 @@ const Alert = ({alert}) => {
                  }}
                     disabled={displayMode===HISTORY_DISPLAY || displayMode===SILENCED_DISPLAY}
             />
-            <div className={`${isInspectMode ? styles.alertName : styles.alertName_small}`}>
+            <div className={`${!isInspectMode ? styles.alertName : styles.alertName_small}`}>
                 <p className={styles.textFields}>{alert.alertName}</p>
             </div>
             <div
-                className={`${isInspectMode ? styles.alertTime : styles.alertTime_small}`}>{processTimeStamp(alert.fired)}</div>
-            <div className={`${isInspectMode ? styles.message : styles.message_small}`} data-tooltip={alert.msg}>
+                className={`${!isInspectMode ? styles.alertTime : styles.alertTime_small}`}>{processTimeStamp(alert.fired)}</div>
+            <div className={`${!isInspectMode ? styles.message : styles.message_small}`} data-tooltip={alert.msg}>
                 <p className={styles.textFields}>{alert.msg}</p>
             </div>
-            <div className={`${styles.silenceWindow} ${isEnabledSilenceWindow ? styles.silenceWindowActive : styles.silenceWindowDisabled} ${isInspectMode ? null : styles.silenceWindow_small}`} >
-                <input type="text" className={`${styles.silenceDuration} ${isInspectMode ? null : styles.silenceDuration_small}`}
+            <div className={`${styles.silenceWindow} ${isEnabledSilenceWindow ? styles.silenceWindowActive : styles.silenceWindowDisabled} ${!isInspectMode ? null : styles.silenceWindow_small}`} >
+                <input type="text" className={`${styles.silenceDuration} ${!isInspectMode ? null : styles.silenceDuration_small}`}
                        placeholder="duration mins."
                        id={`duration_${alert._id}`}
                        ref={durationRef}
                        onKeyDown={handleKeyDown}
                        onChange={ e => setSilenceDuration(e.target.value)}
                 />
-                <input type="text" className={`${styles.silenceComment} ${isInspectMode ? null : styles.silenceComment_small}`}
+                <input type="text" className={`${styles.silenceComment} ${!isInspectMode ? null : styles.silenceComment_small}`}
                           placeholder="comment"
                           id={`comment_${alert._id}`}
                           ref={commentRef}
@@ -182,7 +182,7 @@ const Alert = ({alert}) => {
                           onChange={e => setSilenceComment(e.target.value)}
                 />
                 <button disabled={!isEnabledSilenceButton}
-                        className={`${ isEnabledSilenceButton ? styles.silenceButtonEnabled : styles.silenceButtonDisabled} ${styles.silenceButton} ${isInspectMode ? null : styles.silenceButton_small}`}
+                        className={`${ isEnabledSilenceButton ? styles.silenceButtonEnabled : styles.silenceButtonDisabled} ${styles.silenceButton} ${!isInspectMode ? null : styles.silenceButton_small}`}
                         onClick={(e) => {
                             e.preventDefault()
                             submitSilenceAlert()
@@ -192,7 +192,7 @@ const Alert = ({alert}) => {
                 </button>
             </div>
             {displayMode === MAIN_DISPLAY
-                ? <button className={`${isInspectMode ? styles.controlButton : styles.controlButton_small} ${styles.silence} ${commonStyles.buttonHint}`}
+                ? <button className={`${!isInspectMode ? styles.controlButton : styles.controlButton_small} ${styles.silence} ${commonStyles.buttonHint}`}
                   data-tooltip="silence alert"
                           onClick={e => {
                       e.preventDefault()
@@ -201,10 +201,10 @@ const Alert = ({alert}) => {
                 />
             : null
             }
-            <button className={`${isInspectMode ? styles.controlButton : styles.controlButton_small} ${styles.refresh} ${commonStyles.buttonHint}`}
+            <button className={`${!isInspectMode ? styles.controlButton : styles.controlButton_small} ${styles.refresh} ${commonStyles.buttonHint}`}
             data-tooltip="recheck alert"
             />
-            <button className={`${isInspectMode ? styles.controlButton : styles.controlButton_small} ${styles.info}  ${commonStyles.buttonHint}`}
+            <button className={`${!isInspectMode ? styles.controlButton : styles.controlButton_small} ${styles.info}  ${commonStyles.buttonHint}`}
                     data-tooltip="alert info"
                  onClick={(e) => {
                      e.preventDefault()

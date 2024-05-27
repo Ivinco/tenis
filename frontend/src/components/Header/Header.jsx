@@ -91,7 +91,7 @@ const Header = () => {
 
                 <button
                     className={`${styles.funcButton} ${styles.inspectButton} ${isLogged ? styles.funcButtonEnabled : null} ${commonStyles.buttonHint}`}
-                    style={!isInspectMode ? {backgroundColor: "#a0f1e2"} : {}}
+                    style={isInspectMode ? {backgroundColor: "#a0f1e2"} : {}}
                     data-tooltip="inspect mode"
                     disabled={!isLogged}
                     onClick={(e) => {

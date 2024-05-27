@@ -15,19 +15,26 @@ const FilterMenu = () => {
     const activeProject = useSelector(state => state.setHeaderMenuItemValue.project)
     const grouping = useSelector(state => state.setHeaderMenuItemValue.grouping)
     const inspectMode = useSelector(state => state.setHeaderMenuItemValue.inspectMode)
-    const [isSavedSettings, setIsSavedSettings] = useState(false)
+    const [ifSavedSettings, setIfSavedSettings] = useState(false)
+
+    useEffect(() => {
+        const savedPreferences = JSON.parse(localStorage.getItem("userPreferences"));
+        if (savedPreferences && savedPreferences.isSavedSettings) {
+            setIfSavedSettings(true);
+        }
+    }, []);
+
     const menuItems = headerMenuItems.map((item, index) =>
         index === 0 ? { ...item, buttons: projects } : item
     );
 
-    useEffect(() => {
-        const userPreferences = {
-            inspectMode: inspectMode,
-            grouping: grouping,
-            project: activeProject,
-            isSavedSettings: isSavedSettings
-        }
-    }, [inspectMode, grouping, activeProject, isSavedSettings]);
+
+    const preferences = {
+        inspectMode: inspectMode,
+        grouping: grouping,
+        project: activeProject,
+        isSavedSettings: ifSavedSettings
+    }
 
     const submitAction = (searchString) => {
         const foundAlerts = []
@@ -49,7 +56,20 @@ const FilterMenu = () => {
         setSearchPhrase('')
     }
 
+    const handleSaveSettingsCheckbox = (event ) => {
+        const newChecked = !ifSavedSettings
+        setIfSavedSettings(newChecked)
 
+        if (newChecked) {
+            const newPreferences = {
+                ...preferences,
+                isSavedSettings: newChecked
+            };
+            localStorage.setItem('userPreferences',JSON.stringify(newPreferences))
+        } else {
+            localStorage.removeItem('userPreferences')
+        }
+    }
 
 
     return (
@@ -91,7 +111,10 @@ const FilterMenu = () => {
                     }
                     <li key="searchSeveTumbler"  className={styles.menuItem}>
                         <label className={styles.settingsTumbler}>
-                            <input type="checkbox" className={styles.settingsSaver}/>
+                            <input type="checkbox" className={styles.settingsSaver}
+                                   checked={ifSavedSettings}
+                                   onChange={e  => handleSaveSettingsCheckbox(e)}
+                            />
                             <span className={styles.settingsSlider}/>
                         </label>
                     </li>
