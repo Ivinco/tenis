@@ -143,7 +143,7 @@ function SilenceWindow() {
         <div className={style.silenceBody}>
             <div className={modalHeaderStyles.alertHeader}>
                 <div className={modalHeaderStyles.alertLogo}/>
-                <div className={modalHeaderStyles.alertTitle}> Silenced Alerts</div>
+                <div className={modalHeaderStyles.alertTitle}> Silence Rules</div>
             </div>
             <div className={style.silenceContent}>
                 <div className={style.silenceForm}>

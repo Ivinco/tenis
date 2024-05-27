@@ -32,4 +32,14 @@ export default class AlertService {
         };
         return api.get ('/history', config)
     }
+
+    static async getAlertHistory (params) {
+        const config = {
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            params: params
+        }
+        return api.get ('/history', config)
+    }
 }
