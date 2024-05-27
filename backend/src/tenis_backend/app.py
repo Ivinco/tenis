@@ -515,23 +515,23 @@ def history(user):
     Method to get all active alerts on requested timestamp
     """
     try:
-        # got alert_id, should send history for the given alert only
         alert_id = request.args.get("alert_id")
-        try:
-            start = int(request.args.get("start"))
-            end = int(request.args.get("end"))
-            result = get_single_alert_history(alert_id, start, end)
-            return jsonify({'history': result}), 200
-        except Exception as e:
-            raise BadRequest(e.message)
-    except KeyError:
-        # No alert_id passed, return "all alerts snapshot" for the given point in time
+    except KeyError: # No alert_id passed, return "all alerts snapshot" for the given point in time
         try:
             when = int(request.args.get("timestamp"))
             result = get_all_alerts(when)
             return jsonify({'history': result}), 200
         except Exception as e:
             raise BadRequest(e.message)
+
+    # Ok, got alert_id, should send history for the given alert only
+    try:
+        start = int(request.args.get("start"))
+        end = int(request.args.get("end"))
+        result = get_single_alert_history(alert_id, start, end)
+        return jsonify({'history': result}), 200
+    except Exception as e:
+        raise BadRequest(e.message)
 
 
 @app.route('/users')
