@@ -298,6 +298,7 @@ def add_events(project, event, events, pid, objects):
 def recheck(command, cmd):
     """
     Schedule force recheck for service or host
+
     :param command: { 'cmd': 'command_name', 'host': 'host_name', 'alertName': 'alert_name' }
     :param cmd: Path to the Nagios' command file
     :return: nothing
@@ -362,11 +363,11 @@ def main():
     load_objects(obj, objects)
     dump = {'update': [], 'resolve': []}
     events = {'update': [], 'resolve': []}
+    alerts = parse_status_dat(dat, args.project, args.pid, objects)
+    if alerts:
+        events['update'].extend(alerts)
 
     while 1:  # Main loop to reopen nagios.log file if it was recreated
-        alerts = parse_status_dat(dat, args.project, args.pid, objects)
-        if alerts:
-            events['update'].extend(alerts)
         while not os.path.exists(log):  # wait until log file is ready
             sleep(1)
 
@@ -442,11 +443,15 @@ def main():
                             if command['cmd'] == 'recheck':
                                 recheck(command, cmd)
 
-                        if len(t_alerts) < len(n_alerts):
+                        if t_alerts != n_alerts:
                             for item in n_alerts:
-                                tmp = [z for z in t_alerts if z['host'] == item['host'] and z['alertName'] == item['alertName']]
+                                tmp = [z for z in t_alerts
+                                       if z['host'] == item['host']
+                                       and z['alertName'] == item['alertName']
+                                       and z['msg'] == item['msg']]
                                 if not tmp:
                                     events['update'].append(item)
+
                         for item in t_alerts:
                             event = {
                                 'name': item['alertName'],
@@ -459,7 +464,9 @@ def main():
                             if not n_alerts:
                                 add_events(args.project, event, events['resolve'], args.pid, objects)
                             else:
-                                tmp = [z for z in n_alerts if z['host'] == item['host'] and z['alertName'] == item['alertName']]
+                                tmp = [z for z in n_alerts
+                                       if z['host'] == item['host']
+                                       and z['alertName'] == item['alertName']]
                                 if not tmp:
                                     add_events(args.project, event, events['resolve'], args.pid, objects)
                     except Exception as e:  # Logg all errors
