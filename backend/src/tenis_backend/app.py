@@ -203,7 +203,10 @@ def get_single_alert_history(alert_id, start, end):
     :param start: UNIX timestamp, start of the history interval
     :param end: UNIX timestamp, end of the history interval
     """
-    period = app.config['HISTORY_PERIOD_MINUTES', 60]
+    try:
+        period = int(app.config['HISTORY_PERIOD_MINUTES'])
+    except KeyError:
+        period = 60
     result = []
     with alerts_lock:
         cursor = app.db['history'].find({
