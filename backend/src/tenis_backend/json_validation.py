@@ -139,7 +139,7 @@ silence_schema = {
 # JSON schema to validate inbound plugin command JSON
 command_schema = {
     "type": "array",
-    "maxItems": 3,
+    "maxItems": 1000,
     "additionalProperties": False,
     "items": {
         "type": "array",
