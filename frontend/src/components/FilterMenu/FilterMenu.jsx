@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import styles from './FilterMenu.module.css'
+import commonStyles from '../../styles/common.module.css'
 import {headerMenuItems} from "../../utils/vars";
 import HeaderMenuItem from "../HeaderMenuItem/HeaderMenuItem";
 import {useDispatch, useSelector} from "react-redux";
@@ -112,10 +113,11 @@ const FilterMenu = () => {
                     <li key="searchSeveTumbler"  className={styles.menuItem}>
                         <label className={styles.settingsTumbler}>
                             <input type="checkbox" className={styles.settingsSaver}
+                                   data-tooltip="save preferences"
                                    checked={ifSavedSettings}
                                    onChange={e  => handleSaveSettingsCheckbox(e)}
                             />
-                            <span className={styles.settingsSlider}/>
+                            <span className={`${styles.settingsSlider} ${commonStyles.buttonHint}`} data-tooltip="save preferences"/>
                         </label>
                     </li>
 
