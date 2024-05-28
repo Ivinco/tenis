@@ -11,10 +11,28 @@
     border-radius: 5px;
     visibility: hidden;
     opacity: 0;
-    transition: visibility 0s, opacity 0.5s ease 1s;
+    transition: visibility 0s, opacity 1s ease 1.7s;
 }
 
 .buttonHint:hover::after {
     visibility: visible;
     opacity: 1;
+}
+
+
+.rotatedIcon {
+    opacity: 0.5;
+    animation: rotation 0.5s infinite linear;
+}
+
+
+
+
+@keyframes rotation {
+    0% {
+        rotate: 0;
+    }
+    100% {
+        rotate: 180deg;
+    }
 }

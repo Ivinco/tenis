@@ -6,7 +6,7 @@ import {useDispatch, useSelector} from "react-redux";
 import Alert from "../Alert/Alert";
 import {sha256} from "js-sha256";
 import AlertService from "../../services/AlertService";
-import {setModalError} from "../../store/reducers/modalReducer";
+import {openModal, setModalError} from "../../store/reducers/modalReducer";
 import {HISTORY_DISPLAY, MAIN_DISPLAY, SILENCED_DISPLAY} from "../../store/actions/DISPLAY_ACTIONS";
 
 const AlertGroup = ({group, alertHeight}) => {
@@ -20,8 +20,10 @@ const AlertGroup = ({group, alertHeight}) => {
     const [isAlertsBlockOpened, setIsAlertBlockOpened] = useState('false')
     const [isEnabledSilenceWindow, setEnabledSilenceWindow] = useState(false)
     const [isEnabledSilenceButton, setEnabledSilenceButton] = useState(false)
+    const isRecheckAllAlerts = useSelector(state => state.setAlertReducer.recheckAllAlerts)
     const [silenceDuration, setSilenceDuration] = useState(undefined)
     const [silenceComment, setSilenceComment] = useState(null)
+    const [isRecheck, setIsRecheck] = useState(false)
 
     let alertBackground
     let fontColor
@@ -110,6 +112,27 @@ const AlertGroup = ({group, alertHeight}) => {
         catch (e) {
             dispatch(setModalError("Oops. Something went wrong. Please, try a bit later"))
         }
+    }
+
+    const onRecheckClick = async () => {
+        setIsRecheck(true)
+
+        //Delay for animation
+        const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
+        await delay(1000);
+
+        let recheckList = []
+        group.alerts.forEach(alert => {
+            recheckList.push(["recheck", alert._id])
+        })
+        try {
+            await AlertService.refreshAlerts(recheckList)
+        }
+        catch (e) {
+            dispatch(openModal())
+            dispatch(setModalError(e.response.data.name))
+        }
+        setIsRecheck(false)
     }
 
 
@@ -233,8 +256,12 @@ const AlertGroup = ({group, alertHeight}) => {
                     : null
                 }
                 <div
-                    className={`${!isInspectMode ? alertStyles.controlButton : alertStyles.controlButton_small} ${alertStyles.refresh} ${commonStyles.buttonHint}`}
+                    className={`${!isInspectMode ? alertStyles.controlButton : alertStyles.controlButton_small} ${alertStyles.refresh} ${commonStyles.buttonHint} ${isRecheckAllAlerts || isRecheck ? commonStyles.rotatedIcon : null}`}
                     data-tooltip="recheck group"
+                    onClick={(e) => {
+                        e.preventDefault()
+                        onRecheckClick()
+                    }}
                 />
                 <div
                     className={`${!isInspectMode ? alertStyles.controlButton : alertStyles.controlButton_small} ${alertStyles.info} ${styles.tempHiddenButton}`}/>
@@ -245,7 +272,7 @@ const AlertGroup = ({group, alertHeight}) => {
                 {
                     group.alerts.map(alert => (
                         <div style={{height: `${alertHeight}px`}}>
-                            <Alert alert={alert}/>
+                            <Alert alert={alert} isGroupRecheck={isRecheck}/>
                         </div>
                     ))
                 }

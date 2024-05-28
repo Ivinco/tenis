@@ -11,14 +11,17 @@ import {switchInspectMode} from "../../store/reducers/headerMenuReducer";
 import AlertService from "../../services/AlertService";
 import {setSilenceRules} from "../../store/reducers/silenceRulesReducer";
 import usePortalParam from "../../hooks/usePortalParam";
+import {recheckAllAlerts} from "../../store/reducers/alertReducer";
 
 const Header = () => {
     const dispatch = useDispatch()
     const isLogged = useSelector(state => state.authReducer.isLogged)
     const userInfo = useSelector(state => state.authReducer.user)
     const alerts = useSelector(state => state.setAlertReducer.alertsNumber)
+    const alertList = useSelector(state => state.webSocket.alerts)
     const isInspectMode = useSelector(state => state.setHeaderMenuItemValue.inspectMode)
     const setPortalParams = usePortalParam()
+    const isRecheckAlerts = useSelector(state => state.setAlertReducer.recheckAllAlerts)
 
     const onAvatarClick = (e) => {
         e.preventDefault()
@@ -55,6 +58,29 @@ const Header = () => {
         dispatch(setSilenceRules(rules))
         setPortalParams("silenceRules")
         dispatch(openModal())
+    }
+
+    const onRecheckClick = async () => {
+        dispatch(recheckAllAlerts(true))
+
+        //Delay for animation
+        const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
+        await delay(1000);
+
+        const recheckList = []
+        alertList.forEach(alert => {
+            recheckList.push(["recheck", alert._id])
+        })
+
+        try {
+            await AlertService.refreshAlerts(recheckList)
+        }
+        catch (e) {
+            dispatch(openModal())
+            dispatch(setModalError(e.response.data.name))
+        }
+        dispatch(recheckAllAlerts(false))
+
     }
 
     return (
@@ -101,8 +127,12 @@ const Header = () => {
                 />
 
                 <button
-                    className={`${styles.funcButton} ${styles.refreshButton} ${isLogged ? styles.funcButtonEnabled : null} ${commonStyles.buttonHint}`}
+                    className={`${styles.funcButton} ${styles.refreshButton} ${isLogged ? styles.funcButtonEnabled : null} ${commonStyles.buttonHint} ${isRecheckAlerts ? commonStyles.rotatedIcon : null}`}
                     data-tooltip="recheck all alerts"
+                    onClick={e => {
+                        e.preventDefault()
+                        onRecheckClick()
+                    }}
                 />
 
                 <button

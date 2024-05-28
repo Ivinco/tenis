@@ -53,8 +53,7 @@ const Modal = (content) => {
                     <button className={styles.closeButton}
                     onClick={(e) => onClose()}
                     />
-                    { modalMessage && <ErrorMessage message={modalMessage}/> }
-                    {/*{(modalContent === LOGIN_MODAL || portalParam === 'login') && <AuthForm/>}*/}
+                    {modalMessage && <ErrorMessage message={modalMessage}/> }
                     {portalParam === 'login' && <AuthForm/>}
                     {alertParam && <AlertsDetails/>}
                     {portalParam === 'userInfo' && <UserInfo/>}

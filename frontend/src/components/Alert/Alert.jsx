@@ -9,8 +9,9 @@ import {sha256} from "js-sha256";
 import AlertService from "../../services/AlertService";
 import {HISTORY_DISPLAY, MAIN_DISPLAY, SILENCED_DISPLAY} from "../../store/actions/DISPLAY_ACTIONS";
 import { useSearchParams } from "react-router-dom";
+import usePortalParam from "../../hooks/usePortalParam";
 
-const Alert = ({alert}) => {
+const Alert = ({alert, isGroupRecheck}) => {
     const [searchParams, setSearchParams] = useSearchParams();
     const dispatch = useDispatch()
     const isInspectMode = useSelector(state => state.setHeaderMenuItemValue.inspectMode)
@@ -19,10 +20,12 @@ const Alert = ({alert}) => {
     const durationRef = useRef(null)
     const commentRef = useRef(null)
 
+    const isRecheckAlerts = useSelector(state => state.setAlertReducer.recheckAllAlerts)
     const [isEnabledSilenceWindow, setEnabledSilenceWindow] = useState(false)
     const [isEnabledSilenceButton, setEnabledSilenceButton] = useState(false)
     const [silenceDuration, setSilenceDuration] = useState(undefined)
     const [silenceComment, setSilenceComment] = useState(null)
+    const [isRefresh, setIsRefresh] = useState(false)
 
 
 
@@ -62,9 +65,28 @@ const Alert = ({alert}) => {
             }
         }
         catch (e) {
+
             dispatch(setModalError("Oops. Something went wrong. Please, try a bit later"))
         }
     }
+
+    const onRecheckHandle = async () => {
+        setIsRefresh(true)
+
+        //Delay for animation
+        const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
+        await delay(1000);
+        try {
+            await AlertService.refreshAlerts([["recheck", alert._id]])
+        }
+        catch (e) {
+            dispatch(openModal())
+            dispatch(setModalError(e.response.data.name))
+        }
+
+        setIsRefresh(false)
+    }
+
 
     const handleKeyDown = (e) => {
         if (e.keyCode === 13) {
@@ -201,8 +223,12 @@ const Alert = ({alert}) => {
                 />
             : null
             }
-            <button className={`${!isInspectMode ? styles.controlButton : styles.controlButton_small} ${styles.refresh} ${commonStyles.buttonHint}`}
+            <button className={`${!isInspectMode ? styles.controlButton : styles.controlButton_small} ${styles.refresh} ${commonStyles.buttonHint} ${isRecheckAlerts ||isGroupRecheck || isRefresh ? commonStyles.rotatedIcon : null}`}
             data-tooltip="recheck alert"
+                    onClick={event => {
+                        event.preventDefault()
+                        onRecheckHandle()
+                    }}
             />
             <button className={`${!isInspectMode ? styles.controlButton : styles.controlButton_small} ${styles.info}  ${commonStyles.buttonHint}`}
                     data-tooltip="alert info"
