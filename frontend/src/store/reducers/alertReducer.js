@@ -1,4 +1,6 @@
-import {DETAILED_ALERT, SET_ALERTS_NUMBER, SET_FOUND_ALERTS} from "../actions/ALERT_ACTIONS";
+import {DETAILED_ALERT, RECHECK_ALL_ALERTS, SET_ALERTS_NUMBER, SET_FOUND_ALERTS} from "../actions/ALERT_ACTIONS";
+import {REMOVE_ALERTS} from "../actions/WEBSOCKET_ACTIONS";
+import {type} from "@testing-library/user-event/dist/type";
 
 const defaultdAlert = {
 alert: {
@@ -15,7 +17,8 @@ alert: {
     customField: {}
     },
     alertsNumber: 0,
-    foundAlerts: null
+    foundAlerts: null,
+    recheckAllAlerts: false,
 }
 
 export const alertReducer = (state = defaultdAlert, action) => {
@@ -26,6 +29,8 @@ export const alertReducer = (state = defaultdAlert, action) => {
             return {...state, alertsNumber: action.payload}
         case SET_FOUND_ALERTS:
             return {...state, foundAlerts: action.payload}
+        case RECHECK_ALL_ALERTS:
+            return {...state, recheckAllAlerts: action.payload}
         default:
             return state
     }
@@ -44,4 +49,9 @@ export const setAlertsNumber = (number) => ({
 export const setFoundAlerts = (alerts) => ({
     type: SET_FOUND_ALERTS,
     payload: alerts
+})
+
+export const recheckAllAlerts = (state) => ({
+    type: RECHECK_ALL_ALERTS,
+    payload: state
 })

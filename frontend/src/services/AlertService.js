@@ -42,4 +42,8 @@ export default class AlertService {
         }
         return api.get ('/history', config)
     }
+
+    static async refreshAlerts (payload) {
+        return api.post('/cmd', payload)
+    }
 }
