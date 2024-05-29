@@ -441,6 +441,8 @@ def main():
 
                         for command in commands:
                             if command['cmd'] == 'recheck':
+                                if args.debug:
+                                    print(command)
                                 recheck(command, cmd)
 
                         if t_alerts != n_alerts:
