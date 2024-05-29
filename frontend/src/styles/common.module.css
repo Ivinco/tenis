@@ -11,7 +11,7 @@
     border-radius: 5px;
     visibility: hidden;
     opacity: 0;
-    transition: visibility 0s, opacity 1s ease 1.7s;
+    transition: visibility 0s, opacity 1s ease 1.5s;
 }
 
 .buttonHint:hover::after {

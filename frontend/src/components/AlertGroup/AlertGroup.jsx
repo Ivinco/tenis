@@ -256,7 +256,7 @@ const AlertGroup = ({group, alertHeight}) => {
                     : null
                 }
                 <div
-                    className={`${!isInspectMode ? alertStyles.controlButton : alertStyles.controlButton_small} ${alertStyles.refresh} ${commonStyles.buttonHint} ${isRecheckAllAlerts || isRecheck ? commonStyles.rotatedIcon : null}`}
+                    className={`${!isInspectMode ? alertStyles.controlButton : alertStyles.controlButton_small} ${alertStyles.refresh} ${isRecheckAllAlerts || isRecheck ? commonStyles.rotatedIcon : commonStyles.buttonHint}`}
                     data-tooltip="recheck group"
                     onClick={(e) => {
                         e.preventDefault()
