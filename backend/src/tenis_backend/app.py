@@ -237,6 +237,19 @@ def whoami(user):
     return resp, 200
 
 
+def add_recheck_cmd(alerts_list):
+    for alert in alerts_list:
+        try:
+            commands[alert['plugin_id']]
+        except KeyError:
+            commands[alert['plugin_id']] = []
+        commands[alert['plugin_id']].append({
+            'cmd': 'recheck',
+            'host': alert['host'],
+            'alertName': alert['alertName'],
+        })
+
+
 @app.route('/cmd', methods=['POST'])
 @token_required()  # note () are required!
 def cmd(user):
@@ -253,18 +266,17 @@ def cmd(user):
 
     for item in data:
         cmd, alert_id = item
-        for alert in alerts:
-            if str(alert['_id']) == alert_id:
-                try:
-                    commands[alert['plugin_id']]
-                except KeyError:
-                    commands[alert['plugin_id']] = []
-                commands[alert['plugin_id']].append({
-                    'cmd': cmd,
-                    'host': alert['host'],
-                    'alertName': alert['alertName'],
-                })
-                break
+        if cmd == 'recheck_all':
+            add_recheck_cmd(alerts)
+        elif cmd == 'recheck_host':
+            filtered_alerts = [a for a in alerts if a['host'] == alert_id]
+            add_recheck_cmd(filtered_alerts)
+        elif cmd == 'recheck_alert':
+            filtered_alerts = [a for a in alerts if a['alertName'] == alert_id]
+            add_recheck_cmd(filtered_alerts)
+        else:
+            filtered_alerts = [a for a in alerts if str(a['_id']) == alert_id]
+            add_recheck_cmd(filtered_alerts)
 
     return "OK", 200
 
