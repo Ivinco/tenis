@@ -223,7 +223,7 @@ const Alert = ({alert, isGroupRecheck}) => {
                 />
             : null
             }
-            <button className={`${!isInspectMode ? styles.controlButton : styles.controlButton_small} ${styles.refresh} ${commonStyles.buttonHint} ${isRecheckAlerts ||isGroupRecheck || isRefresh ? commonStyles.rotatedIcon : null}`}
+            <button className={`${!isInspectMode ? styles.controlButton : styles.controlButton_small} ${styles.refresh}  ${isRecheckAlerts ||isGroupRecheck || isRefresh ? commonStyles.rotatedIcon : commonStyles.buttonHint}`}
             data-tooltip="recheck alert"
                     onClick={event => {
                         event.preventDefault()

@@ -127,7 +127,7 @@ const Header = () => {
                 />
 
                 <button
-                    className={`${styles.funcButton} ${styles.refreshButton} ${isLogged ? styles.funcButtonEnabled : null} ${commonStyles.buttonHint} ${isRecheckAlerts ? commonStyles.rotatedIcon : null}`}
+                    className={`${styles.funcButton} ${styles.refreshButton} ${isLogged ? styles.funcButtonEnabled : null} ${isRecheckAlerts ? commonStyles.rotatedIcon : commonStyles.buttonHint}`}
                     data-tooltip="recheck all alerts"
                     onClick={e => {
                         e.preventDefault()
