@@ -30,6 +30,7 @@ const AlertGroup = ({group, alertHeight}) => {
     let silenceRule
     let silenceRuleHost = ""
     let silenceRuleAlertName = ""
+    let recheckRequest = []
 
     useEffect(() => {
         if (silenceComment && silenceComment.length > 4){
@@ -116,17 +117,14 @@ const AlertGroup = ({group, alertHeight}) => {
 
     const onRecheckClick = async () => {
         setIsRecheck(true)
+        console.log(recheckRequest)
 
         //Delay for animation
         const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
         await delay(1000);
 
-        let recheckList = []
-        group.alerts.forEach(alert => {
-            recheckList.push(["recheck", alert._id])
-        })
         try {
-            await AlertService.refreshAlerts(recheckList)
+            await AlertService.refreshAlerts([recheckRequest])
         }
         catch (e) {
             dispatch(openModal())
@@ -136,13 +134,15 @@ const AlertGroup = ({group, alertHeight}) => {
     }
 
 
-    //Check groupfactor
+    //define group factor related settings
     if (group.groupFactor.startsWith('Host:')){
         silenceRuleHost = group.groupFactor.substring('Host: '.length);
+        recheckRequest = ["recheck_host", group.alerts[0].host]
     }
 
     if (group.groupFactor.startsWith('Alert Name:')){
         silenceRuleAlertName = group.groupFactor.substring('Alert Name: '.length);
+        recheckRequest = ["recheck_host", group.alerts[0].alertName]
     }
 
     const handleSilenceButton = () => {
