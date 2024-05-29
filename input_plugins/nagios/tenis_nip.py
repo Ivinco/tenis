@@ -308,7 +308,7 @@ def recheck(command, cmd):
     if command['alertName'] == 'HOST DOWN':
         nag_cmd = f"[{ts}] SCHEDULE_FORCED_HOST_CHECK;{command['host']};{ts}\n"
 
-    with open(cmd, 'a') as cmd_file:
+    with open(cmd, 'w') as cmd_file:
         cmd_file.write(nag_cmd)
 
 
