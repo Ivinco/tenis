@@ -33,6 +33,77 @@
     border: #01a2d8 2px solid;
 }
 
+.searchForm {
+    display: flex;
+    height: 50px;
+    margin: auto auto 0 20px;
+    padding: 2px 4px 2px 2px;
+    border: #01A2D8 2px solid;
+    border-radius: 10px;
+    background-color: white;
+}
+
+.searchField {
+    height: 50px;
+    width: 420px;
+    margin: 0;
+    border: none;
+    font-size: 1.5rem;
+    padding: 0 8px;
+
+}
+
+.searchField:focus {
+    outline: none;
+}
+.searchField::placeholder {
+    color: #bbb;
+}
+
+.searchButton {
+    height: 50px;
+    width: 50px;
+    border: none;
+    background-color: transparent;
+    background-image: url("../../../public/images/search.svg");
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    transition: transform 0.2s;
+}
+
+.searchButton:hover {
+    cursor: pointer;
+    transform: scale(0.9);
+}
+
+input[type="search"]::-webkit-search-cancel-button {
+    display: none;
+}
+
+.resetSearchButton_hidden {
+    visibility: hidden;
+}
+
+.resetSearchButton {
+    margin: auto;
+    height: 30px;
+    width: 30px;
+    background-color: transparent;
+    background-image: url("../../../public/images/close-icon.svg");
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    border: none;
+    transition: transform 0.2s;
+}
+
+.resetSearchButton:hover {
+    cursor: pointer;
+    transform: scale(1.2);
+}
+
+
 .alertsCount {
     display: flex;
     margin: auto auto 0;
@@ -164,6 +235,28 @@
         min-height: 34px;
         font-size: 1rem;
     }
+
+    .searchForm {
+        height: 33px;
+    }
+
+    .searchField {
+        height: 33px;
+        width: 280px;
+        font-size: 1rem;
+        padding: 0 6px;
+
+    }
+    .searchButton {
+        height: 33px;
+        width: 33px;
+        border: none;
+    }
+    .resetSearchButton {
+        height: 20px;
+        width: 20px;
+    }
+
     .avatar {
         width: 66px;
         height: 66px;
@@ -200,6 +293,28 @@
         min-height: 12px;
         font-size: 0.66rem;
     }
+
+    .searchForm {
+        height: 22px;
+    }
+
+    .searchField {
+        height: 22px;
+        width: 186px;
+        font-size: 0.8rem;
+        padding: 0 4px;
+
+    }
+    .searchButton {
+        height: 22px;
+        width: 22px;
+        border: none;
+    }
+    .resetSearchButton {
+        height: 14px;
+        width: 14px;
+    }
+
     .avatar {
         width: 44px;
         height: 44px;

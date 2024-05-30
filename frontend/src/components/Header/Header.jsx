@@ -11,17 +11,21 @@ import {setGroupingMenuValue, switchInspectMode} from "../../store/reducers/head
 import AlertService from "../../services/AlertService";
 import {setSilenceRules} from "../../store/reducers/silenceRulesReducer";
 import usePortalParam from "../../hooks/usePortalParam";
-import {recheckAllAlerts} from "../../store/reducers/alertReducer";
+import {recheckAllAlerts, setFoundAlerts} from "../../store/reducers/alertReducer";
+import React, {useState} from "react";
 
 const Header = () => {
     const dispatch = useDispatch()
     const isLogged = useSelector(state => state.authReducer.isLogged)
     const userInfo = useSelector(state => state.authReducer.user)
-    const alerts = useSelector(state => state.setAlertReducer.alertsNumber)
+    const alerts = useSelector(state => state.webSocket.alerts)
+    const alertsNumber = useSelector(state => state.setAlertReducer.alertsNumber)
     const isInspectMode = useSelector(state => state.setHeaderMenuItemValue.inspectMode)
     const setPortalParams = usePortalParam()
     const isRecheckAlerts = useSelector(state => state.setAlertReducer.recheckAllAlerts)
     const isGrouped = useSelector(state => state.setHeaderMenuItemValue.grouping)
+
+    const [searchPhrase, setSearchPhrase] = useState('')
 
     const onAvatarClick = (e) => {
         e.preventDefault()
@@ -33,6 +37,25 @@ const Header = () => {
             dispatch(openModal())
         }
 
+    }
+
+    const onSearchHandle = (searchString) => {
+        const foundAlerts = []
+        alerts.forEach(alert => {
+            for (const [key, value] of Object.entries(alert)){
+                if (typeof value === 'string'){
+                    if (value.toLowerCase().includes(searchString.toLowerCase())) {
+                        foundAlerts.push(alert)
+                    }
+                }
+            }
+        })
+        dispatch(setFoundAlerts(foundAlerts))
+    }
+
+    const searchReset = () => {
+        dispatch(setFoundAlerts(null))
+        setSearchPhrase('')
     }
 
     const onInspectClick = () => {
@@ -89,6 +112,28 @@ const Header = () => {
                 <div className={`${styles.onDutyPortal} ${isLogged ? styles.onDutyPortalActive : null}`}>
                     {isLogged ? " On call: Vasya Pupkin" : null}
                 </div>
+                <form className={styles.searchForm}>
+                    <button id="alertSearchButton" type="submit" className={styles.searchButton}
+                            onClick={e => {
+                                e.preventDefault()
+                                onSearchHandle(searchPhrase)
+                            }}
+                    />
+                    <input id="alertSearchField" type="search" className={styles.searchField}
+                           placeholder="Search..."
+                           onChange={e => setSearchPhrase(e.target.value)}
+                           onKeyDown={e => {
+                               if (e.key === 'Escape') {
+                                   searchReset()
+                               }
+                           }}
+                    />
+                    <button id="resetSearchButton"
+                            type="reset"
+                            className={`${styles.resetSearchButton} ${searchPhrase ? '' : styles.resetSearchButton_hidden}`}
+                            onClick={e => searchReset()}
+                    />
+                </form>
                 <div className={styles.alertsCount}
                      style={{borderColor: !isLogged ? "grey" : null}}
                 >
@@ -96,7 +141,7 @@ const Header = () => {
                         isLogged
                             ?
                             <>
-                                <p className={styles.alertsNumber}>{alerts}</p>
+                                <p className={styles.alertsNumber}>{alertsNumber}</p>
                                 <p className={styles.alertsCountTitle}>Total alerts fired</p>
                             </>
                             : null
