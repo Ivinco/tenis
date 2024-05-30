@@ -13,11 +13,6 @@ export const headerMenuItems = [
         buttons: ["All"],
         action: setProjectMenuValue
     },
-    {
-        name: "Grouping",
-        buttons: ["Disabled", "Enabled"],
-        action: setGroupingMenuValue
-    },
     // {
     //     name: "TZ",
     //     buttons: ["Browser", "Data Center", "UTC"],

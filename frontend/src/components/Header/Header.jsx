@@ -7,7 +7,7 @@ import {
 } from "../../store/reducers/modalReducer";
 import FilterMenu from "../FilterMenu/FilterMenu";
 import {switchFilterMenu} from "../../store/reducers/hiddenMenuReducer";
-import {switchInspectMode} from "../../store/reducers/headerMenuReducer";
+import {setGroupingMenuValue, switchInspectMode} from "../../store/reducers/headerMenuReducer";
 import AlertService from "../../services/AlertService";
 import {setSilenceRules} from "../../store/reducers/silenceRulesReducer";
 import usePortalParam from "../../hooks/usePortalParam";
@@ -18,10 +18,10 @@ const Header = () => {
     const isLogged = useSelector(state => state.authReducer.isLogged)
     const userInfo = useSelector(state => state.authReducer.user)
     const alerts = useSelector(state => state.setAlertReducer.alertsNumber)
-    const alertList = useSelector(state => state.webSocket.alerts)
     const isInspectMode = useSelector(state => state.setHeaderMenuItemValue.inspectMode)
     const setPortalParams = usePortalParam()
     const isRecheckAlerts = useSelector(state => state.setAlertReducer.recheckAllAlerts)
+    const isGrouped = useSelector(state => state.setHeaderMenuItemValue.grouping)
 
     const onAvatarClick = (e) => {
         e.preventDefault()
@@ -40,6 +40,10 @@ const Header = () => {
     }
     const onFilterClick = () => {
         dispatch(switchFilterMenu())
+    }
+
+    const onGroupClick = () => {
+        dispatch(setGroupingMenuValue())
     }
 
     const onSilenceClick =  async () => {
@@ -66,11 +70,6 @@ const Header = () => {
         //Delay for animation
         const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
         await delay(1000);
-
-        // const recheckList = []
-        // alertList.forEach(alert => {
-        //     recheckList.push(["recheck_all", alert._id])
-        // })
 
         try {
             await AlertService.refreshAlerts([["recheck_all",""]])
@@ -106,12 +105,13 @@ const Header = () => {
                 </div>
 
                 <button
-                    className={`${styles.funcButton} ${styles.silenceButton} ${isLogged ? styles.funcButtonEnabled : null} ${commonStyles.buttonHint}`}
+                    className={`${styles.funcButton} ${styles.groupAlerts} ${isLogged ? styles.funcButtonEnabled : null} ${commonStyles.buttonHint}`}
+                    style={isGrouped ? {backgroundColor: "#a0f1e2"} : {}}
                     disabled={!isLogged}
-                    data-tooltip="silence rules"
+                    data-tooltip="group alerts"
                     onClick={(e) => {
                         e.preventDefault()
-                        onSilenceClick()
+                        onGroupClick()
                     }}
                 />
 
@@ -132,6 +132,16 @@ const Header = () => {
                     onClick={e => {
                         e.preventDefault()
                         onRecheckClick()
+                    }}
+                />
+
+                <button
+                    className={`${styles.funcButton} ${styles.silenceButton} ${isLogged ? styles.funcButtonEnabled : null} ${commonStyles.buttonHint}`}
+                    disabled={!isLogged}
+                    data-tooltip="silence rules"
+                    onClick={(e) => {
+                        e.preventDefault()
+                        onSilenceClick()
                     }}
                 />
 

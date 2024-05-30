@@ -97,7 +97,7 @@ export default function MainDisplay() {
 
     //This block defines grouping functionality
     const alertGroups = []
-    if (isGrouped === "Enabled"){
+    if (isGrouped){
         //Here we are grouping alerts by Hostname
         const groupsByHost = groupByField(alertsToDisplay, 'host')
         //Process alerts grouped by name
