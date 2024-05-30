@@ -78,30 +78,6 @@ const FilterMenu = () => {
             <div className={`${styles.menuSpace} ${isOpened ? null : styles.menuClosed}`}>
 
                 <ul className={styles.filterMenu}>
-                    <li key="searchField" className={styles.menuItem}>
-                        <form className={styles.searchForm}>
-                            <button id="alertSearchButton" type="submit" className={styles.searchButton}
-                                    onClick={e => {
-                                        e.preventDefault()
-                                        submitAction(searchPhrase)
-                                    }}
-                            />
-                            <input id="alertSearchField" type="search" className={styles.searchField}
-                                   placeholder="Search..."
-                                   onChange={e => setSearchPhrase(e.target.value)}
-                                   onKeyDown={e => {
-                                       if (e.key === 'Escape') {
-                                           resetAction()
-                                       }
-                                   }}
-                            />
-                            <button id="resetSearchButton"
-                                    type="reset"
-                                    className={`${styles.resetSearchButton} ${searchPhrase ? '' : styles.resetSearchButton_hidden}`}
-                                    onClick={e => resetAction()}
-                            />
-                        </form>
-                    </li>
                     {
                         menuItems.map((item, index) =>
                             <li key={index} className={styles.menuItem}>
@@ -110,18 +86,16 @@ const FilterMenu = () => {
                         )
 
                     }
-                    <li key="searchSeveTumbler"  className={styles.menuItem}>
-                        <label className={styles.settingsTumbler}>
-                            <input type="checkbox" className={styles.settingsSaver}
-                                   data-tooltip="save preferences"
-                                   checked={ifSavedSettings}
-                                   onChange={e  => handleSaveSettingsCheckbox(e)}
-                            />
-                            <span className={`${styles.settingsSlider} ${commonStyles.buttonHint}`} data-tooltip="save preferences"/>
-                        </label>
-                    </li>
-
                 </ul>
+                <label className={styles.settingsTumbler}>
+                    <input type="checkbox" className={styles.settingsSaver}
+                           data-tooltip="save preferences"
+                           checked={ifSavedSettings}
+                           onChange={e => handleSaveSettingsCheckbox(e)}
+                    />
+                    <span className={`${styles.settingsSlider} ${commonStyles.buttonHint}`}
+                          data-tooltip="save preferences"/>
+                </label>
             </div>
 
         </>
