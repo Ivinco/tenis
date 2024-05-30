@@ -5,7 +5,12 @@ import AutoSizer from "react-virtualized-auto-sizer";
 import {useConnectSocket} from "../../hooks/useConnectSocket";
 import Alert from "../Alert/Alert";
 import {useDispatch, useSelector} from "react-redux";
-import {setAlertsNumber} from "../../store/reducers/alertReducer";
+import {
+    setAlertsNumber,
+    setCriticalAlertsNumber, setEmergencyAlertsNumber, setOtherAlertsNumber,
+    setTotalAlertsNumber,
+    setWarningAlertsNumber
+} from "../../store/reducers/alertReducer";
 import AlertGroup from "../AlertGroup/AlertGroup";
 import {groupByField} from "../../utils/utils";
 import {alertNameGroups, alertsToGroup, hostNameGroups} from "../../utils/grouping";
@@ -93,7 +98,19 @@ export default function MainDisplay() {
     }
     //Define ungrouped alerts which will be displayed in virtual list
     let ungroupedAlerts = alertsToDisplay
-    dispatch(setAlertsNumber(alertsToDisplay.length))
+    let totalAlertsNumber = alertsToDisplay.length
+    let emergencyAlertsNumber = alertsToDisplay.filter((alert) => alert.severity === 'EMERGENCY').length
+    let criticalAlertsNumber = alertsToDisplay.filter(alert => alert.severity === 'CRITICAL').length
+    let warningAlertsNumber = alertsToDisplay.filter(alert => alert.severity === 'WARNING').length
+    let otherAlertsNumber = alertsToDisplay.filter(alert => alert.severity !== 'CRITICAL' && alert.severity !== 'WARNING' && alert.severity !== 'EMERGENCY').length
+    dispatch(setTotalAlertsNumber(totalAlertsNumber))
+    dispatch(setEmergencyAlertsNumber(emergencyAlertsNumber))
+    dispatch(setCriticalAlertsNumber(criticalAlertsNumber))
+    dispatch(setWarningAlertsNumber(warningAlertsNumber))
+    dispatch(setOtherAlertsNumber(otherAlertsNumber))
+
+
+    console.log(otherAlertsNumber)
 
     //This block defines grouping functionality
     const alertGroups = []

@@ -3,7 +3,7 @@ import styles from './UserInfo.module.css'
 import {useDispatch, useSelector} from "react-redux";
 import {logoutAction} from "../../store/reducers/authReducer";
 import {closeModal} from "../../store/reducers/modalReducer";
-import {setAlertsNumber} from "../../store/reducers/alertReducer";
+import {setTotalAlertsNumber} from "../../store/reducers/alertReducer";
 import usePortalParam from "../../hooks/usePortalParam";
 
 
@@ -18,7 +18,7 @@ const UserInfo = () => {
         dispatch(logoutAction())
         setPortalParam()
         dispatch(closeModal())
-        dispatch(setAlertsNumber(0))
+        dispatch(setTotalAlertsNumber(0))
     }
     return (
         <>

@@ -36,7 +36,7 @@
 .searchForm {
     display: flex;
     height: 50px;
-    margin: auto auto 0 20px;
+    margin: auto 0 0 20px;
     padding: 2px 4px 2px 2px;
     border: #01A2D8 2px solid;
     border-radius: 10px;
@@ -106,23 +106,49 @@ input[type="search"]::-webkit-search-cancel-button {
 
 .alertsCount {
     display: flex;
-    margin: auto auto 0;
+    margin: auto auto 0 50px;
     justify-content: center;
     align-items: end;
+    font-size: 2rem;
+}
+
+.alertCountItems {
+    font-weight: bold;
+    margin: 0 10px 0 0;
+    padding: 5px 8px;
     color: #01a2d8;
 }
 
 .alertsNumber {
-    display: flex;
-    font-size: 1.5rem;
+   text-shadow: -1px -1px 0 #939292,
+                1px -1px 0 #939292,
+                -1px  1px 0 #939292,
+                1px  1px 0 #939292;
+}
+
+.emergencyAlerts {
+    color: #f67d7a;
+}
+
+.criticalAlerts {
+    color: #FFBBBA;
+}
+
+.warningAlerts {
+    color: #FEFFC1;
+}
+
+.otherAlerts {
+    color: #bab8b8;
+}
+
+.totalAlerts {
     margin: 0;
 }
 
 .alertsCountTitle {
-    display: flex;
-    font-size: 1.5rem;
-    text-align: center;
-    margin: auto auto 0 10px;
+    margin: 0 0 0 20px;
+    padding-right: 0;
 }
 
 
@@ -257,6 +283,20 @@ input[type="search"]::-webkit-search-cancel-button {
         width: 20px;
     }
 
+    .alertsCount {
+        margin: auto auto 0 33px;
+        font-size: 1.5rem;
+    }
+
+    .alertCountItems {
+        margin: 0 7px 0 0;
+        padding: 3px 4px;
+    }
+
+    .alertsCountTitle {
+        margin: 0 0 0 14px;
+    }
+
     .avatar {
         width: 66px;
         height: 66px;
@@ -283,7 +323,7 @@ input[type="search"]::-webkit-search-cancel-button {
 
 }
 
-@media screen and (max-width: 1150px) {
+@media screen and (max-width: 1510px) {
     .logo {
         width: 53px;
         margin-left: 20px;
@@ -313,6 +353,20 @@ input[type="search"]::-webkit-search-cancel-button {
     .resetSearchButton {
         height: 14px;
         width: 14px;
+    }
+
+    .alertsCount {
+        margin: auto auto 0 33px;
+        font-size: 1rem;
+    }
+
+    .alertCountItems {
+        margin: 0 5px 0 0;
+        padding: 2px 3px;
+    }
+
+    .alertsCountTitle {
+        margin: 0 0 0 10px;
     }
 
     .avatar {
