@@ -7,6 +7,7 @@
     background-color: rgba(246, 243, 243, 0.78);
     color: #000000;
     font-size: 0.6rem;
+    text-shadow: none;
     white-space: nowrap;
     border-radius: 5px;
     visibility: hidden;

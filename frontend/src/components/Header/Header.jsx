@@ -19,7 +19,11 @@ const Header = () => {
     const isLogged = useSelector(state => state.authReducer.isLogged)
     const userInfo = useSelector(state => state.authReducer.user)
     const alerts = useSelector(state => state.webSocket.alerts)
-    const alertsNumber = useSelector(state => state.setAlertReducer.alertsNumber)
+    const totalAlertsNumbers = useSelector(state => state.setAlertReducer.totalAlertsNumber)
+    const emergencyAlertsNumber = useSelector(state => state.setAlertReducer.emergencyAlertsNumber)
+    const criticalAlertsNumber = useSelector(state => state.setAlertReducer.criticalAlertsNumber)
+    const warningAlertsNumber = useSelector(state => state.setAlertReducer.warningAlertsNumber)
+    const otherAlertsNumber = useSelector(state => state.setAlertReducer.otherAlertsNumber)
     const isInspectMode = useSelector(state => state.setHeaderMenuItemValue.inspectMode)
     const setPortalParams = usePortalParam()
     const isRecheckAlerts = useSelector(state => state.setAlertReducer.recheckAllAlerts)
@@ -141,8 +145,29 @@ const Header = () => {
                         isLogged
                             ?
                             <>
-                                <p className={styles.alertsNumber}>{alertsNumber}</p>
-                                <p className={styles.alertsCountTitle}>Total alerts fired</p>
+
+                                <p className={`${styles.alertCountItems} ${styles.alertsNumber} ${styles.emergencyAlerts} ${commonStyles.buttonHint}`}
+                                data-tooltip="emergency alerts"
+                                >
+                                    {emergencyAlertsNumber}
+                                </p>
+                                <p className={`${styles.alertCountItems} ${styles.alertsNumber} ${styles.criticalAlerts} ${commonStyles.buttonHint}`}
+                                   data-tooltip="critical alerts"
+                                >
+                                    {criticalAlertsNumber}
+                                </p>
+                                <p className={`${styles.alertCountItems} ${styles.alertsNumber} ${styles.warningAlerts} ${commonStyles.buttonHint}`}
+                                   data-tooltip="warning alerts"
+                                >
+                                    {warningAlertsNumber}
+                                </p>
+                                <p className={`${styles.alertCountItems} ${styles.alertsNumber} ${styles.otherAlerts} ${commonStyles.buttonHint}`}
+                                   data-tooltip="other alerts"
+                                >
+                                    {otherAlertsNumber}
+                                </p>
+                                <p className={`${styles.alertCountItems} ${styles.alertsCountTitle}`}>TOTAL:</p>
+                                <p className={`${styles.alertCountItems} ${styles.alertsNumber} ${styles.totalAlerts}`}>{totalAlertsNumbers}</p>
                             </>
                             : null
                     }
