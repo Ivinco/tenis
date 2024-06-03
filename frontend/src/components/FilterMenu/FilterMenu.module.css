@@ -104,4 +104,24 @@
         min-width: 111px;
         margin: auto 18px 0;
     }
+    .settingsTumbler {
+        width: 40px;
+        height: 22px;
+        margin: 20px 100px 0 auto;
+    }
+
+    .settingsSlider {
+        border-radius: 22px;
+    }
+
+    .settingsSlider:before {
+        height: 19px;
+        width: 19px;
+        left: 2px;
+        bottom: 2px;
+    }
+
+    .settingsSaver:checked + .settingsSlider:before {
+        transform: translateX(19px);
+    }
 }
