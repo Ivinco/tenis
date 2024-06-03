@@ -1,4 +1,5 @@
 import styles from './MainDisplay.module.css'
+import alertStyles from '../Alert/Alert.module.css'
 import React, {useEffect, useState} from 'react';
 import { FixedSizeList as List } from 'react-window';
 import AutoSizer from "react-virtualized-auto-sizer";
@@ -157,6 +158,17 @@ export default function MainDisplay() {
 
     return (
         <div className={styles.mainDisplay}>
+            <div className={`${styles.groupWrapper} ${!isInspectMode ? null : styles.groupWrapper_small}`}>
+                <div className={styles.alertsHeader}>
+                    <div className={styles.projectHeader}>PRJ</div>
+                    <div className={styles.hostHeader}>Host</div>
+                    <div className={styles.userHeader}>User</div>
+                    <div className={styles.alertHeader}>Alert Name</div>
+                    <div className={styles.timeHeader}>Alert fired</div>
+                    <div className={styles.messageHeader}>Alert Message</div>
+                </div>
+
+            </div>
             {isActiveSocket ?
                 <>
                     {displayMode === HISTORY_DISPLAY

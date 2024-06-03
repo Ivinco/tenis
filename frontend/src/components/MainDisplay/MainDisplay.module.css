@@ -1,7 +1,7 @@
 .mainDisplay {
     display: flex;
     flex-direction: column;
-    width: 100%;
+    width: 99%;
     overflow-y: scroll;
     padding-left: calc(1.5%);
     scrollbar-width: none;
@@ -10,6 +10,99 @@
 .mainDisplay::-webkit-scrollbar {
     display: none;
 }
+
+.alertsHeader {
+    width: 99%;
+    height: 90%;
+    display: flex;
+    position: relative;
+    align-content: space-between;
+    margin: auto;
+    border: #8a8a8a solid 3px;
+    border-radius: 10px;
+}
+
+.projectHeader {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    margin: auto 20px;
+    font-size: 0.7rem;
+}
+
+.hostHeader {
+    display: flex;
+    height: 100%;
+    width: 10%;
+    align-items: center;
+    margin: auto 5px;
+    padding: 0 10px;
+    justify-content: center;
+    text-align: center;
+    border-left: slategrey solid 3px;
+    border-right: slategrey solid 3px;
+    overflow: hidden;
+}
+
+.userHeader {
+    display: flex;
+    width: 60px;
+    height: 60px;
+    margin: auto;
+    padding: 10px;
+    border: none;
+    background-color: transparent;
+    border-radius: 50%;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.alertHeader {
+    height: 100%;
+    display: flex;
+    width: 20%;
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+    margin: auto 6px;
+    padding: 0 10px;
+    font-size: 1.2rem;
+    overflow: hidden;
+    border-left: slategrey solid 3px;
+    border-right: slategrey solid 3px;
+}
+
+.timeHeader {
+    display: flex;
+    height: 100%;
+    width: 7%;
+    margin: 0 15px;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    text-align: center;
+    line-height: 2;
+}
+
+.messageHeader {
+    display: flex;
+    height: 100%;
+    width: 52%;
+    align-items: center;
+    font-size: 1.2rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    padding: 0 10px;
+    border-left: slategrey solid 3px;
+    border-right: slategrey solid 3px;
+}
+
+
 
 .dateField {
     display: flex;
