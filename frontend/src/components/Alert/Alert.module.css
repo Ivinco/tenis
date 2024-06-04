@@ -493,12 +493,12 @@
         width: 18px;
         font-size: 1rem;
         margin: auto 4px;
-        padding: 4px;
+        padding: 2px;
     }
 
     .host {
         margin: auto 2px;
-        padding: 0 4px;
+        padding: 0 2px;
         font-size: 0.5rem;
         border-left: slategrey solid 1px;
         border-right: slategrey solid 1px;
@@ -508,12 +508,12 @@
         width: 27px;
         height: 27px;
         margin: 6px;
-        padding: 4px;
+        padding: 2px;
     }
 
     .alertName {
         margin: auto 6px;
-        padding: 0 4px;
+        padding: 0 2px;
         font-size: 0.5rem;
         border-left: slategrey solid 1px;
         border-right: slategrey solid 1px;
@@ -526,7 +526,7 @@
     }
 
     .message {
-        padding: 0 4px;
+        padding: 0 2px;
         border-left: slategrey solid 1px;
         border-right: slategrey solid 1px;
         font-size: 0.5rem;

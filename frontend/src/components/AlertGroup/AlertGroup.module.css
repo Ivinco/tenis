@@ -95,7 +95,7 @@
 
 @media screen and (max-width: 1570px) {
     .alertsNumber {
-        padding: 0 4px;
+        padding: 0 2px;
         font-size: 0.5rem;
     }
     .alertBlock {
@@ -103,7 +103,7 @@
     }
 
     .alertsGroupMessage {
-        padding: 0 4px;
+        padding: 0 2px;
         font-size: 0.5rem;
         border-left: slategrey solid 1px;
         border-right: slategrey solid 1px;
