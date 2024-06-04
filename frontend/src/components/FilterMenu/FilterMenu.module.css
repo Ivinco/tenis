@@ -79,7 +79,7 @@
     transform: translateX(26px);
 }
 
-@media screen and (max-width: 2150px) {
+@media screen and (max-width: 2175px) {
     .menuSpace {
         max-height: 66px;
     }
@@ -92,7 +92,7 @@
     }
 }
 
-@media screen and (max-width: 1510px) {
+@media screen and (max-width: 1570px) {
     .menuSpace {
         max-height: 44px;
     }

@@ -155,7 +155,7 @@
     background-position: center;
 }
 
-@media screen and (max-width: 2150px) {
+@media screen and (max-width: 2175px) {
     .silenceContent {
         max-height: 450px;
     }
@@ -183,7 +183,7 @@
 
 }
 
-@media screen and (max-width: 1510px) {
+@media screen and (max-width: 1570px) {
     .silenceContent {
         max-height: 430px;
     }

@@ -397,7 +397,7 @@
 }
 
 
-@media screen and (max-width: 2150px){
+@media screen and (max-width: 2175px){
     .alertBody {
         margin: auto;
         border: #8a8a8a solid 2px;
@@ -483,7 +483,7 @@
 
 }
 
-@media screen and (max-width: 1510px){
+@media screen and (max-width: 1570px){
     .alertBody {
         margin: auto;
     }
@@ -514,14 +514,14 @@
     .alertName {
         margin: auto 6px;
         padding: 0 4px;
-        font-size: 0.7rem;
+        font-size: 0.5rem;
         border-left: slategrey solid 1px;
         border-right: slategrey solid 1px;
     }
 
     .alertTime {
         margin: 0 6px;
-        font-size: 0.6rem;
+        font-size: 0.5rem;
         line-height: 1;
     }
 
@@ -529,7 +529,7 @@
         padding: 0 4px;
         border-left: slategrey solid 1px;
         border-right: slategrey solid 1px;
-        font-size: 0.6rem;
+        font-size: 0.5rem;
     }
 
     .controlButton {

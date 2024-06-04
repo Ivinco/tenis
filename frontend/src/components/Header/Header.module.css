@@ -112,6 +112,80 @@ input[type="search"]::-webkit-search-cancel-button {
     font-size: 2rem;
 }
 
+.alertsCount_portable {
+    position: relative;
+    display: none;
+    margin: auto auto 0 20px;
+}
+
+.alertsCountPortableButton {
+    position: relative;
+    height: 26px;
+    border: none;
+    background-color: transparent;
+    color: #01a2d8;
+    font-size: 0.7rem;
+    transition: transform 0.5s;
+
+}
+
+.alertsCountPortableButton::before {
+    content: attr(data-tooltip);
+    margin-right: 5px;
+}
+
+
+.alertsCountPortableButton::after {
+    position: absolute;
+    width: 25px;
+    height: 26px;
+    content: '';
+    right: -20px;
+    top: -0.2px;
+    background-image: url("../../../public/images/arrow-down-svgrepo-com.svg");
+    background-size: cover;
+}
+
+.alertsCount_portable:hover .alertsCountPortableButton {
+    color: white;
+    background-color: #01a2d8;
+    transform: scale(1.2);
+}
+
+.alertsCount_portable:hover .alertsCountPortableButton::after {
+    background-image: url("../../../public/images/arrow-down-white-svgrepo-com.svg");
+    background-color: #01a2d8;
+}
+
+.alertsCountPortableDropdown {
+    display: flex;
+    flex-direction: column;
+    height: 0;
+    opacity: 0;
+    position: absolute;
+    right: -34px;
+    z-index: 1;
+    background-color: #e1fafa;
+    top: 110%;
+    padding: 0 20px;
+}
+
+.alertsCountPortableDropdownItem {
+    font-size: 0.7rem;
+    white-space: nowrap;
+    margin: 5px 0 0;
+    padding: 0;
+}
+
+
+
+.alertsCount_portable:hover .alertsCountPortableDropdown {
+    height: 100px;
+    opacity: 1;
+    transition: height 0.2s ease-in-out, opacity 0.3s ease-in-out;
+}
+
+
 .alertCountItems {
     font-weight: bold;
     margin: 0 10px 0 0;
@@ -178,6 +252,64 @@ input[type="search"]::-webkit-search-cancel-button {
     transform: scale(1.2);
     border-color:  #01A2D8;
     color:  #01A2D8;
+}
+
+
+.funcButtons {
+    margin: auto 0 0 20px;
+}
+
+.funcButtonsMenu {
+    position: relative;
+    display: none;
+    width: 44px;
+    height: 22px;
+    margin: auto 20px 0 auto;
+    align-items: center;
+}
+
+.funcButtonsMenuButton {
+    width: 22px;
+    height: 22px;
+    background-image: url("../../../public/images/settings-svgrepo-com.svg");
+    background-size: contain;
+    background-position: center;
+    background-color: transparent;
+    border: none;
+    padding: 5px;
+    transition: transform 0.2s;
+}
+
+.funcButtonsMenuButton:hover {
+    transform: scale(1.2);
+    background-color: #01A2D8;
+    background-image: url("../../../public/images/settings-white-svgrepo-com.svg");
+}
+
+.funcButtonsDropdown {
+    position: absolute;
+    z-index: 1;
+    display: flex;
+    height: 0;
+    opacity: 0;
+    flex-direction: column;
+    align-items: center;
+    background: #e1fafa;
+    top: 110%;
+}
+
+.funcButtonsDropdown button {
+    margin: 10px auto;
+    padding: 0 22px;
+    background-size: contain;
+
+}
+
+
+.funcButtonsMenu:hover .funcButtonsDropdown {
+    height: 125px;
+    opacity: 1;
+    transition: height 0.2s ease-in-out, opacity 0.3s ease-in-out;
 }
 
 .funcButton {
@@ -250,7 +382,7 @@ input[type="search"]::-webkit-search-cancel-button {
 }
 
 
-@media screen and (max-width: 2150px) {
+@media screen and (max-width: 2175px) {
     .logo {
         width: 120px;
         height: 66px;
@@ -324,7 +456,7 @@ input[type="search"]::-webkit-search-cancel-button {
 
 }
 
-@media screen and (max-width: 1510px) {
+@media screen and (max-width: 1570px) {
     .logo {
         width: 100px;
         height: 44px;
@@ -406,4 +538,46 @@ input[type="search"]::-webkit-search-cancel-button {
     .inspectButton {
         display: none;
     }
+}
+
+@media screen and (max-width: 1120px) {
+    .onDutyPortal {
+        min-width: 85px;
+        min-height: 12px;
+        font-size: 0.5rem;
+    }
+    .searchField {
+        height: 22px;
+        width: 120px;
+        font-size: 0.5rem;
+        padding: 0 4px;
+
+    }
+    .searchButton {
+        height: 22px;
+        width: 22px;
+        border: none;
+    }
+    .resetSearchButton {
+        height: 14px;
+        width: 14px;
+    }
+    .alertsCount{
+        display: none;
+    }
+
+    .alertsCount_portable {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .funcButtons {
+        display: none;
+    }
+
+    .funcButtonsMenu {
+        display: flex;
+        flex-direction: column;
+    }
+
 }

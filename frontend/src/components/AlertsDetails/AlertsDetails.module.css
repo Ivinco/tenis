@@ -143,7 +143,8 @@
 }
 
 .historyBlock {
-    display: flex;
+    /*TODO: change to flex when the function is ready on backend*/
+    display: none;
     flex-direction: column;
 }
 
@@ -180,7 +181,7 @@
 
 
 
-@media screen and (max-width: 2150px) {
+@media screen and (max-width: 2175px) {
 
     .alertHeader {
         height: 15%;
@@ -237,7 +238,7 @@
 
 }
 
-@media screen and (max-width: 1510px) {
+@media screen and (max-width: 1570px) {
     .alertHeader {
         height: 15%;
         margin: 14px;

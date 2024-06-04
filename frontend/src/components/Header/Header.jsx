@@ -138,6 +138,25 @@ const Header = () => {
                             onClick={e => searchReset()}
                     />
                 </form>
+                <div className={styles.alertsCount_portable}>
+                    {
+                        isLogged
+                            ?
+                            <>
+                                <button className={styles.alertsCountPortableButton} data-tooltip={totalAlertsNumbers}>
+                                    ALERTS
+                                </button>
+                                <div className={styles.alertsCountPortableDropdown}>
+                                    <p className={styles.alertsCountPortableDropdownItem}>Emergency: {emergencyAlertsNumber}</p>
+                                    <p className={styles.alertsCountPortableDropdownItem}>Critical: {criticalAlertsNumber}</p>
+                                    <p className={styles.alertsCountPortableDropdownItem}>Warning: {warningAlertsNumber}</p>
+                                    <p className={styles.alertsCountPortableDropdownItem}>Other: {otherAlertsNumber}</p>
+                                </div>
+                            </>
+                            : null
+                    }
+
+                </div>
                 <div className={styles.alertsCount}
                      style={{borderColor: !isLogged ? "grey" : null}}
                 >
@@ -147,7 +166,7 @@ const Header = () => {
                             <>
 
                                 <p className={`${styles.alertCountItems} ${styles.alertsNumber} ${styles.emergencyAlerts} ${commonStyles.buttonHint}`}
-                                data-tooltip="emergency alerts"
+                                   data-tooltip="emergency alerts"
                                 >
                                     {emergencyAlertsNumber}
                                 </p>
@@ -174,46 +193,106 @@ const Header = () => {
 
                 </div>
 
-                <button
-                    className={`${styles.funcButton} ${styles.groupAlerts} ${isLogged ? styles.funcButtonEnabled : null} ${commonStyles.buttonHint}`}
-                    style={isGrouped ? {backgroundColor: "#a0f1e2"} : {}}
-                    disabled={!isLogged}
-                    data-tooltip="group alerts"
-                    onClick={(e) => {
-                        e.preventDefault()
-                        onGroupClick()
-                    }}
-                />
+                <div className={styles.funcButtons}>
+                    <button
+                        className={`${styles.funcButton} ${styles.groupAlerts} ${isLogged ? styles.funcButtonEnabled : null} ${commonStyles.buttonHint}`}
+                        style={isGrouped ? {backgroundColor: "#a0f1e2"} : {}}
+                        disabled={!isLogged}
+                        data-tooltip="group alerts"
+                        onClick={(e) => {
+                            e.preventDefault()
+                            onGroupClick()
+                        }}
+                    />
 
-                <button
-                    className={`${styles.funcButton} ${styles.inspectButton} ${isLogged ? styles.funcButtonEnabled : null} ${commonStyles.buttonHint}`}
-                    style={isInspectMode ? {backgroundColor: "#a0f1e2"} : {}}
-                    data-tooltip="inspect mode"
-                    disabled={!isLogged}
-                    onClick={(e) => {
-                        e.preventDefault()
-                        onInspectClick()
-                    }}
-                />
+                    <button
+                        className={`${styles.funcButton} ${styles.inspectButton} ${isLogged ? styles.funcButtonEnabled : null} ${commonStyles.buttonHint}`}
+                        style={isInspectMode ? {backgroundColor: "#a0f1e2"} : {}}
+                        data-tooltip="inspect mode"
+                        disabled={!isLogged}
+                        onClick={(e) => {
+                            e.preventDefault()
+                            onInspectClick()
+                        }}
+                    />
 
-                <button
-                    className={`${styles.funcButton} ${styles.refreshButton} ${isLogged ? styles.funcButtonEnabled : null} ${isRecheckAlerts ? commonStyles.rotatedIcon : commonStyles.buttonHint}`}
-                    data-tooltip="recheck all alerts"
-                    onClick={e => {
-                        e.preventDefault()
-                        onRecheckClick()
-                    }}
-                />
+                    <button
+                        className={
+                            `${styles.funcButton} 
+                    ${styles.refreshButton} 
+                    ${isLogged ? styles.funcButtonEnabled : null} 
+                    ${isRecheckAlerts ? commonStyles.rotatedIcon : commonStyles.buttonHint}`
+                        }
+                        data-tooltip="recheck all alerts"
+                        onClick={e => {
+                            e.preventDefault()
+                            onRecheckClick()
+                        }}
+                    />
 
-                <button
-                    className={`${styles.funcButton} ${styles.silenceButton} ${isLogged ? styles.funcButtonEnabled : null} ${commonStyles.buttonHint}`}
-                    disabled={!isLogged}
-                    data-tooltip="silence rules"
-                    onClick={(e) => {
-                        e.preventDefault()
-                        onSilenceClick()
-                    }}
-                />
+                    <button
+                        className={`${styles.funcButton} ${styles.silenceButton} ${isLogged ? styles.funcButtonEnabled : null} ${commonStyles.buttonHint}`}
+                        disabled={!isLogged}
+                        data-tooltip="silence rules"
+                        onClick={(e) => {
+                            e.preventDefault()
+                            onSilenceClick()
+                        }}
+                    />
+                </div>
+
+                <div className={styles.funcButtonsMenu}>
+                    <button className={styles.funcButtonsMenuButton}></button>
+                    <div className={styles.funcButtonsDropdown}>
+                        <button
+                            className={`${styles.funcButton} ${styles.groupAlerts} ${isLogged ? styles.funcButtonEnabled : null} ${commonStyles.buttonHint}`}
+                            style={isGrouped ? {backgroundColor: "#a0f1e2"} : {}}
+                            disabled={!isLogged}
+                            data-tooltip="group alerts"
+                            onClick={(e) => {
+                                e.preventDefault()
+                                onGroupClick()
+                            }}
+                        />
+
+                        <button
+                            className={`${styles.funcButton} ${styles.inspectButton} ${isLogged ? styles.funcButtonEnabled : null} ${commonStyles.buttonHint}`}
+                            style={isInspectMode ? {backgroundColor: "#a0f1e2"} : {}}
+                            data-tooltip="inspect mode"
+                            disabled={!isLogged}
+                            onClick={(e) => {
+                                e.preventDefault()
+                                onInspectClick()
+                            }}
+                        />
+
+                        <button
+                            className={
+                                `${styles.funcButton} 
+                    ${styles.refreshButton} 
+                    ${isLogged ? styles.funcButtonEnabled : null} 
+                    ${isRecheckAlerts ? commonStyles.rotatedIcon : commonStyles.buttonHint}`
+                            }
+                            data-tooltip="recheck all alerts"
+                            onClick={e => {
+                                e.preventDefault()
+                                onRecheckClick()
+                            }}
+                        />
+
+                        <button
+                            className={`${styles.funcButton} ${styles.silenceButton} ${isLogged ? styles.funcButtonEnabled : null} ${commonStyles.buttonHint}`}
+                            disabled={!isLogged}
+                            data-tooltip="silence rules"
+                            onClick={(e) => {
+                                e.preventDefault()
+                                onSilenceClick()
+                            }}
+                        />
+                    </div>
+
+                </div>
+
 
                 <button
                     className={`${styles.funcButton} ${styles.filterButton} ${isLogged ? styles.funcButtonEnabled : null} ${commonStyles.buttonHint}`}
