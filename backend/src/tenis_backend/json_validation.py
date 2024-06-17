@@ -283,11 +283,3 @@ user_update_schema = {
     },
     "additionalProperties": False
 }
-
-# JSON schema to validate inbound timestamp for history endpoint JSON
-history_request_schema = {
-    "required": ["datetime"],
-    "properties": {
-        "datetime": {"type": "integer"}
-    }
-}
