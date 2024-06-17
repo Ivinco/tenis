@@ -37,13 +37,13 @@
     background-color: #E1F6F6FF;
     margin-top: 15px;
     overflow: scroll;
-    height: 0;
-    transition: height 0.2s;
+    max-height: 0;
+    transition: max-height 0.2s;
     border-radius: 10px;
 }
 
 .itemBody_active {
-    height: 320%;
+    max-height: 400%;
 }
 
 .itemButton {
@@ -75,7 +75,7 @@
     }
 }
 
-@media screen and (max-width: 1150px) {
+@media screen and (max-width: 1510px) {
     .menuHeader {
         font-size: 0.75rem;
     }

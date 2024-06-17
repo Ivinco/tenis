@@ -5,21 +5,21 @@ import {useDispatch} from "react-redux";
 import {loginAction} from "../../store/reducers/authReducer";
 import {closeModal} from "../../store/reducers/modalReducer";
 import AuthService from "../../services/AuthService";
-import {switchErrorMessageModal} from "../../store/reducers/modalReducer";
+import {setModalError} from "../../store/reducers/modalReducer";
 import {sha256} from "js-sha256";
-import {BACKEND_SERVER} from "../../utils/vars";
+import usePortalParam from "../../hooks/usePortalParam";
 
 
 const AuthForm = () => {
     const emailValidator = useInput('',{isEmpty: true, minLength: 3, maxLength: 20})
     const passwordValidator = useInput('', {isEmpty: true, minLength: 6, maxLength: 20})
     const dispatch = useDispatch()
+    const setPortalParams = usePortalParam()
 
     const onLogin = async (email, password) => {
         try {
             const response = await AuthService.login(email, password)
                     localStorage.setItem('token', response.data.access_token)
-                    console.log(`https://gravatar.com/avatar/${sha256(response.data.user.email)}?s=150`)
                     const user_raw = {
                         userName: response.data.user.name,
                         userId: response.data.user._id,
@@ -30,17 +30,19 @@ const AuthForm = () => {
                         }
                     const user = {...user_raw, userProjects: ['All', ...user_raw.userProjects]}
                     dispatch(loginAction(user))
+                    setPortalParams()
                     dispatch(closeModal())
         }
         catch (e) {
             switch (e.request.status){
                 case 401:
-                    dispatch(switchErrorMessageModal("Login failed"))
+                    dispatch(setModalError("Login failed"))
+                    setPortalParams()
                     break
                 default:
-                    dispatch(switchErrorMessageModal("Oops. Something went wrong. Please, try a bit later"))
+                    dispatch(setModalError("Oops. Something went wrong. Please, try a bit later"))
+                    setPortalParams()
             }
-            console.error(`This is request error: ${e.request.status}`)
         }
     }
 

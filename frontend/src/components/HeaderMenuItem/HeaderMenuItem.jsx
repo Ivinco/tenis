@@ -7,7 +7,6 @@ function HeaderMenuItem({item}) {
     const dispatch = useDispatch()
     const activeHeaderMenuItem = useSelector(state => state.switchHeaderMenuItem.activeHeaderMenuItem)
     const activeHeaderMenuSubItem = useSelector(state => state.setHeaderMenuItemValue)
-    const isActive = useSelector(state => state.webSocket.isOpened)
 
     const itemOnClickHandler = (itemName) => {
         if (activeHeaderMenuItem === item.name) {
@@ -20,7 +19,6 @@ function HeaderMenuItem({item}) {
     const subItemOnClickHandler = (action, subItemName) => {
         dispatch(action(subItemName))
         dispatch(switchActiveHeaderMenuItem(null))
-        console.log(`Selected ${subItemName} menu option`)
     }
 
     return (

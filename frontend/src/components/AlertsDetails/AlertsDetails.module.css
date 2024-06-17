@@ -142,6 +142,42 @@
     border-radius: 20px;
 }
 
+.historyBlock {
+    display: flex;
+    flex-direction: column;
+}
+
+.historyTitle {
+    text-align: center;
+}
+
+.historyInputBlock {
+    display: flex;
+    margin: 20px auto;
+}
+
+.historyInputElement {
+    margin-right: 20px;
+}
+
+.historySearchButton {
+    display: flex;
+    width: 80px;
+    border: 1px #656B7A solid;
+    border-radius: 10%;
+    background-color: transparent;
+    background-image: url("../../../public/images/search.svg");
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    transition: transform 0.2s;
+}
+
+.historySearchButton:hover {
+    cursor: pointer;
+    transform: scale(0.9);
+}
+
 
 
 @media screen and (max-width: 2150px) {
@@ -201,7 +237,7 @@
 
 }
 
-@media screen and (max-width: 1150px) {
+@media screen and (max-width: 1510px) {
     .alertHeader {
         height: 15%;
         margin: 14px;

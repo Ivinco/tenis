@@ -2,6 +2,7 @@
     width: 99%;
     height: 90%;
     display: flex;
+    position: relative;
     align-content: space-between;
     margin: auto;
     border: #8a8a8a solid 3px;
@@ -12,6 +13,7 @@
     width: 99%;
     height: 99%;
     display: flex;
+    position: relative;
     align-content: space-between;
     margin: auto;
     border: #3b3b3b solid 1px;
@@ -20,10 +22,12 @@
 }
 
 .projectName {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     height: 40px;
     width: 40px;
     font-size: 2rem;
-    text-align: center;
     margin: auto 10px;
     border: 2px solid black;
     border-radius: 10%;
@@ -31,12 +35,14 @@
 }
 
 .projectName_small {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     height: 12px;
     width: 12px;
     font-size: 0.7rem;
     margin: auto 6px;
     padding: 3px;
-    text-align: center;
     border: 1px solid black;
     border-radius: 10%;
 }
@@ -53,6 +59,7 @@
     font-size: 1.3rem;
     border-left: slategrey solid 3px;
     border-right: slategrey solid 3px;
+    overflow: hidden;
 }
 
 .host_small {
@@ -66,6 +73,7 @@
     font-size: 0.7rem;
     border-left: slategrey solid 1px;
     border-right: slategrey solid 1px;
+    overflow: hidden;
 }
 
 .responsibleUser {
@@ -74,8 +82,10 @@
     height: 60px;
     margin: auto;
     padding: 10px;
+    border: none;
+    background-color: transparent;
     border-radius: 50%;
-    background-size: contain;
+    background-size: cover;
     background-repeat: no-repeat;
     background-position: center;
     cursor: pointer;
@@ -83,7 +93,7 @@
 }
 
 .responsibleUser:hover {
-    transform: scale(1.2);
+    transform: scale(0.8);
 }
 
 .responsibleUser_small {
@@ -92,12 +102,14 @@
     height: 20px;
     margin: 4px;
     padding: 2px;
+    border: none;
+    background-color: transparent;
     border-radius: 50%;
-    background-size: contain;
+    background-size: cover;
     background-repeat: no-repeat;
     background-position: center;
     cursor: pointer;
-    transition: transform 0.2s;
+    transition: transform 0.15s;
 }
 
 .responsibleUser_small:hover {
@@ -111,9 +123,9 @@
     text-align: center;
     align-items: center;
     justify-content: center;
-    margin: auto 15px;
+    margin: auto 6px;
     padding: 0 10px;
-    font-size: 1.5rem;
+    font-size: 1.2rem;
     overflow: hidden;
     border-left: slategrey solid 3px;
     border-right: slategrey solid 3px;
@@ -144,6 +156,7 @@
     width: 7%;
     margin: 0 15px;
     align-items: center;
+    justify-content: center;
     font-size: 1.2rem;
     text-align: center;
     line-height: 2;
@@ -157,6 +170,7 @@
     font-size: 0.7rem;
     line-height: 1;
     align-items: center;
+    justify-content: center;
     text-align: center;
 }
 
@@ -165,9 +179,7 @@
     height: 100%;
     width: 52%;
     align-items: center;
-    justify-content: center;
     font-size: 1.2rem;
-    text-align: center;
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
@@ -192,7 +204,7 @@
     white-space: pre-line;
     visibility: hidden;
     opacity: 0;
-    transition: visibility 0s, opacity 0.5s ease 1s;
+    transition: visibility 0s, opacity 0.5s ease 1.5s;
 }
 
 .message:hover::after {
@@ -206,8 +218,6 @@
     height: 100%;
     width: 52%;
     align-items: center;
-    justify-content: center;
-    text-align: center;
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
@@ -232,7 +242,7 @@
     white-space: pre-line;
     visibility: hidden;
     opacity: 0;
-    transition: visibility 0s, opacity 0.5s ease 1s;
+    transition: visibility 0s, opacity 0.5s ease 1.5s;
 }
 
 .message_small:hover::after {
@@ -241,13 +251,12 @@
 }
 
 
-
-
-.info {
+.controlButton {
     width: 60px;
     height: 60px;
     margin: auto 15px;
-    background-image: url("../../../public/images/comment-dots.svg");
+    border: none;
+    background-color: transparent;
     background-size: contain;
     background-position: center;
     background-repeat: no-repeat;
@@ -255,15 +264,16 @@
     transition: transform 0.2s;
 }
 
-.info:hover {
+.controlButton:hover {
     transform: scale(1.2);
 }
 
-.info_small {
+.controlButton_small {
     width: 23px;
     height: 23px;
     margin: auto 6px;
-    background-image: url("../../../public/images/comment-dots.svg");
+    border: none;
+    background-color: transparent;
     background-size: contain;
     background-position: center;
     background-repeat: no-repeat;
@@ -271,40 +281,119 @@
     transition: transform 0.2s;
 }
 
-.info_small:hover {
+.controlButton_small:hover {
     transform: scale(1.2);
+}
+
+.silenceWindow {
+    z-index: 10;
+    display: flex;
+    padding: 6px 30px;
+    position: absolute;
+    right: 10%;
+    top: 15px;
+    background-color: #708090EA;
+    border-radius: 20px;
+}
+
+.silenceWindow_small {
+    padding: 5px 14px;
+    top: 1px;
+}
+
+.silenceWindowActive {
+    display: flex;
+}
+
+.silenceWindowDisabled {
+    display: none;
+}
+
+.silenceComment {
+    overflow: auto;
+    font-size: 1rem;
+    text-align: center;
+    margin-right: 30px;
+    width: 250px;
+    border-radius: 10px;
+    outline: none;
+}
+
+.silenceComment::placeholder {
+    font-size: 1rem;
+}
+
+
+
+.silenceComment_small {
+    font-size: 0.7rem;
+    margin-right: 14px;
+}
+
+.silenceComment_small::placeholder {
+    font-size: 0.7rem;
+}
+
+.silenceDuration {
+    font-size: 1rem;
+    text-align: center;
+    margin-right: 30px;
+    width: 150px;
+    border-radius: 10px;
+    outline: none;
+}
+.silenceDuration::placeholder {
+    font-size: 1rem;
+}
+
+.silenceDuration_small {
+    font-size: 0.7rem;
+    margin-right: 14px;
+    width: 70px;
+}
+
+.silenceDuration_small::placeholder {
+    font-size: 0.7rem;
+}
+
+
+.silenceButton {
+    font-size: 1.5rem;
+    border-radius: 10px;
+}
+
+.silenceButton_small {
+    font-size: 0.7rem;
+}
+
+.silenceButtonDisabled {
+    background-color: #989898;
+    color: black;
+    border: 2px #989898 solid;
+}
+.silenceButtonEnabled {
+    background-color: #e1fafa;
+    border: 2px solid #C3FAFAFF;
+    transition: transform 0.15s;
+    color: black;
+    cursor: pointer;
+}
+
+.silenceButtonEnabled:hover {
+    cursor: pointer;
+    transform: scale(0.9);
+}
+
+.silence {
+    background-image: url("../../../public/images/mute-notification-svgrepo-com.svg");
+}
+
+.info {
+    background-image: url("../../../public/images/comment-dots.svg");
 }
 
 .refresh {
-    width: 60px;
-    height: 60px;
-    margin: auto 15px;
-    background-image: url("../../../public/images/refresh-svgrepo-com.svg");
-    background-size: contain;
-    background-position: center;
-    background-repeat: no-repeat;
-    cursor: pointer;
-    transition: transform 0.2s;
-}
-
-.refresh:hover {
-    transform: scale(1.2);
-}
-
-.refresh_small {
-    width: 23px;
-    height: 23px;
-    margin: auto 6px;
-    background-image: url("../../../public/images/refresh-svgrepo-com.svg");
-    background-size: contain;
-    background-position: center;
-    background-repeat: no-repeat;
-    cursor: pointer;
-    transition: transform 0.2s;
-}
-
-.refresh_small:hover {
-    transform: scale(1.2);
+    background-image: url("../../../public/images/refresh-cw-alt-bw-svgrepo-com.svg");
 }
 
 
@@ -339,7 +428,7 @@
     .alertName {
         margin: auto 10px;
         padding: 0 6px;
-        font-size: 1rem;
+        font-size: 0.8rem;
         border-left: slategrey solid 2px;
         border-right: slategrey solid 2px;
     }
@@ -357,20 +446,44 @@
         font-size: 0.8rem;
     }
 
-    .refresh {
+    .controlButton {
         width: 40px;
         height: 40px;
         margin: auto 10px;
     }
 
-    .info {
-        width: 40px;
-        height: 40px;
-        margin: auto 10px;
+    .silenceWindow {
+        padding: 8px 20px;
+        right: 200px;
+        top: 5px;
     }
+
+    .silenceWindow_small {
+        padding: 1px 14px;
+        top: 2px;
+    }
+
+    .silenceComment {
+        font-size: 0.9rem;
+        margin-right: 20px;
+    }
+
+    .silenceDuration {
+        font-size: 0.9rem;
+        margin-right: 20px;
+        width: 140px;
+    }
+
+    .silenceButton {
+        font-size: 1rem;
+    }
+    .silenceButton_small {
+        font-size: 0.7rem;
+    }
+
 }
 
-@media screen and (max-width: 1150px){
+@media screen and (max-width: 1510px){
     .alertBody {
         margin: auto;
     }
@@ -419,15 +532,29 @@
         font-size: 0.6rem;
     }
 
-    .refresh {
+    .controlButton {
         width: 26px;
         height: 26px;
         margin: auto 6px;
     }
 
-    .info {
-        width: 27px;
-        height: 27px;
-        margin: auto 6px;
+    .silenceWindow {
+        padding: 1px 14px;
+        right: 120px;
+    }
+
+    .silenceComment {
+        font-size: 0.6rem;
+        margin-right: 14px;
+    }
+
+    .silenceDuration {
+        font-size: 0.6rem;
+        margin-right: 14px;
+        width: 90px;
+    }
+
+    .silenceButton {
+        font-size: 0.9rem;
     }
 }

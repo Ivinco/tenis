@@ -6,8 +6,11 @@ from time import sleep
 schema = {
     "definitions": {
         "custom_field_definition": {
-            "additionalProperties": True
-        },
+            "type": "object",
+            "additionalProperties": {
+                "type": "string"
+            }
+        }
         "alert_definition": {
             "properties": {
                 "project": { "type": "string", "maxLength": 255 },
@@ -18,12 +21,12 @@ schema = {
                 "msg": { "type": "string", "maxLength": 65536 },
                 "responsibleUser": { "type": "string", "maxLength": 1024 },
                 "comment": { "type": "string" , "maxLength": 65536},
-                "isScheduled": { "type": "boolean" },
+                "silenced": { "type": "boolean" },
                 "customFields": { "type": "object", "$ref": "#/definitions/custom_field_definition" }
             },
             "anyOf": [
-                {"required": [ "project", "host", "fired", "alertName", "severity", "msg", "responsibleUser", "comment", "isScheduled" ]},
-                {"required": [ "project", "host", "fired", "alertName", "severity", "msg", "responsibleUser", "comment", "isScheduled", "customFields" ]}
+                {"required": [ "project", "host", "fired", "alertName", "severity", "msg", "responsibleUser", "comment", "silenced" ]},
+                {"required": [ "project", "host", "fired", "alertName", "severity", "msg", "responsibleUser", "comment", "silenced", "customFields" ]}
             ],
             "additionalProperties": False
         }

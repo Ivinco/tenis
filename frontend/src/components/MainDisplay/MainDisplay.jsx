@@ -5,21 +5,53 @@ import AutoSizer from "react-virtualized-auto-sizer";
 import {useConnectSocket} from "../../hooks/useConnectSocket";
 import Alert from "../Alert/Alert";
 import {useDispatch, useSelector} from "react-redux";
-import {setAlertsNumber} from "../../store/reducers/alertReducer";
+import {
+    setAlertsNumber,
+    setCriticalAlertsNumber, setEmergencyAlertsNumber, setOtherAlertsNumber,
+    setTotalAlertsNumber,
+    setWarningAlertsNumber
+} from "../../store/reducers/alertReducer";
 import AlertGroup from "../AlertGroup/AlertGroup";
 import {groupByField} from "../../utils/utils";
 import {alertNameGroups, alertsToGroup, hostNameGroups} from "../../utils/grouping";
+import {HISTORY_DISPLAY, SILENCED_DISPLAY} from "../../store/actions/DISPLAY_ACTIONS";
+import {LocalizationProvider} from "@mui/x-date-pickers/LocalizationProvider";
+import {AdapterDayjs} from "@mui/x-date-pickers/AdapterDayjs";
+import {MobileDateTimePicker} from "@mui/x-date-pickers/MobileDateTimePicker";
+import dayjs from "dayjs";
+import AlertService from "../../services/AlertService";
+import {setModalError} from "../../store/reducers/modalReducer";
 
 export default function MainDisplay() {
     useConnectSocket(localStorage.getItem('token'))
     const dispatch = useDispatch()
     const isActiveSocket = useSelector(state => state.webSocket.isOpened)
-    const rawAlerts = useSelector(state => state.webSocket.alerts)
+    const allAlerts = useSelector(state => state.webSocket.alerts)
     const isInspectMode = useSelector(state => state.setHeaderMenuItemValue.inspectMode)
     const activeProject = useSelector(state => state.setHeaderMenuItemValue.project)
     const isGrouped = useSelector(state => state.setHeaderMenuItemValue.grouping)
     const foundAlerts = useSelector(state => state.setAlertReducer.foundAlerts)
+    const displayMode = useSelector(state => state.setDisplay.display)
     const [windowWidth, setWindowWidth] = useState(window.innerWidth)
+    const [startDate, setStartDate] = useState(new Date());
+    const [historyAlertList, setHistoryAlertList] = useState([]);
+    let rawAlerts
+
+    switch(displayMode){
+        case SILENCED_DISPLAY:
+            rawAlerts = allAlerts.filter((alert) => alert.silenced === true)
+            break
+        case HISTORY_DISPLAY:
+            rawAlerts = historyAlertList
+            break
+        default:
+            rawAlerts = allAlerts.filter((alert) => alert.silenced === false)
+    }
+
+
+
+
+
     let alertList
     let alertsToDisplay
     let rowHeight
@@ -37,11 +69,11 @@ export default function MainDisplay() {
         };
     }, []);
 
-    if(windowWidth > 2150 && isInspectMode){
+    if(windowWidth > 2150 && !isInspectMode){
         rowHeight = 95
-    } else if ((1150 < windowWidth && windowWidth <= 2150) && isInspectMode) {
+    } else if ((1150 < windowWidth && windowWidth <= 2150) && !isInspectMode) {
         rowHeight = 60
-    } else if (!isInspectMode){
+    } else if (isInspectMode){
         rowHeight = 32
     }
 
@@ -66,11 +98,23 @@ export default function MainDisplay() {
     }
     //Define ungrouped alerts which will be displayed in virtual list
     let ungroupedAlerts = alertsToDisplay
-    dispatch(setAlertsNumber(alertsToDisplay.length))
+    let totalAlertsNumber = alertsToDisplay.length
+    let emergencyAlertsNumber = alertsToDisplay.filter((alert) => alert.severity === 'EMERGENCY').length
+    let criticalAlertsNumber = alertsToDisplay.filter(alert => alert.severity === 'CRITICAL').length
+    let warningAlertsNumber = alertsToDisplay.filter(alert => alert.severity === 'WARNING').length
+    let otherAlertsNumber = alertsToDisplay.filter(alert => alert.severity !== 'CRITICAL' && alert.severity !== 'WARNING' && alert.severity !== 'EMERGENCY').length
+    dispatch(setTotalAlertsNumber(totalAlertsNumber))
+    dispatch(setEmergencyAlertsNumber(emergencyAlertsNumber))
+    dispatch(setCriticalAlertsNumber(criticalAlertsNumber))
+    dispatch(setWarningAlertsNumber(warningAlertsNumber))
+    dispatch(setOtherAlertsNumber(otherAlertsNumber))
+
+
+    console.log(otherAlertsNumber)
 
     //This block defines grouping functionality
     const alertGroups = []
-    if (isGrouped === "Enabled"){
+    if (isGrouped){
         //Here we are grouping alerts by Hostname
         const groupsByHost = groupByField(alertsToDisplay, 'host')
         //Process alerts grouped by name
@@ -96,18 +140,44 @@ export default function MainDisplay() {
         </div>
     )
 
+    const onClickHandler = async (e) => {
+        e.preventDefault()
+        const datetime = Date.parse(startDate) / 1000
+        try {
+            const response = await AlertService.getHistoryAlerts(datetime)
+            const historyAlerts = response.data.history
+            setHistoryAlertList(historyAlerts)
+        }
+        catch (e) {
+            dispatch(setModalError("Oops. Something went wrong. Please, try a bit later"))
+        }
+    }
+
 
 
     return (
         <div className={styles.mainDisplay}>
             {isActiveSocket ?
                 <>
-                    { alertGroups.length > 0
+                    {displayMode === HISTORY_DISPLAY
+                        ?
+                        <div className={styles.dateField}>
+                            <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                <MobileDateTimePicker defaultValue={dayjs(startDate)} onChange={e => setStartDate(e)}
+                                                      ampm={false}/>
+                            </LocalizationProvider>
+                            <button className={styles.submitDateButton} onClick={e => onClickHandler(e)}/>
+                        </div>
+                        :
+                        null
+                    }
+
+                    {alertGroups.length > 0
                         ?
                         alertGroups.map(group => (
                             <div className={
                                 `${styles.groupWrapper} 
-                                ${isInspectMode ? null : styles.groupWrapper_small}`
+                                ${!isInspectMode ? null : styles.groupWrapper_small}`
                             } key={group.id}>
                                 <AlertGroup group={group} alertHeight={rowHeight}/>
                             </div>

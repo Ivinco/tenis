@@ -3,17 +3,24 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@emotion/react": "^11.11.3",
+    "@emotion/styled": "^11.11.0",
+    "@mui/material": "^5.15.10",
+    "@mui/x-date-pickers": "^6.19.5",
     "@testing-library/jest-dom": "^5.14.1",
     "@testing-library/react": "^13.0.0",
     "@testing-library/user-event": "^13.2.1",
     "axios": "^1.6.0",
+    "dayjs": "^1.11.10",
     "js-sha256": "^0.10.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-google-charts": "^4.0.1",
     "react-loading": "^2.0.3",
     "react-redux": "^8.1.3",
     "react-router-dom": "^6.17.0",
     "react-scripts": "^5.0.1",
+    "react-timelines": "^2.6.1",
     "react-virtualized-auto-sizer": "^1.0.20",
     "react-window": "^1.8.10",
     "redux": "^4.2.1",
@@ -44,5 +51,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11"
   }
 }

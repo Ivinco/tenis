@@ -6,16 +6,19 @@ import re
 import logging
 import requests
 import subprocess
-from time import sleep
+from time import sleep, time
 from argparse import ArgumentParser
 
 access_token = ''   # TENIS Access token, it's more secure to write it here or as env var instead of adding through args
-check_timeout = 60  # Main files check timeout in sec, if files where deleted or recreated we have to reopen them
-nagios_obj = '/var/log/nagios/objects.cache'  # Default Nagios' active objects cache file path
+check_files = 60    # Main files check timeout in sec, if files where deleted or recreated we have to reopen them
+check_alerts = 10   # Check alerts timeout, list of alerts will be collected from Tenis and checked if alerts are actual
+nagios_obj = '/var/log/nagios/objects.cache'  # Default Nagios' active objects cache file
+nagios_cmd = '/var/log/nagios/rw/nagios.cmd'  # Default Nagios' command file path to send commands
 nagios_log = '/var/log/nagios/nagios.log'     # Default Nagios' event log file path to parse
 nagios_dat = '/var/log/nagios/status.dat'     # Default Nagios' status file path to parse
 nagios_cfg = '/etc/nagios/nagios.cfg'         # Default Nagios' config file path to parse
 plugin_log = '/var/log/nip.log'               # Default log file path for this script
+plugin_pid = 'NIP'                            # Default plugin ID string to match alerts
 project_name = 'main'                         # Default project name
 max_send = 5000                               # Send max 5000 events at once
 # -------------------------------------------------------------------------------------------------------------------- #
@@ -28,6 +31,7 @@ def args_parser():
     parser.add_argument('-d', '--debug',   help='Print some debug data',      action='store_true')
     parser.add_argument('-c', '--cfg',     help='Path to Nagios config file', default=nagios_cfg)
     parser.add_argument('-l', '--log',     help='Path to NIP log file',       default=plugin_log)
+    parser.add_argument('-i', '--pid',     help='NIP id to match alerts',     default=plugin_pid)
     parser.add_argument('-s', '--server',  help='TENIS server url',           required=True)
     parser.add_argument('-t', '--token',   help='Access token',               default=token)
     return parser.parse_args()
@@ -122,7 +126,7 @@ def send_events(args, events, dump, tenis):
     return can_clear_data
 
 
-def parse_nagios_config(cfg, log, obj, dat):
+def parse_nagios_config(cfg, log, obj, dat, cmd):
     """
     Parse Nagios' config file to get paths to nagios.log, status.dat and object.cache
 
@@ -133,13 +137,15 @@ def parse_nagios_config(cfg, log, obj, dat):
     :return: renewed log, obj, dat
     """
 
-    new_log, new_dat, new_obj = '', '', ''
+    new_log, new_dat, new_obj, new_cmd = '', '', '', ''
     with open(cfg) as f:
         line = 1
         while line:
             line = f.readline()
             if re.match(r'^log_file=.+', line):
                 new_log = line.split('=')[1].strip()
+            if re.match(r'^command_file=.+', line):
+                new_cmd = line.split('=')[1].strip()
             if re.match(r'^status_file=.+', line):
                 new_dat = line.split('=')[1].strip()
             if re.match(r'^object_cache_file=.+', line):
@@ -152,17 +158,96 @@ def parse_nagios_config(cfg, log, obj, dat):
         dat = new_dat
     if new_obj:
         obj = new_obj
+    if new_cmd:
+        cmd = new_cmd
 
-    return log, obj, dat
+    return log, obj, dat, cmd
 
 
-def add_events(project, event, events, objects):
+def parse_status_dat(dat, project, pid, objects):
+    """
+    Parse status.dat to get alerts that already fired or resolved long ago before NIP service (re)start
+
+    :param dat: Path to Nagios' status.dat file
+    :param project: Project name
+    :param pid: Plugin ID
+    :param objects: Dictionary with services info, needed to parse fix_instruction url
+    :return: list of alert items(dictionary)
+    """
+
+    alerts = []
+    # Grep only actual alerts, the fastest method
+    greps = [
+        'current_state=[1-9]',
+        r'(service|host)status\s',
+        'last_time_up=',
+        'host_name=',
+        'last_hard_state_change=',
+        'service_description=',
+        r'\splugin_output=',
+    ]
+    full_grep = '|'.join(greps)
+    cmd = [f"grep -E '{greps[0]}' -B16 -A17 {dat} | grep -E '{full_grep}'"]
+    data = []
+    try:
+        data = subprocess.run(cmd, shell=True, stdout=subprocess.PIPE).stdout.decode('utf-8').split('\n')
+    except Exception as e:
+        logging.warning(f"Error reading data from {dat}: {str(e)}")
+
+    # Resulted data example (6 lines)
+    # hoststatus {
+    # host_name=archive01
+    # current_state=0
+    # plugin_output=PING OK - Packet loss = 0%, RTA = 0.14 ms
+    # last_hard_state_change=1706471355
+    # last_time_up=1707306034
+    host_map = ('host', 'severity', 'message', 'fired', 'trash')
+
+    # servicestatus {
+    # host_name=blogse13
+    # service_description=Package versions - nrpe
+    # current_state=0
+    # last_hard_state_change=1677065634
+    # plugin_output=OK: nrpe version 4.0 OK
+    service_map = ('host', 'name', 'severity', 'fired', 'message')
+    srv_sev_map = ('OK', 'WARNING', 'CRITICAL', 'UNKNOWN')
+    hst_sev_map = ('UP', 'DOWN', 'UNKNOWN')
+
+    step = 6  # to process all 6 lines of each item at once
+    for i in range(0, len(data), step):
+        if data[i]:
+            try:
+                event = {'type': 'update'}
+                raw = data[i:i + step]
+                typ = raw.pop(0)
+                for j in range(0, len(raw)):
+                    parameter_name = host_map[j]
+                    if re.match(r'service', typ):
+                        parameter_name = service_map[j]
+                    parameter_value = raw[j].split('=')[1:]
+                    event[parameter_name] = '='.join(parameter_value)
+                event['fired'] = int(event['fired'])
+                if re.match(r'service', typ):
+                    event['severity'] = srv_sev_map[int(event['severity'])]
+                if re.match(r'host', typ):
+                    event['severity'] = hst_sev_map[int(event['severity'])]
+                    event['name'] = 'HOST DOWN'
+                if event['severity'] == 'OK' or event['severity'] == 'UP':
+                    event['type'] = 'resolve'
+                add_events(project, event, alerts, pid, objects)
+            except Exception as e:
+                logging.warning(f"Error reading data from {dat}: {str(e)}")
+    return alerts
+
+
+def add_events(project, event, events, pid, objects):
     """
     Append the list of alerts with new items.
 
     :param project: Project name
     :param event: Dictionary with Alert parameters
     :param events: Lists of updates and resolves to append too
+    :param pid: Plugin ID
     :param objects: Dictionary with services info, needed to parse fix_instruction url
     :return: nothing
     """
@@ -199,7 +284,8 @@ def add_events(project, event, events, objects):
             "msg": event['message'],
             "responsibleUser": "",
             "comment": "",
-            "isScheduled": False,
+            "silenced": False,
+            "plugin_id": pid,
             "customFields": {
                 "fixInstructions": notes_url,
             }
@@ -209,72 +295,21 @@ def add_events(project, event, events, objects):
     events.append(event_template[event['type']])
 
 
-def parse_status_dat(dat, project, events, objects):
+def recheck(command, cmd):
     """
-    Parse status.dat to get alerts that already fired or resolved long ago before NIP service (re)start
+    Schedule force recheck for service or host
 
-    :param dat: Path to Nagios' status.dat file
-    :param project: Project name
-    :param events: Global List of alerts and resolves
-    :param objects: Dictionary with services info, needed to parse fix_instruction url
-    :return: Nothing
+    :param command: { 'cmd': 'command_name', 'host': 'host_name', 'alertName': 'alert_name' }
+    :param cmd: Path to the Nagios' command file
+    :return: nothing
     """
+    ts = int(time())
+    nag_cmd = f"[{ts}] SCHEDULE_FORCED_SVC_CHECK;{command['host']};{command['alertName']};{ts}\n"
+    if command['alertName'] == 'HOST DOWN':
+        nag_cmd = f"[{ts}] SCHEDULE_FORCED_HOST_CHECK;{command['host']};{ts}\n"
 
-    # Grep only needed values to ease the process
-    grep1 = '(service|host)status {'
-    grep2 = fr'{grep1}|time_up=|host_name=|service_description=|current_state=|hard_state_change=|\splugin_output='
-    cmd = [f"grep -E '{grep1}' -A32 {dat} | grep -E '{grep2}'"]
-    data = []
-    try:
-        data = subprocess.run(cmd, shell=True, stdout=subprocess.PIPE).stdout.decode('utf-8').split('\n')
-    except Exception as e:
-        logging.warning(f"Error reading data from {dat}: {str(e)}")
-
-    # Resulted data example (6 lines)
-    # hoststatus {
-    # host_name=archive01
-    # current_state=0
-    # plugin_output=PING OK - Packet loss = 0%, RTA = 0.14 ms
-    # last_hard_state_change=1706471355
-    # last_time_up=1707306034
-    host_map = ('host', 'severity', 'message', 'fired', 'trash')
-
-    # servicestatus {
-    # host_name=blogse13
-    # service_description=Package versions - nrpe
-    # current_state=0
-    # last_hard_state_change=1677065634
-    # plugin_output=OK: nrpe version 4.0 OK
-    service_map = ('host', 'name', 'severity', 'fired', 'message')
-    srv_sev_map = ('OK', 'WARNING', 'CRITICAL', 'UNKNOWN')
-    hst_sev_map = ('UP', 'DOWN', 'UNKNOWN')
-
-    step = 6  # to process all 6 lines of each item at once
-    for i in range(0, len(data), step):
-        if data[i]:
-            try:
-                event = {'type': 'update'}
-                raw = data[i:i + step]
-                typ = raw[0]
-                raw.pop(0)
-                for j in range(0, len(raw)):
-                    parameter_name = host_map[j]
-                    if re.match(r'service', typ):
-                        parameter_name = service_map[j]
-                    parameter_value = raw[j].split('=')[1:]
-                    event[parameter_name] = '='.join(parameter_value)
-                event['fired'] = int(event['fired'])
-                if re.match(r'service', typ):
-                    event['severity'] = srv_sev_map[int(event['severity'])]
-                if re.match(r'host', typ):
-                    event['severity'] = hst_sev_map[int(event['severity'])]
-                    event['name'] = f"host_name\t{event['host']}"
-                if event['severity'] == 'OK' or event['severity'] == 'UP':
-                    event['type'] = 'resolve'
-
-                add_events(project, event, events[event['type']], objects)
-            except Exception as e:
-                logging.warning(f"Error reading data from {dat}: {str(e)}")
+    with open(cmd, 'w') as cmd_file:
+        cmd_file.write(nag_cmd)
 
 
 def main():
@@ -288,7 +323,7 @@ def main():
     """
 
     args = args_parser()
-    log, obj, dat = parse_nagios_config(args.cfg, nagios_log, nagios_obj, nagios_dat)
+    log, obj, dat, cmd = parse_nagios_config(args.cfg, nagios_log, nagios_obj, nagios_dat, nagios_cmd)
     # Nagios' log data example, we need strings with '^\[[0-9]+].*(SERVICE|HOST)\sALERT:.*' pattern:
     # N of index in lst:       0            1        2      3   4       5
     # [1705421869] SERVICE ALERT: host;Alert name;CRITICAL;SOFT;1;Alert message
@@ -328,13 +363,16 @@ def main():
     load_objects(obj, objects)
     dump = {'update': [], 'resolve': []}
     events = {'update': [], 'resolve': []}
-    parse_status_dat(dat, args.project, events, objects)
+    alerts = parse_status_dat(dat, args.project, args.pid, objects)
+    if alerts:
+        events['update'].extend(alerts)
 
     while 1:  # Main loop to reopen nagios.log file if it was recreated
         while not os.path.exists(log):  # wait until log file is ready
             sleep(1)
 
-        timer = 0
+        timer_files = 0
+        timer_alerts = 0
         log_id = check_file_id(log)
         obj_id = check_file_id(obj)
         logging.info(f"Start reading file {log}")
@@ -360,7 +398,7 @@ def main():
                                         event['host'] = parameter_value.split(' ')[-1]
                                     else:
                                         event[parameter_name] = parameter_value.strip()
-                                event['name'] = f"host_name\t{event['host']}"
+                                event['name'] = 'HOST DOWN'
                             else:  # it's Service alert
                                 for i in range(0, len(raw_alert_split)):
                                     parameter_name = service_map[i]
@@ -374,7 +412,7 @@ def main():
                             if re.match(r'OK|UP', event['severity']):  # it's Resolve
                                 event['type'] = 'resolve'
 
-                            add_events(args.project, event, events[event['type']], objects)
+                            add_events(args.project, event, events[event['type']], args.pid, objects)
 
                     else:  # If string is empty it means we reached the end of file, send collected events, renew events
                         if events['update'] or events['resolve']:
@@ -388,12 +426,56 @@ def main():
 
                 except Exception as e:  # Logg all errors
                     logging.critical(f"Some error occurred: {str(e)}")
-                    sleep(check_timeout)
+                    sleep(check_files)
 
                 sleep(n)  # To keep CPU load low
-                timer += n
-                if timer >= check_timeout:
-                    timer = 0
+                timer_files += n
+                timer_alerts += n
+                if timer_alerts >= check_alerts:  # It's time to check alerts and commands
+                    timer_alerts = 0
+                    try:
+                        json_hdr = {'Accept': 'application/json'}
+                        n_alerts = parse_status_dat(dat, args.project, args.pid, objects)
+                        t_alerts = tenis.get(args.server + f'/out?pid={args.pid}', headers=json_hdr).json()
+                        commands = tenis.get(args.server + f'/out?pid={args.pid}&type=cmd', headers=json_hdr).json()
+
+                        for command in commands:
+                            if command['cmd'] == 'recheck':
+                                if args.debug:
+                                    print(command)
+                                recheck(command, cmd)
+
+                        if t_alerts != n_alerts:
+                            for item in n_alerts:
+                                tmp = [z for z in t_alerts
+                                       if z['host'] == item['host']
+                                       and z['alertName'] == item['alertName']
+                                       and z['msg'] == item['msg']]
+                                if not tmp:
+                                    events['update'].append(item)
+
+                        for item in t_alerts:
+                            event = {
+                                'name': item['alertName'],
+                                'fired': item['fired'],
+                                'host': item['host'],
+                                'type': 'resolve',
+                                'severity': 'OK',
+                                'message': ''
+                            }
+                            if not n_alerts:
+                                add_events(args.project, event, events['resolve'], args.pid, objects)
+                            else:
+                                tmp = [z for z in n_alerts
+                                       if z['host'] == item['host']
+                                       and z['alertName'] == item['alertName']]
+                                if not tmp:
+                                    add_events(args.project, event, events['resolve'], args.pid, objects)
+                    except Exception as e:  # Logg all errors
+                        logging.critical(f"Some error occurred: {str(e)}")
+
+                if timer_files >= check_files:  # It's time to check Nagios' files
+                    timer_files = 0
                     obj_id_new = check_file_id(obj)  # Check that objects file is not deleted/recreated
                     if obj_id_new != obj_id:
                         objects = {}

@@ -1,11 +1,12 @@
 .header {
     display: flex;
     width: 100%;
+    position: relative;
 
 }
 .logo {
-    width: 120px;
-    height: 100px;
+    width: 160px;
+    height: 75px;
     background-image: url("../../../public/images/ivinco.svg");
     background-size: contain;
     background-repeat: no-repeat;
@@ -14,6 +15,7 @@
 }
 
 .onDutyPortal {
+    visibility: hidden;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -22,70 +24,140 @@
     background-color: white;
     border: darkgrey 2px solid;
     border-radius: 10px;
-    margin: auto 15px 30px auto;
+    margin: auto 0 0 30px;
     padding: 0 10px;
     font-size: 1.5rem;
 }
 
 .onDutyPortalActive {
-    border: #05F0D2 2px solid;
+    border: #01a2d8 2px solid;
 }
+
+.searchForm {
+    display: flex;
+    height: 50px;
+    margin: auto 0 0 20px;
+    padding: 2px 4px 2px 2px;
+    border: #01A2D8 2px solid;
+    border-radius: 10px;
+    background-color: white;
+}
+
+.searchField {
+    height: 50px;
+    width: 420px;
+    margin: 0;
+    border: none;
+    font-size: 1.5rem;
+    padding: 0 8px;
+
+}
+
+.searchField:focus {
+    outline: none;
+}
+.searchField::placeholder {
+    color: #bbb;
+}
+
+.searchButton {
+    height: 50px;
+    width: 50px;
+    border: none;
+    background-color: transparent;
+    background-image: url("../../../public/images/search.svg");
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    transition: transform 0.2s;
+}
+
+.searchButton:hover {
+    cursor: pointer;
+    transform: scale(0.9);
+}
+
+input[type="search"]::-webkit-search-cancel-button {
+    display: none;
+}
+
+.resetSearchButton_hidden {
+    visibility: hidden;
+}
+
+.resetSearchButton {
+    margin: auto;
+    height: 30px;
+    width: 30px;
+    background-color: transparent;
+    background-image: url("../../../public/images/close-icon.svg");
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    border: none;
+    transition: transform 0.2s;
+}
+
+.resetSearchButton:hover {
+    cursor: pointer;
+    transform: scale(1.2);
+}
+
 
 .alertsCount {
     display: flex;
-    flex-direction: column;
-    width: 165px;
-    height: 108px;
-    margin: 40px auto auto;
-    padding: 27px;
+    margin: auto auto 0 50px;
     justify-content: center;
-    align-items: center;
-    background-color: white;
-    border: #05F0D2 2px solid;
-    border-radius: 30px;
+    align-items: end;
+    font-size: 2rem;
+}
 
+.alertCountItems {
+    font-weight: bold;
+    margin: 0 10px 0 0;
+    padding: 5px 8px;
+    color: #01a2d8;
 }
 
 .alertsNumber {
-    display: flex;
-    font-size: 3.6rem;
+   text-shadow: -1px -1px 0 #939292,
+                1px -1px 0 #939292,
+                -1px  1px 0 #939292,
+                1px  1px 0 #939292;
+}
+
+.emergencyAlerts {
+    color: #f67d7a;
+}
+
+.criticalAlerts {
+    color: #FFBBBA;
+}
+
+.warningAlerts {
+    color: #FEFFC1;
+}
+
+.otherAlerts {
+    color: #bab8b8;
+}
+
+.totalAlerts {
     margin: 0;
 }
 
 .alertsCountTitle {
-    display: flex;
-    font-size: 1.5rem;
-    margin: 10px auto 0;
+    margin: 0 0 0 20px;
+    padding-right: 0;
 }
 
-
-
-.navbar {
-    display: flex;
-    margin: auto auto 30px auto;
-    width: 50%;
-}
-
-.itemsBlock {
-    display: flex;
-    width: 100%;
-    margin: 0;
-    padding: 0;
-    list-style: none;
-    justify-content: space-around;
-    align-items: center;
-}
-
-.navItem {
-    display: flex;
-}
 
 .headerButton {
     min-width: 135px;
     min-height: 50px;
-    margin: auto auto;
+    margin: auto;
     background-color: transparent;
-    border: #05F0D2 2px solid;
+    border: #01a2d8 2px solid;
     border-radius: 10px;
     font-size: 2rem;
     padding: 12px 15px;
@@ -115,7 +187,7 @@
     background-position: center;
     background-repeat: no-repeat;
     background-color: transparent;
-    margin: auto 0 30px auto;
+    margin: auto 30px 0 0;
     border: none;
     filter: grayscale(100%);
 }
@@ -123,11 +195,25 @@
 .funcButtonEnabled {
     cursor: pointer;
     transition: transform 0.2s;
-    border: #05F0D2 2px solid;
     filter: none;
 }
 .funcButtonEnabled:hover {
     transform: scale(1.2);
+}
+
+.groupAlerts {
+    border: none;
+    border-radius: 10px;
+    background-image: url("../../../public/images/group-list-color-svgrepo-com.svg");
+}
+
+.silenceButton {
+    border: none;
+    background-image: url("../../../public/images/mute-notification-color-svgrepo-com.svg");
+}
+
+.funcButton:focus{
+    outline: none;
 }
 
 .inspectButton {
@@ -136,9 +222,11 @@
     background-image: url("../../../public/images/resize-button.svg");
 }
 
+
+
 .refreshButton {
     border: none;
-    background-image: url("../../../public/images/refresh-svgrepo-com.svg");
+    background-image: url("../../../public/images/refresh-cw-alt-color-svgrepo-com.svg");
 }
 
 .filterButton {
@@ -146,13 +234,13 @@
 }
 
 .avatar {
-    width: 100px;
-    height: 100px;
+    width: 75px;
+    height: 75px;
     background-size: cover;
     background-repeat: no-repeat;
-    margin: auto 45px;
+    margin: 10px 45px 0;
     border-radius: 50%;
-    border: 3px solid #05F0D2;
+    border: 3px solid #01a2d8;
     transition: transform 0.2s;
     position: relative;
 }
@@ -164,7 +252,7 @@
 
 @media screen and (max-width: 2150px) {
     .logo {
-        width: 80px;
+        width: 120px;
         height: 66px;
         margin-left: 30px;
     }
@@ -174,10 +262,46 @@
         min-height: 34px;
         font-size: 1rem;
     }
+
+    .searchForm {
+        height: 33px;
+    }
+
+    .searchField {
+        height: 33px;
+        width: 280px;
+        font-size: 1rem;
+        padding: 0 6px;
+
+    }
+    .searchButton {
+        height: 33px;
+        width: 33px;
+        border: none;
+    }
+    .resetSearchButton {
+        height: 20px;
+        width: 20px;
+    }
+
+    .alertsCount {
+        margin: auto auto 0 33px;
+        font-size: 1.5rem;
+    }
+
+    .alertCountItems {
+        margin: 0 7px 0 0;
+        padding: 3px 4px;
+    }
+
+    .alertsCountTitle {
+        margin: 0 0 0 14px;
+    }
+
     .avatar {
         width: 66px;
         height: 66px;
-        margin: 20px 30px 21px auto;
+        margin: 10px 30px 0 auto;
         border: 2px solid slategrey;
     }
 
@@ -198,29 +322,11 @@
         height: 34px;
     }
 
-    .alertsCount {
-        width: 110px;
-        height: 72px;
-        margin: 27px auto auto;
-        padding: 18px;
-        border-radius: 20px;
-
-    }
-
-    .alertsNumber {
-        font-size: 2.4rem;
-    }
-
-    .alertsCountTitle {
-        font-size: 0.9rem;
-        margin: 6px auto 0;
-    }
-
 }
 
-@media screen and (max-width: 1150px) {
+@media screen and (max-width: 1510px) {
     .logo {
-        width: 53px;
+        width: 100px;
         height: 44px;
         margin-left: 20px;
     }
@@ -229,10 +335,46 @@
         min-height: 12px;
         font-size: 0.66rem;
     }
+
+    .searchForm {
+        height: 22px;
+    }
+
+    .searchField {
+        height: 22px;
+        width: 186px;
+        font-size: 0.8rem;
+        padding: 0 4px;
+
+    }
+    .searchButton {
+        height: 22px;
+        width: 22px;
+        border: none;
+    }
+    .resetSearchButton {
+        height: 14px;
+        width: 14px;
+    }
+
+    .alertsCount {
+        margin: auto auto 0 33px;
+        font-size: 1rem;
+    }
+
+    .alertCountItems {
+        margin: 0 5px 0 0;
+        padding: 2px 3px;
+    }
+
+    .alertsCountTitle {
+        margin: 0 0 0 10px;
+    }
+
     .avatar {
         width: 44px;
         height: 44px;
-        margin: 14px 20px 15px auto;
+        margin: 10px 20px 0 auto;
         border: 1px solid slategrey;
     }
 
@@ -252,22 +394,13 @@
         height: 22px;
     }
 
-    .alertsCount {
-        width: 73px;
-        height: 48px;
-        margin: 18px auto auto;
-        padding: 12px;
-        border-radius: 14px;
-
-    }
-
     .alertsNumber {
-        font-size: 1.6rem;
+        font-size: 1rem;
     }
 
     .alertsCountTitle {
-        font-size: 0.5rem;
-        margin: 4px auto 0;
+        font-size: 1rem;
+        margin-left: 7px;;
     }
 
     .inspectButton {

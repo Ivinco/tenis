@@ -9,11 +9,13 @@ const defaultActiveHeaderMenuItem = {
     activeHeaderMenuItem: null
 }
 
+const localPreferences = JSON.parse(localStorage.getItem('userPreferences'))
+
 const defaultHeaderMenuValues = {
-    project: 'All',
-    grouping: 'Disabled',
+    project: localPreferences ? localPreferences.project : 'All',
+    grouping: localPreferences ? localPreferences.grouping : false,
     tz: 'Browser',
-    inspectMode: true
+    inspectMode: localPreferences ? localPreferences.inspectMode : false
 }
 
 
@@ -31,7 +33,7 @@ export const headerMenuValuesReducer = (state = defaultHeaderMenuValues, action)
         case SET_PROJECT_VALUE:
             return {...state, project: action.payload}
         case SET_GROUPING_VALUE:
-            return {...state, grouping: action.payload}
+            return {...state, grouping: !state.grouping}
         case SET_TIMEZONE_VALUE:
             return {...state, tz: action.payload}
         case SWITCH_INSPECT_MODE:
@@ -51,9 +53,8 @@ export const setProjectMenuValue = (projectName) => ({
     payload: projectName
 })
 
-export const setGroupingMenuValue = (isGrouped) => ({
-    type: SET_GROUPING_VALUE,
-    payload: isGrouped
+export const setGroupingMenuValue = () => ({
+    type: SET_GROUPING_VALUE
 })
 
 export const setTimeZoneValue = (timeZone) => ({

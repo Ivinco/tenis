@@ -28,28 +28,25 @@
 }
 
 .alertsGroupMessage {
-    display: flex;
+    display: inline-block;
     height: 100%;
     width: 52%;
-    align-items: center;
-    justify-content: center;
+    align-content: center;
     font-size: 1.2rem;
-    text-align: center;
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
     padding: 0 10px;
     border-left: slategrey solid 3px;
     border-right: slategrey solid 3px;
+    word-break: break-word; /* Или попробуйте это свойство */
 }
 
 .alertsGroupMessage_small {
-    display: flex;
+    display: inline-block;
     height: 100%;
     width: 52%;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
+    align-content: center;
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
@@ -70,6 +67,10 @@
     display: none;
 }
 
+.tempHiddenButton {
+    visibility: hidden;
+}
+
 
 @media screen and (max-width: 2150px) {
     .alertsNumber {
@@ -84,7 +85,7 @@
     }
 }
 
-@media screen and (max-width: 1150px) {
+@media screen and (max-width: 1510px) {
     .alertsNumber {
         font-size: 1rem;
     }

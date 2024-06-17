@@ -1,5 +1,3 @@
 export const CLOSE_MODAL = 'CLOSE_MODAL'
-export const LOGIN_MODAL = 'LOGIN_MODAL'
-export const PROFILE_MODAL = 'PROFILE_MODAL'
 export const ERROR_MESSAGE = 'ERROR_MESSAGE'
-export const ALERT_DETAILS = 'ALERT_DETAILS'
+export const OPEN_MODAL = 'OPEN_MODAL'

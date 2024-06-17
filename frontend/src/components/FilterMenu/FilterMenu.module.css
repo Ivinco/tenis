@@ -1,9 +1,9 @@
 .menuSpace {
     display: flex;
     width: 100%;
-    height: 162px;
+    height: 100px;
     background-color: #e1fafa;
-    margin: 0 0 20px 0;
+    margin: 0 0 10px 0;
     padding: 0;
     overflow: visible;
     opacity: 1;
@@ -24,137 +24,104 @@
     min-width: 251px;
 }
 
-.searchForm {
-    display: flex;
-    padding: 2px 4px 2px 2px;
-    border: rgba(5, 240, 210, 0.45) 2px solid;
-    border-radius: 10px;
-    background-color: white;
-}
-
-.searchField {
-    min-height: 50px;
-    width: 420px;
-    margin: 0;
-    border: none;
-    font-size: 1.5rem;
-    padding: 0 8px;
-
-}
-.searchField:focus {
-    outline: none;
-}
-.searchField::placeholder {
-    color: #bbb;
-}
-
-.searchButton {
-    height: 50px;
-    width: 50px;
-    border: none;
-    background-color: transparent;
-    background-image: url("../../../public/images/search.svg");
-    background-size: contain;
-    background-position: center;
-    background-repeat: no-repeat;
-    transition: transform 0.2s;
-}
-
-.searchButton:hover {
-    cursor: pointer;
-    transform: scale(0.9);
-}
-
-input[type="search"]::-webkit-search-cancel-button {
-    display: none;
-}
-
-.resetSearchButton_hidden {
-    visibility: hidden;
-}
-
-.resetSearchButton {
-    margin: auto;
-    height: 30px;
-    width: 30px;
-    background-color: transparent;
-    background-image: url("../../../public/images/close-icon.svg");
-    background-size: contain;
-    background-position: center;
-    background-repeat: no-repeat;
-    border: none;
-    transition: transform 0.2s;
-}
-
-.resetSearchButton:hover {
-    cursor: pointer;
-    transform: scale(1.2);
-}
 
 .filterMenu {
     display: flex;
     list-style: none;
-    height: 100px;
+    height: 60px;
     padding: 0;
     margin: auto;
     justify-content: space-between;
 }
+.settingsTumbler {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+    margin: 40px 100px 0 auto;
+}
+
+.settingsSaver {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.settingsSlider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 34px;
+}
+
+.settingsSlider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+.settingsSaver:checked + .settingsSlider {
+    background-color: #2196F3;
+}
+
+.settingsSaver:checked + .settingsSlider:before {
+    transform: translateX(26px);
+}
 
 @media screen and (max-width: 2150px) {
     .menuSpace {
-        max-height: 108px;
+        max-height: 66px;
     }
     .filterMenu {
-        height: 57px;
+        height: 45px;
     }
     .menuItem {
         min-width: 167px;
         margin: auto 27px 0;
     }
-    .searchField {
-        min-height: 33px;
-        width: 280px;
-        font-size: 1rem;
-        padding: 0 6px;
-
-    }
-    .searchButton {
-        height: 33px;
-        width: 33px;
-        border: none;
-    }
-    .resetSearchButton {
-        height: 20px;
-        width: 20px;
-    }
 }
 
-@media screen and (max-width: 1150px) {
+@media screen and (max-width: 1510px) {
     .menuSpace {
-        max-height: 72px;
+        max-height: 44px;
     }
     .filterMenu {
-        height: 33px;
+        height: 30px;
     }
 
     .menuItem {
         min-width: 111px;
         margin: auto 18px 0;
     }
-    .searchField {
-        min-height: 22px;
-        width: 186px;
-        font-size: 0.8rem;
-        padding: 0 4px;
-
-    }
-    .searchButton {
+    .settingsTumbler {
+        width: 40px;
         height: 22px;
-        width: 22px;
-        border: none;
+        margin: 20px 100px 0 auto;
     }
-    .resetSearchButton {
-        height: 14px;
-        width: 14px;
+
+    .settingsSlider {
+        border-radius: 22px;
+    }
+
+    .settingsSlider:before {
+        height: 19px;
+        width: 19px;
+        left: 2px;
+        bottom: 2px;
+    }
+
+    .settingsSaver:checked + .settingsSlider:before {
+        transform: translateX(19px);
     }
 }

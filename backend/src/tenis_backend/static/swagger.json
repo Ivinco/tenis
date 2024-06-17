@@ -1,0 +1,547 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "description": "Tenis",
+    "version": "1.0.0",
+    "title": "Ivinco Tenis API",
+    "license": {
+      "name": "MIT",
+      "url": "https://opensource.org/licenses/MIT"
+    }
+  },
+  "servers": [
+    {
+      "url": "/"
+    }
+  ],
+  "paths":{
+    "/auth":{
+      "post":{
+        "summary": "Auth - Get Token",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Get Token for user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/auth"
+                }
+              }
+            }
+          }          
+        }
+      }
+    },
+    "/ack": {
+      "post":{
+        "security": [
+          {
+          "bearerAuth": []
+          }
+        ],
+        "summary": "Alert - Method to set or unset responsible User for alerts",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "unack": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "alertId": {
+                          "type": "string"
+                        }
+                      },
+                      "required": ["alertId"]
+                    }
+                  }
+                },
+                  "required": ["unack"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Always return OK if alertID exists",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ack"
+                }
+              }
+            }
+          }          
+        }
+      }
+    },
+    "/silence": {
+      "post":{
+        "security": [
+          {
+          "bearerAuth": []
+          }
+        ],        
+        "summary": "Alert - Method to add silence rule and set 'silenced' field of all matched alerts to True",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "project": {
+                    "type": "string"
+                  },
+                  "host": {
+                    "type": "string"
+                  },
+                  "alertName": {
+                    "type": "string"
+                  },
+                  "startSilence": {
+                    "type": "integer"
+                  },
+                  "endSilence": {
+                    "type": "integer"
+                  },
+                  "comment": {
+                    "type": "string"
+                  }                  
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Get Token for user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/auth"
+                }
+              }
+            }
+          }          
+        }
+      }
+    },
+    "/unsilence" :{
+      "post":{
+        "security": [
+          {
+          "bearerAuth": []
+          }
+        ],        
+        "summary": "Alert - Method to remove silence rule(s) and set 'silenced' field of all matched alerts to False",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "_id": {
+                    "type": "string"
+                  },
+                  "project": {
+                    "type": "string"
+                  },
+                  "host": {
+                    "type": "string"
+                  },
+                   "alertName": {
+                    "type": "string"
+                  },
+                   "startSilence": {
+                    "type": "integer"
+                  },
+                   "endSilence": {
+                    "type": "integer"
+                  },
+                  "comment": {
+                    "type": "string"
+                  },
+                 "author": {
+                    "type": "string"
+                  }                                                      
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Get Token for user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/auth"
+                }
+              }
+            }
+          }          
+        }
+      }
+    },
+    "/silenced" :{
+      "get":{
+        "security": [
+          {
+          "bearerAuth": []
+          }
+        ], 
+        "summary": "Alert - Method to return a json list of 'silence' rules",
+        "responses": {
+          "200": {
+            "description": "Get Token for user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/auth"
+                }
+              }
+            }
+          }          
+        }
+      }
+    },
+    "/whoami" :{
+      "get":{
+       "security": [
+          {
+          "bearerAuth": []
+          }
+        ],  
+        "summary": "User - get user's email",
+        "responses": {
+          "200": {
+            "description": "Get Token for user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/auth"
+                }
+              }
+            }
+          }          
+        }
+      }
+    },
+    "/users" :{
+      "get":{
+        "summary": "User - get list of all users",
+        "responses": {
+          "200": {
+            "description": "Get Token for user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/auth"
+                }
+              }
+            }
+          }          
+        }
+      }
+    },
+    "/user" :{
+      "post":{
+        "summary": "User - Return user by id",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Get Token for user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/auth"
+                }
+              }
+            }
+          }          
+        }
+      }
+    },
+    "/user/get_by_email" :{
+      "post":{
+        "summary": "User - Return user by email",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Get Token for user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/auth"
+                }
+              }
+            }
+          }          
+        }
+      }
+    },
+    "/user/add" :{
+      "post":{
+        "summary": "User - Create new User",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Get Token for user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/auth"
+                }
+              }
+            }
+          }          
+        }
+      }
+    },
+    "/user/del" :{
+      "post":{
+        "summary": "User - Removing user with id",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Get Token for user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/auth"
+                }
+              }
+            }
+          }          
+        }
+      }
+    },
+    "/user/disable" :{
+      "post":{
+        "summary": "User - Disable user by id",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Get Token for user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/auth"
+                }
+              }
+            }
+          }          
+        }
+      }
+    },
+    "/user/enable" :{
+      "post":{
+        "summary": "User - Enable user by id",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Get Token for user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/auth"
+                }
+              }
+            }
+          }          
+        }
+      }
+    },
+    "/user/update" :{
+      "post":{
+        "summary": "User - Update user data",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Get Token for user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/auth"
+                }
+              }
+            }
+          }          
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "auth": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string"
+          }
+        }
+      },
+      "ack": {
+        "type": "object",
+        "properties": {
+          "unack": {
+            "type": "array"
+          }
+        }
+      },
+      "silence": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string"
+          }
+        }
+      }
+    },
+   "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Tenis API",
+      "description": "Example of API for Tenis"
+    }
+  ]  
+}    

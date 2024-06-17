@@ -7,6 +7,8 @@ import {authReducer} from "./reducers/authReducer";
 import {modalReducer} from "./reducers/modalReducer";
 import {loadingReducer} from "./reducers/loadingReducer";
 import {alertReducer} from "./reducers/alertReducer";
+import {displayReducer} from "./reducers/displayModeReducer";
+import {silenceRulesReducer} from "./reducers/silenceRulesReducer";
 
 const rootReducer = combineReducers({
     hiddenMenu: hiddenMenuReducer,
@@ -17,7 +19,9 @@ const rootReducer = combineReducers({
     authReducer: authReducer,
     switchModal: modalReducer,
     switchLoadingWindow: loadingReducer,
-    setAlertReducer: alertReducer
+    setAlertReducer: alertReducer,
+    setDisplay: displayReducer,
+    setSilenceRules: silenceRulesReducer,
 })
 
 export const store = createStore(rootReducer, composeWithDevTools())
