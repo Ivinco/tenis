@@ -453,7 +453,7 @@ def healz():
     try:
         app.db.command('ping')
     except Exception as e:
-        return f"Mongo error: {e!r}\n", 500
+        return f"Mongo ping failed\n", 503
     return "tenis is big as ever\n", 200
 
 
