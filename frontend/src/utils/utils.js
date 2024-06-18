@@ -45,3 +45,26 @@ export function groupByField(alerts, fieldName){
 
     return Object.values(groupedByField).filter(group => group.length > 1)
 }
+
+export function sortList (list, field, direction) {
+    list.sort((a, b) => {
+        const aValue = a[field].toLowerCase()
+        const bValue = b[field].toLowerCase()
+        if (aValue < bValue) {
+            if (direction === 'asc'){
+                return -1
+            } else {
+                return 1
+            }
+        }
+        if (aValue > bValue) {
+            if (direction === 'asc'){
+                return 1
+            } else {
+                return -1
+            }
+        }
+        return 0
+    })
+    return list
+}

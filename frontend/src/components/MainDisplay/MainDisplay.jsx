@@ -160,12 +160,25 @@ export default function MainDisplay() {
         <div className={styles.mainDisplay}>
             <div className={`${styles.groupWrapper} ${!isInspectMode ? null : styles.groupWrapper_small}`}>
                 <div className={styles.alertsHeader}>
-                    <div className={styles.projectHeader}>PRJ</div>
-                    <div className={styles.hostHeader}>Host</div>
+                    <div className={styles.projectHeader}>
+                        <button className={styles.filterButton}> PRJ</button>
+                    </div>
+                    <div className={styles.hostHeader}>
+                        <button className={styles.filterButton}> Host</button>
+                    </div>
                     <div className={styles.userHeader}>User</div>
-                    <div className={styles.alertHeader}>Alert Name</div>
-                    <div className={styles.timeHeader}>Alert fired</div>
-                    <div className={styles.messageHeader}>Alert Message</div>
+                    <div className={styles.alertHeader}>
+                        <button className={styles.filterButton}> Alert Name</button>
+                    </div>
+                    <div className={styles.timeHeader}>
+                        <button className={styles.filterButton}> Fired Time</button>
+                    </div>
+                    <div className={styles.messageHeader}>
+                        <button className={styles.filterButton}> Alert Message</button>
+                    </div>
+                    <div className={styles.controlButtonHeader}>Silence</div>
+                    <div className={styles.controlButtonHeader}>Recheck</div>
+                    <div className={styles.controlButtonHeader}>Info</div>
                 </div>
 
             </div>

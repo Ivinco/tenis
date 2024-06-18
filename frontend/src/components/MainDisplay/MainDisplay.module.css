@@ -18,8 +18,28 @@
     position: relative;
     align-content: space-between;
     margin: auto;
-    border: #8a8a8a solid 3px;
+    border: #8a8a8a solid 1px;
     border-radius: 10px;
+}
+
+.filterButton {
+    display: flex;
+    background-color: transparent;
+    border: none;
+    justify-content: center;
+    align-items: center;
+    font-size: 0.7rem;
+    cursor: pointer;
+}
+
+.filterButton::after {
+    content: '';
+    display: inline-block;
+    height: 20px;
+    width: 20px;
+    background-image: url("../../../public/images/select-arrows-svgrepo-com.svg");
+    background-size: cover;
+    background-position: center;
 }
 
 .projectHeader {
@@ -33,73 +53,57 @@
 
 .hostHeader {
     display: flex;
-    height: 100%;
     width: 10%;
     align-items: center;
     margin: auto 5px;
     padding: 0 10px;
     justify-content: center;
     text-align: center;
-    border-left: slategrey solid 3px;
-    border-right: slategrey solid 3px;
-    overflow: hidden;
+    font-size: 0.7rem;
 }
 
 .userHeader {
     display: flex;
+    justify-content: center;
     width: 60px;
-    height: 60px;
     margin: auto;
     padding: 10px;
-    border: none;
-    background-color: transparent;
-    border-radius: 50%;
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-position: center;
-    cursor: pointer;
-    transition: transform 0.2s;
+    font-size: 0.7rem;
 }
 
 .alertHeader {
-    height: 100%;
     display: flex;
     width: 20%;
-    text-align: center;
     align-items: center;
     justify-content: center;
     margin: auto 6px;
-    padding: 0 10px;
-    font-size: 1.2rem;
-    overflow: hidden;
-    border-left: slategrey solid 3px;
-    border-right: slategrey solid 3px;
+    font-size: 0.7rem;
 }
 
 .timeHeader {
     display: flex;
-    height: 100%;
     width: 7%;
     margin: 0 15px;
     align-items: center;
     justify-content: center;
-    font-size: 1.2rem;
-    text-align: center;
-    line-height: 2;
+    font-size: 0.7rem;
 }
 
 .messageHeader {
     display: flex;
-    height: 100%;
+    /*width: calc(100% - 7% - 20% - 60px - 10% - 40px);*/
     width: 52%;
     align-items: center;
-    font-size: 1.2rem;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    overflow: hidden;
-    padding: 0 10px;
-    border-left: slategrey solid 3px;
-    border-right: slategrey solid 3px;
+    font-size: 0.7rem;
+    justify-content: center;
+
+}
+
+.controlButtonHeader {
+    width: 60px;
+    margin: auto 15px;
+    font-size: 0.7rem;
+    text-align: center;
 }
 
 
