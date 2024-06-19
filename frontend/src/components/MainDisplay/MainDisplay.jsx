@@ -168,8 +168,8 @@ export default function MainDisplay() {
         <div className={styles.mainDisplay}>
             <div className={`${styles.groupWrapper} ${!isInspectMode ? null : styles.groupWrapper_small}`}>
                 <div className={styles.alertsHeader}>
-                    <div className={styles.projectHeader}>
-                        <button className={`${styles.filterButton} ${sortingFeature ==='project' ? sortingDirection === 'asc' ? styles.filterButtonAsc : styles.filterButtonDesc : null}`}
+                    <div className={`${isInspectMode ? styles.projectHeader_small : styles.projectHeader}`}>
+                        <button className={`${isInspectMode ? styles.filterButton_small : styles.filterButton} ${sortingFeature ==='project' ? sortingDirection === 'asc' ? styles.filterButtonAsc : styles.filterButtonDesc : null}`}
                         onClick={(e) => {
                             e.preventDefault()
                             handleSortButton('project')
@@ -178,8 +178,8 @@ export default function MainDisplay() {
                             PRJ
                         </button>
                     </div>
-                    <div className={styles.hostHeader}>
-                        <button className={`${styles.filterButton} ${sortingFeature ==='host' ? sortingDirection === 'asc' ? styles.filterButtonAsc : styles.filterButtonDesc : null}`}
+                    <div className={`${ isInspectMode ? styles.hostHeader_small : styles.hostHeader}`}>
+                        <button className={`${isInspectMode ? styles.filterButton_small: styles.filterButton} ${sortingFeature ==='host' ? sortingDirection === 'asc' ? styles.filterButtonAsc : styles.filterButtonDesc : null}`}
                         onClick={(e) => {
                             e.preventDefault()
                             handleSortButton('host')
@@ -188,9 +188,9 @@ export default function MainDisplay() {
                             Host
                         </button>
                     </div>
-                    <div className={styles.userHeader}>User</div>
-                    <div className={styles.alertHeader}>
-                        <button className={`${styles.filterButton} ${sortingFeature ==='alertName' ? sortingDirection === 'asc' ? styles.filterButtonAsc : styles.filterButtonDesc : null}`}
+                    <div className={`${isInspectMode ? styles.userHeader_small : styles.userHeader}`}>User</div>
+                    <div className={`${isInspectMode ? styles.alertHeader_small : styles.alertHeader}`}>
+                        <button className={`${isInspectMode ? styles.filterButton_small : styles.filterButton} ${sortingFeature ==='alertName' ? sortingDirection === 'asc' ? styles.filterButtonAsc : styles.filterButtonDesc : null}`}
                                 onClick={(e) => {
                                     e.preventDefault()
                                     handleSortButton('alertName')
@@ -199,8 +199,8 @@ export default function MainDisplay() {
                             Alert Name
                         </button>
                     </div>
-                    <div className={styles.timeHeader}>
-                        <button className={`${styles.filterButton} ${sortingFeature ==='fired' ? sortingDirection === 'asc' ? styles.filterButtonAsc : styles.filterButtonDesc : null}`}
+                    <div className={`${isInspectMode ? styles.timeHeader_small : styles.timeHeader}`}>
+                        <button className={`${isInspectMode ? styles.filterButton_small : styles.filterButton} ${sortingFeature ==='fired' ? sortingDirection === 'asc' ? styles.filterButtonAsc : styles.filterButtonDesc : null}`}
                                 onClick={(e) => {
                                     e.preventDefault()
                                     handleSortButton('fired')
@@ -209,8 +209,8 @@ export default function MainDisplay() {
                             Fired Time
                         </button>
                     </div>
-                    <div className={styles.messageHeader}>
-                        <button className={`${styles.filterButton} ${sortingFeature ==='msg' ? sortingDirection === 'asc' ? styles.filterButtonAsc : styles.filterButtonDesc : null}`}
+                    <div className={`${isInspectMode ? styles.messageHeader_small : styles.messageHeader}`}>
+                        <button className={`${isInspectMode ? styles.filterButton_small : styles.filterButton} ${sortingFeature ==='msg' ? sortingDirection === 'asc' ? styles.filterButtonAsc : styles.filterButtonDesc : null}`}
                                 onClick={(e) => {
                                     e.preventDefault()
                                     handleSortButton('msg')
@@ -219,9 +219,9 @@ export default function MainDisplay() {
                             Alert Message
                         </button>
                     </div>
-                    <div className={styles.controlButtonHeader}>Silence</div>
-                    <div className={styles.controlButtonHeader}>Recheck</div>
-                    <div className={styles.controlButtonHeader}>Info</div>
+                    <div className={`${isInspectMode ? styles.controlButtonHeader_small : styles.controlButtonHeader}`}></div>
+                    <div className={`${isInspectMode ? styles.controlButtonHeader_small : styles.controlButtonHeader}`}></div>
+                    <div className={`${isInspectMode ? styles.controlButtonHeader_small : styles.controlButtonHeader}`}></div>
                 </div>
 
             </div>
