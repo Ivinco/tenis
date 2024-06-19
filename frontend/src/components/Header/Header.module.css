@@ -204,12 +204,12 @@ input[type="search"]::-webkit-search-cancel-button {
 .groupAlerts {
     border: none;
     border-radius: 10px;
-    background-image: url("../../../public/images/group-list-color-svgrepo-com.svg");
+    background-image: url('../../../public/images/group-list-color-svgrepo-com.svg');
 }
 
 .silenceButton {
     border: none;
-    background-image: url("../../../public/images/mute-notification-color-svgrepo-com.svg");
+    background-image: url('../../../public/images/mute-notification-color-svgrepo-com.svg');
 }
 
 .funcButton:focus{
