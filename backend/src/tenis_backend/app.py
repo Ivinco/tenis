@@ -453,7 +453,7 @@ def healz():
     try:
         app.db.command('ping')
     except Exception as e:
-        return f"Mongo error: {e!r}\n", 500
+        return f"Mongo ping failed\n", 503
     return "tenis is big as ever\n", 200
 
 
@@ -816,9 +816,9 @@ def inbound():
                     # we need Mongo to give us inserted object _ids
                     socketio.emit('update', parse_json(new_alerts))
                 except pymongo.errors.PyMongoError as e:
-                    raise InternalServerError("Failed to save alerts in MongoDB: %s" % e)
+                    raise InternalServerError("Failed to save new alerts in MongoDB: %s" % e)
                 except socketio.exceptions.SocketIOError as e:
-                    print("Warning: Failed to send update to connected socketio clients: %s" % e)
+                    print("Warning: Failed to send new alerts to connected socketio clients: %s" % e)
                     pass
 
             if updated_alerts:
@@ -828,9 +828,9 @@ def inbound():
                         update_alerts(alerts, a)
                     socketio.emit('update', parse_json(updated_alerts))
                 except pymongo.errors.PyMongoError as e:
-                    raise InternalServerError("Failed to save alerts in MongoDB: %s" % e)
+                    raise InternalServerError("Failed to save updated alerts in MongoDB: %s" % e)
                 except socketio.exceptions.SocketIOError as e:
-                    print("Warning: Failed to send update to connected socketio clients: %s" % e)
+                    print("Warning: Failed to send updated alerts to connected socketio clients: %s" % e)
                     pass
 
         # history can be updated outside of alerts_lock: it's write_only
