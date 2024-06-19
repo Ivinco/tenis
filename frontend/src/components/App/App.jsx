@@ -14,7 +14,7 @@ import LoadingWindow from "../LoadingWindow/LoadingWindow";
 function App () {
     const dispatch = useDispatch()
     const isLoading = useSelector(state => state.switchLoadingWindow.isLoading)
-    const totalAlerts = useSelector(state => state.setAlertReducer.alertsNumber)
+    const totalAlerts = useSelector(state => state.setAlertReducer.totalAlertsNumber)
 
     useEffect( () => {
         async function checkAuth () {

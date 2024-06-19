@@ -48,16 +48,14 @@ export function groupByField(alerts, fieldName){
 
 export function sortList (list, field, direction) {
     list.sort((a, b) => {
-        const aValue = a[field].toLowerCase()
-        const bValue = b[field].toLowerCase()
-        if (aValue < bValue) {
+        if (a[field] < b[field]) {
             if (direction === 'asc'){
                 return -1
             } else {
                 return 1
             }
         }
-        if (aValue > bValue) {
+        if (a[field] > b[field]) {
             if (direction === 'asc'){
                 return 1
             } else {

@@ -42,6 +42,14 @@
     background-position: center;
 }
 
+.filterButtonAsc::after {
+    background-image: url("../../../public/images/select-arrows-active-up-svgrepo-com.svg");
+}
+
+.filterButtonDesc::after {
+    background-image: url("../../../public/images/select-arrows-active-down-svgrepo-com.svg");
+}
+
 .projectHeader {
     display: flex;
     align-items: center;
