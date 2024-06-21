@@ -741,7 +741,6 @@ def output():
     data_type = request.args.get("type")
     plugin_id = request.args.get("pid")
     if not plugin_id:
-        return json.dumps(alerts, default=str), 200  # need for testing TT-207
         raise BadRequest('Plugin ID required')
 
     if data_type == 'cmd':
