@@ -16,9 +16,10 @@ def lookup_alert(alerts, alert):
     """
     try:
         for a in alerts:
-            if (a['project'] == alert['project'] and
+            if (a['host'] == alert['host'] and
+                a['project'] == alert['project'] and
                 a['alertName'] == alert['alertName'] and
-                a['host'] == alert['host']):
+                a['plugin_id'] == alert['plugin_id']):
                 return a
         return None
     except TypeError:
@@ -49,9 +50,10 @@ def update_alerts(alerts, alert):
         and update the details """
     try:
         for a in alerts:
-            if (a['project'] == alert['project'] and
+            if (a['host'] == alert['host'] and
+                a['project'] == alert['project'] and
                 a['alertName'] == alert['alertName'] and
-                a['host'] == alert['host']):
+                a['plugin_id'] == alert['plugin_id']):
                 for attr in ['fired', 'severity', 'msg', 'responsibleUser', 'comment', 'silenced', 'customFields']:
                     a[attr] = alert[attr]
     except TypeError:
@@ -76,6 +78,7 @@ def make_history_entry(alert):
         'comment': alert['comment'],
         'customFields': alert['customFields']
     }
+
 
 def is_resolved(alert):
     """ Return true if alert['severity'] indicates that alert is resolved """
