@@ -858,11 +858,8 @@ def inbound():
             if len(resolved_alerts) == 0:
                 return 'OK', 200  # submitted alerts list does not match a single alert from the global list
 
-            try:
-                for a in resolved_alerts:
-                    alerts.remove(a)  # remove from global in-mem list
-            except ValueError as e:
-                raise InternalServerError("Failed to resolve an alert, possible project_name/plugin_id mismatch: %s" % e)
+            for a in resolved_alerts:
+                alerts.remove(a)  # remove from global in-mem list
 
             try:
                 app.db['current'].delete_many({'_id': {'$in': resolved_ids}})
