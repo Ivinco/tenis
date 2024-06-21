@@ -272,7 +272,8 @@ def add_events(project, event, events, pid, objects):
         'resolve': {
             "project": project,
             "host": event['host'],
-            "alertName": event['name']
+            "alertName": event['name'],
+            "plugin_id": pid,
         },
 
         'update': {
