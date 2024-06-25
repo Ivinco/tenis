@@ -3,7 +3,7 @@ name: Deploy to prod
 env:
   WERF_SECRET_KEY: ${{ secrets.WERF_SECRET_KEY }}
   WERF_REPO: docker-registry.ivinco.com/tenis
-  REACT_APP_SERVER: https://api.tenis.k8s-test.ivinco.com
+  REACT_APP_SERVER: https://api.tenis.ivinco.com
 
 on:
   pull_request:
@@ -59,7 +59,7 @@ jobs:
       - name: Render chart
         run: werf render --env prod --ignore-secret-key
         env:
-          WERF_SET_ENV_URL: "env_url=tenis.k8s-test.ivinco.com"
+          WERF_SET_ENV_URL: "env_url=tenis.ivinco.com"
 
       - name: Lint chart
         run: werf helm lint .helm
@@ -90,6 +90,6 @@ jobs:
           kube-config-base64-data: ${{ secrets.KUBE_CONFIG_BASE64_DATA }}
           env: prod
         env:
-          WERF_SET_ENV_URL: "env_url=tenis.k8s-test.ivinco.com"
+          WERF_SET_ENV_URL: "env_url=tenis.ivinco.com"
           WERF_NAMESPACE: tenis-prod
           WERF_RELEASE: tenis-prod
