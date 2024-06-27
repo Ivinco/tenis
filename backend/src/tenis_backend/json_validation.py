@@ -292,3 +292,15 @@ history_request_schema = {
         "datetime": {"type": "integer"}
     }
 }
+
+single_alert_history_schema = {
+    "required": ["alert_id"],
+    "properties": {
+        "alert_id": {
+            "type": "string",
+            "maxLength": 50,
+        },
+        "start": {"type": "integer"},
+        "end": {"type": "integer"}
+    }
+}
