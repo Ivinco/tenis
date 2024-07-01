@@ -18,7 +18,7 @@ const Modal = (content) => {
     const isOpenedModal = useSelector(state => state.switchModal.isOpened)
     const modalMessage = useSelector(state => state.switchModal.customMessage)
     const portalParam = searchParams.get("portal")
-    const alertParam = searchParams.get("alert")
+    const alertParam = searchParams.get("alert_id")
 
     const onClose = () => {
         dispatch(closeModal())
