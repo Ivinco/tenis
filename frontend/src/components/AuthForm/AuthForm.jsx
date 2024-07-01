@@ -26,7 +26,7 @@ const AuthForm = () => {
                         userEmail: response.data.user.email,
                         userImage: `https://gravatar.com/avatar/${sha256(response.data.user.email)}?s=150`,
                         usersCommentReplaceRules: response.data.user.commentReplaceRules,
-                        userProjects: response.data.user.userProjects
+                        userProjects: response.data.user.projects
                         }
                     const user = {...user_raw, userProjects: ['All', ...user_raw.userProjects]}
                     dispatch(loginAction(user))
