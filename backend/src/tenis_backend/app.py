@@ -1,5 +1,7 @@
 import atexit
 import json
+import time
+
 import jsonschema
 import os
 import re
@@ -19,7 +21,7 @@ from .alert import load_alerts, lookup_alert, update_alerts, regexp_alerts, make
 from .auth import create_token, token_required, token_required_ws, plugin_token_required
 from .user import User
 from .json_validation import schema, silence_schema, user_schema, user_add_schema, user_update_schema, \
-    history_request_schema, command_schema
+    history_request_schema, command_schema, single_alert_history_schema
 from flask_swagger_ui import get_swaggerui_blueprint
 
 # Global vars init
@@ -169,10 +171,16 @@ def send_alerts(updated_alerts, update_alerts_query):
             raise InternalServerError("Failed to save alerts in MongoDB: %s" % e)
 
 
-def get_history_alerts(start_datetime, end_datetime):
-    start_timestamp = datetime.utcfromtimestamp(start_datetime)
-    end_timestamp = datetime.utcfromtimestamp(end_datetime)
-    query = {'logged': {'$gt': start_timestamp, '$lte': end_timestamp}}
+def get_history_alerts(timestamp):
+    """
+    Function to send history alerts records for certain timestamp
+    Used in /history GET method
+
+    :param timestamp: unix format timestamp
+    """
+    history_period = app.config['HISTORY_PERIOD_MINUTES']
+    query = {'logged': {'$gt': datetime.utcfromtimestamp(timestamp - history_period * 60),
+                        '$lte': datetime.utcfromtimestamp(timestamp)}}
     cursor = app.db['history'].find(query)
 
     alerts_by_id = {}
@@ -188,6 +196,114 @@ def get_history_alerts(start_datetime, end_datetime):
 
     result = list(alerts_by_id.values())
     return result
+
+
+def get_alert_details(alert_id, start_tstmp, end_tstmp):
+    """
+    Function to get current alert object and its history of status changing
+    Used in /alerts endpoint
+
+    :param alert_id: required param, id of needed alert
+    :param start_tstmp: optional start timestamp of current alert history str type
+    :param end_tstmp: optional end timestamp of current alert history str type
+
+    """
+    history_period = app.config['HISTORY_PERIOD_MINUTES']
+    # If no timestamps in request, the default period is for last 24 hours
+    if not start_tstmp:
+        start_tstmp = int(time.time()) - (24 * 3600) - (history_period * 60)
+    if not end_tstmp:
+        end_tstmp = int(time.time())
+    alert_cursor = app.db['current'].find_one({"_id": ObjectId(alert_id)})
+    details = {}
+    history = []
+    if alert_cursor:
+        # check if alert is active. If it is we take its details from current db
+        alert_cursor["_id"] = str(alert_cursor["_id"])
+        details = alert_cursor
+    history_cursor = app.db['history'].find_one({"alert_id": ObjectId(alert_id)})
+    if history_cursor:
+        """
+        Check for alert history. If there is no any history records
+        it means alert doesn't exist
+        """
+        last_status = None
+        project = history_cursor['project']
+        host = history_cursor['host']
+        alert_name = history_cursor['alertName']
+        history_query = {
+            "$and": [
+                {"project": project},
+                {"alertName": alert_name},
+                {"host": host},
+                {},
+                {"logged": {
+                    "$gt": datetime.utcfromtimestamp(int(start_tstmp) - history_period * 60),
+                    "$lte": datetime.utcfromtimestamp(int(end_tstmp)),
+                }}
+            ]
+        }
+        """
+        The alert can be identified by its project, host and alertName attributes.
+        After alert has been resolved and fired again, its id will be changed
+        """
+        alert_history_cursor = app.db['history'].find(history_query).sort('logged', 1)
+        alert_history = list(alert_history_cursor)
+        if len(alert_history) > 0:
+            prev_severity = None
+            for record in alert_history:
+                record['_id'] = str(record['_id'])
+                record['alert_id'] = str(record['alert_id'])
+                last_status = record
+                if record['severity'] != prev_severity:
+                    history_entry = [record['severity'], record['logged']]
+                    history.append(history_entry)
+                    prev_severity = record['severity']
+            # if alert is in resolved status, we take its details from the last history record
+            if not details:
+                details = last_status
+            # enrich history records by change severity level from the next record
+            for i in range(len(history[:-1])):
+                history[i].append(history[i+1][1])
+            history[-1].append(datetime.utcfromtimestamp(int(end_tstmp)))
+            # if there are several records in history_period gap, we take the last one
+            for i in range(len(history) - 1, -1, -1):
+                if history[i][2] < datetime.utcfromtimestamp(int(start_tstmp)):
+                    history.pop(i)
+            # if there are no records in history_period gap, it means that alert was in resolved status
+            if history[0][1] > datetime.utcfromtimestamp(int(start_tstmp)):
+                prev_status = ["RESOLVED", datetime.utcfromtimestamp(int(start_tstmp)), history[0][1]]
+                history.insert(0, prev_status)
+            # cut history period to the start timestamp
+            if history[0][1] < datetime.utcfromtimestamp(int(start_tstmp)):
+                history[0][1] = datetime.utcfromtimestamp(int(start_tstmp))
+        else:
+            """
+            If there are no any records for selected period it means the alert was in resolved status.
+            We make the single history record with RESOLVED status and take alert details from the last record
+            """
+            query = {
+                "$and": [
+                    {"project": project},
+                    {"alertName": alert_name},
+                    {"host": host},
+                ]
+            }
+            last_alert_cursor = app.db['history'].find(query).sort('logged', -1).limit(1)
+            if last_alert_cursor:
+                last_alert = list(last_alert_cursor)[0]
+                last_alert['_id'] = str(last_alert['_id'])
+                last_alert['alert_id'] = str(last_alert['alert_id'])
+                details = last_alert
+            else:
+                return None
+            history.append(["OK", datetime.utcfromtimestamp(int(start_tstmp)), datetime.utcfromtimestamp(int(end_tstmp))])
+        resp = {"details": details,
+                "history": history}
+        return resp
+    else:
+        return None
+
 
 
 # swagger specific
@@ -495,16 +611,33 @@ def send_history_alerts(user):
     """
     Method to get all active alerts on requested timestamp
     """
-    history_period = app.config['HISTORY_PERIOD_MINUTES']
     try:
-        data = int(request.args.get("datetime"))
-        jsonschema.validate(instance=data, schema=history_request_schema)
+        tstmp = int(request.args.get("datetime"))
+        jsonschema.validate(instance=tstmp, schema=history_request_schema)
     except jsonschema.exceptions.ValidationError as e:
         raise BadRequest(e.message)
-    start_datetime = data - history_period * 60
-    history_alerts = get_history_alerts(start_datetime, data)
+    history_alerts = get_history_alerts(tstmp)
     resp = {'history': history_alerts}
     return jsonify(resp), 200
+
+
+@app.route('/alerts')
+@token_required()
+def send_alert_details(user):
+    """
+    Endpoint to get details for a single alert with its status history
+    """
+    try:
+        alert_id = request.args.get("alert_id")
+        jsonschema.validate(instance=alert_id, schema=single_alert_history_schema)
+    except jsonschema.exceptions.ValidationError as e:
+        raise BadRequest(e.message)
+    start_timestamp = request.args.get("start")
+    end_timestamp = request.args.get("end")
+    resp = get_alert_details(alert_id, start_timestamp, end_timestamp)
+    return jsonify(resp), 200
+    # return "OK", 200
+
 
 
 @app.route('/users')
@@ -858,11 +991,8 @@ def inbound():
             if len(resolved_alerts) == 0:
                 return 'OK', 200  # submitted alerts list does not match a single alert from the global list
 
-            try:
-                for a in resolved_alerts:
-                    alerts.remove(a)  # remove from global in-mem list
-            except ValueError as e:
-                raise InternalServerError("Failed to resolve an alert, possible project_name/plugin_id mismatch: %s" % e)
+            for a in resolved_alerts:
+                alerts.remove(a)  # remove from global in-mem list
 
             try:
                 app.db['current'].delete_many({'_id': {'$in': resolved_ids}})

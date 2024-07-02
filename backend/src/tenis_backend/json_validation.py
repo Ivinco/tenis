@@ -29,11 +29,12 @@ schema = {
         },
         "resolved_alert_definition": {
             "properties": {
-                "project": {"type": "string"},
-                "host": {"type": "string"},
-                "alertName": {"type": "string"},
+                "project": {"type": "string", "maxLength": 255},
+                "host": {"type": "string", "maxLength": 255},
+                "alertName": {"type": "string", "maxLength": 255},
+                "plugin_id": {"type": "string", "maxLength": 255},
             },
-            "required": ["project", "host", "alertName"],
+            "required": ["project", "host", "alertName", "plugin_id"],
             "additionalProperties": False
         },
         "ack_definition": {
@@ -289,5 +290,17 @@ history_request_schema = {
     "required": ["datetime"],
     "properties": {
         "datetime": {"type": "integer"}
+    }
+}
+
+single_alert_history_schema = {
+    "required": ["alert_id"],
+    "properties": {
+        "alert_id": {
+            "type": "string",
+            "maxLength": 50,
+        },
+        "start": {"type": "integer"},
+        "end": {"type": "integer"}
     }
 }

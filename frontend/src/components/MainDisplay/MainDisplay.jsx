@@ -1,5 +1,6 @@
 import styles from './MainDisplay.module.css'
-import React, {useEffect, useState} from 'react';
+import alertStyles from '../Alert/Alert.module.css'
+import React, {useEffect, useMemo, useState} from 'react';
 import { FixedSizeList as List } from 'react-window';
 import AutoSizer from "react-virtualized-auto-sizer";
 import {useConnectSocket} from "../../hooks/useConnectSocket";
@@ -12,7 +13,7 @@ import {
     setWarningAlertsNumber
 } from "../../store/reducers/alertReducer";
 import AlertGroup from "../AlertGroup/AlertGroup";
-import {groupByField} from "../../utils/utils";
+import {groupByField, sortList} from "../../utils/utils";
 import {alertNameGroups, alertsToGroup, hostNameGroups} from "../../utils/grouping";
 import {HISTORY_DISPLAY, SILENCED_DISPLAY} from "../../store/actions/DISPLAY_ACTIONS";
 import {LocalizationProvider} from "@mui/x-date-pickers/LocalizationProvider";
@@ -35,26 +36,32 @@ export default function MainDisplay() {
     const [windowWidth, setWindowWidth] = useState(window.innerWidth)
     const [startDate, setStartDate] = useState(new Date());
     const [historyAlertList, setHistoryAlertList] = useState([]);
+    const [sortingFeature, setSortingFeature] = useState(undefined);
+    const [sortingDirection, setSortingDirection] = useState(undefined);
+
+    const sortedAlerts = useMemo(() => {
+        if (!sortingFeature){
+            return allAlerts
+        }
+        return sortList([...allAlerts], sortingFeature, sortingDirection)
+    }, [allAlerts, sortingFeature, sortingDirection])
+
+
     let rawAlerts
+    let alertList
+    let alertsToDisplay
+    let rowHeight
 
     switch(displayMode){
         case SILENCED_DISPLAY:
-            rawAlerts = allAlerts.filter((alert) => alert.silenced === true)
+            rawAlerts = sortedAlerts.filter((alert) => alert.silenced === true)
             break
         case HISTORY_DISPLAY:
             rawAlerts = historyAlertList
             break
         default:
-            rawAlerts = allAlerts.filter((alert) => alert.silenced === false)
+            rawAlerts = sortedAlerts.filter((alert) => alert.silenced === false)
     }
-
-
-
-
-
-    let alertList
-    let alertsToDisplay
-    let rowHeight
 
     //Track screen width for dynamic scaling for alert height in virtual list
     useEffect(() => {
@@ -109,9 +116,6 @@ export default function MainDisplay() {
     dispatch(setWarningAlertsNumber(warningAlertsNumber))
     dispatch(setOtherAlertsNumber(otherAlertsNumber))
 
-
-    console.log(otherAlertsNumber)
-
     //This block defines grouping functionality
     const alertGroups = []
     if (isGrouped){
@@ -130,6 +134,11 @@ export default function MainDisplay() {
         alertnameGroups.forEach(group => alertGroups.push(group))
         const alertnameAlerts = alertsToGroup(alertGroups)
         ungroupedAlerts = ungroupedAlerts.filter(alert => !alertnameAlerts.has(alert._id))
+    }
+
+    const handleSortButton = (feature) => {
+        setSortingFeature(feature)
+        setSortingDirection(sortingDirection === 'asc' ? 'desc' : 'asc')
     }
 
 
@@ -157,6 +166,65 @@ export default function MainDisplay() {
 
     return (
         <div className={styles.mainDisplay}>
+            <div className={`${styles.groupWrapper} ${!isInspectMode ? null : styles.groupWrapper_small}`}>
+                <div className={styles.alertsHeader}>
+                    <div className={`${isInspectMode ? styles.projectHeader_small : styles.projectHeader}`}>
+                        <button className={`${isInspectMode ? styles.filterButton_small : styles.filterButton} ${sortingFeature ==='project' ? sortingDirection === 'asc' ? styles.filterButtonAsc : styles.filterButtonDesc : null}`}
+                        onClick={(e) => {
+                            e.preventDefault()
+                            handleSortButton('project')
+                        }}
+                        >
+                            PRJ
+                        </button>
+                    </div>
+                    <div className={`${ isInspectMode ? styles.hostHeader_small : styles.hostHeader}`}>
+                        <button className={`${isInspectMode ? styles.filterButton_small: styles.filterButton} ${sortingFeature ==='host' ? sortingDirection === 'asc' ? styles.filterButtonAsc : styles.filterButtonDesc : null}`}
+                        onClick={(e) => {
+                            e.preventDefault()
+                            handleSortButton('host')
+                        }}
+                        >
+                            Host
+                        </button>
+                    </div>
+                    <div className={`${isInspectMode ? styles.userHeader_small : styles.userHeader}`}>User</div>
+                    <div className={`${isInspectMode ? styles.alertHeader_small : styles.alertHeader}`}>
+                        <button className={`${isInspectMode ? styles.filterButton_small : styles.filterButton} ${sortingFeature ==='alertName' ? sortingDirection === 'asc' ? styles.filterButtonAsc : styles.filterButtonDesc : null}`}
+                                onClick={(e) => {
+                                    e.preventDefault()
+                                    handleSortButton('alertName')
+                                }}
+                        >
+                            Alert Name
+                        </button>
+                    </div>
+                    <div className={`${isInspectMode ? styles.timeHeader_small : styles.timeHeader}`}>
+                        <button className={`${isInspectMode ? styles.filterButton_small : styles.filterButton} ${sortingFeature ==='fired' ? sortingDirection === 'asc' ? styles.filterButtonAsc : styles.filterButtonDesc : null}`}
+                                onClick={(e) => {
+                                    e.preventDefault()
+                                    handleSortButton('fired')
+                                }}
+                        >
+                            Fired Time
+                        </button>
+                    </div>
+                    <div className={`${isInspectMode ? styles.messageHeader_small : styles.messageHeader}`}>
+                        <button className={`${isInspectMode ? styles.filterButton_small : styles.filterButton} ${sortingFeature ==='msg' ? sortingDirection === 'asc' ? styles.filterButtonAsc : styles.filterButtonDesc : null}`}
+                                onClick={(e) => {
+                                    e.preventDefault()
+                                    handleSortButton('msg')
+                                }}
+                        >
+                            Alert Message
+                        </button>
+                    </div>
+                    <div className={`${isInspectMode ? styles.controlButtonHeader_small : styles.controlButtonHeader}`}></div>
+                    <div className={`${isInspectMode ? styles.controlButtonHeader_small : styles.controlButtonHeader}`}></div>
+                    <div className={`${isInspectMode ? styles.controlButtonHeader_small : styles.controlButtonHeader}`}></div>
+                </div>
+
+            </div>
             {isActiveSocket ?
                 <>
                     {displayMode === HISTORY_DISPLAY

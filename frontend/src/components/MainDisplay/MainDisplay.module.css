@@ -1,7 +1,7 @@
 .mainDisplay {
     display: flex;
     flex-direction: column;
-    width: 100%;
+    width: 99%;
     overflow-y: scroll;
     padding-left: calc(1.5%);
     scrollbar-width: none;
@@ -10,6 +10,189 @@
 .mainDisplay::-webkit-scrollbar {
     display: none;
 }
+
+.alertsHeader {
+    width: 99%;
+    height: 90%;
+    display: flex;
+    position: relative;
+    align-content: space-between;
+    margin: auto;
+    border: #8a8a8a solid 1px;
+    border-radius: 10px;
+}
+
+.filterButton {
+    display: flex;
+    background-color: transparent;
+    border: none;
+    justify-content: center;
+    align-items: center;
+    font-size: 0.7rem;
+    cursor: pointer;
+}
+
+.filterButton_small {
+    display: flex;
+    background-color: transparent;
+    border: none;
+    justify-content: center;
+    align-items: center;
+    font-size: 0.5rem;
+    cursor: pointer;
+}
+
+.filterButton::after {
+    content: '';
+    display: inline-block;
+    height: 20px;
+    width: 20px;
+    background-image: url("../../../public/images/select-arrows-svgrepo-com.svg");
+    background-size: cover;
+    background-position: center;
+}
+
+.filterButton_small::after {
+    content: '';
+    display: inline-block;
+    height: 15px;
+    width: 15px;
+    background-image: url("../../../public/images/select-arrows-svgrepo-com.svg");
+    background-size: cover;
+    background-position: center;
+}
+
+.filterButtonAsc::after {
+    background-image: url("../../../public/images/select-arrows-active-up-svgrepo-com.svg");
+}
+
+.filterButtonDesc::after {
+    background-image: url("../../../public/images/select-arrows-active-down-svgrepo-com.svg");
+}
+
+.projectHeader {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    margin: auto 20px;
+}
+
+.projectHeader_small {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    margin: auto 6px;
+}
+
+.hostHeader {
+    display: flex;
+    width: 10%;
+    align-items: center;
+    margin: auto 5px;
+    padding: 0 10px;
+    justify-content: center;
+    text-align: center;
+}
+
+.hostHeader_small {
+    display: flex;
+    width: 10%;
+    align-items: center;
+    margin: auto 3px;
+    justify-content: center;
+    text-align: center;
+}
+
+.userHeader {
+    display: flex;
+    justify-content: center;
+    width: 60px;
+    margin: auto;
+    padding: 10px;
+    font-size: 0.7rem;
+}
+
+.userHeader_small {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 33px;
+    margin: auto 2px;
+    font-size: 0.5rem;
+}
+
+.alertHeader {
+    display: flex;
+    width: 20%;
+    align-items: center;
+    justify-content: center;
+    margin: auto 6px;
+}
+
+.alertHeader_small {
+    display: flex;
+    width: 20.4%;
+    align-items: center;
+    justify-content: center;
+    margin: auto 4px;
+}
+
+.timeHeader {
+    display: flex;
+    width: 7%;
+    margin: 0 15px;
+    align-items: center;
+    justify-content: center;
+}
+
+.timeHeader_small {
+    display: flex;
+    width: 7%;
+    margin: auto 6px;
+    align-items: center;
+    justify-content: center;
+}
+
+.messageHeader {
+    display: flex;
+    width: 52%;
+    align-items: center;
+    justify-content: center;
+
+}
+
+.messageHeader_small {
+    display: flex;
+    width: 52%;
+    align-items: center;
+    justify-content: center;
+}
+
+.controlButtonHeader {
+    display: flex;
+    width: 60px;
+    margin: auto 15px;
+    font-size: 0.7rem;
+    align-items: center;
+    text-align: center;
+}
+
+.controlButtonHeader_small {
+    display: flex;
+    width: 23px;
+    margin: auto 6px;
+    font-size: 0.5rem;
+    align-items: center;
+    text-align: center;
+}
+
+.controlButtonHeader_small:last-child{
+    margin-right: 10px;
+}
+
+
 
 .dateField {
     display: flex;
@@ -42,4 +225,42 @@
 }
 .groupWrapper_small {
     margin: 0 auto 0 0;
+}
+
+@media screen and (max-width: 2150px){
+    .projectHeader {
+        width: 40px;
+        margin: auto 6px;
+    }
+
+    .hostHeader {
+        margin: auto 3px;
+        padding: 0 6px;
+    }
+
+    .userHeader {
+        width: 40px;
+        padding: 6px;
+        font-size: 0.6rem;
+    }
+
+    .filterButton {
+        font-size: 0.6rem;
+    }
+
+    .alertHeader{
+        width: 22%;
+    }
+    .timeHeader {
+        width: 8%;
+    }
+}
+
+@media screen and (max-width: 1510px){
+    .alertHeader{
+        width: 23%;
+    }
+    .timeHeader {
+        width: 9%;
+    }
 }
