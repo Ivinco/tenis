@@ -30,7 +30,7 @@ function App () {
                         userEmail: fetchUser.data.user.email,
                         userImage: `https://gravatar.com/avatar/${sha256(fetchUser.data.user.email)}?s=150`,
                         usersCommentReplaceRules: fetchUser.data.user.commentReplaceRules,
-                        userProjects: fetchUser.data.user.userProjects
+                        userProjects: fetchUser.data.user.projects
                     }
                     const user = {...raw_user, userProjects: ['All', ...raw_user.userProjects]}
                     dispatch(loginAction(user))

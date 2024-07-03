@@ -66,3 +66,8 @@ export function sortList (list, field, direction) {
     })
     return list
 }
+
+export function stringToDate (string) {
+        const date = new Date(string);
+        return isNaN(date.getTime()) ? string : date;
+}
