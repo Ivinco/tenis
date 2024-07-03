@@ -44,6 +44,14 @@ const Modal = (content) => {
        }
     }, [alertParam])
 
+    useEffect(() => {
+        if(portalParam === 'login') {
+            searchParams.delete("alert_id")
+            setSearchParams(searchParams)
+        }
+
+    }, [portalParam])
+
     const onClose = () => {
         dispatch(closeModal())
         dispatch(setModalError(""))

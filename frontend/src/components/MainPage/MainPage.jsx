@@ -31,23 +31,18 @@ function MainPage(){
         dispatch(switchActiveHeaderMenuItem(null))
     }
 
-    useEffect(()=>{
-        if(isLoggedIn && alertParam){
-            dispatch(openModal())
-        }
-    }, [dispatch, isLoggedIn, alertParam])
-
     useEffect(() => {
         if (!isLoggedIn){
             dispatch(openModal())
-            searchParams.delete("alert_id")
-            searchParams.delete("portal")
-            setPortalParams("login")
+            setPortalParams("login");
         }
         else {
             setPortalParams()
+            if(alertParam){
+                dispatch(openModal())
+            }
         }
-    }, [dispatch, isLoggedIn]);
+    }, [dispatch, isLoggedIn, alertParam]);
 
     return (
         <div className={styles.page}>
