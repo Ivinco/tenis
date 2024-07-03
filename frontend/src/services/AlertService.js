@@ -33,17 +33,17 @@ export default class AlertService {
         return api.get ('/history', config)
     }
 
-    static async getAlertHistory (params) {
+    static async refreshAlerts (payload) {
+        return api.post('/cmd', payload)
+    }
+
+    static async getAlert (params) {
         const config = {
             headers: {
                 'Content-Type': 'application/json'
             },
             params: params
         }
-        return api.get ('/history', config)
-    }
-
-    static async refreshAlerts (payload) {
-        return api.post('/cmd', payload)
+        return api.get (`/alerts`, config)
     }
 }

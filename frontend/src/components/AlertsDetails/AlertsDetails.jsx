@@ -1,15 +1,14 @@
 import React, {useEffect, useRef, useState} from 'react';
 import styles from './AlertsDetails.module.css'
 import {useSelector} from "react-redux";
-import {processAlertComment, processDuration} from "../../utils/utils";
+import {processAlertComment, processDuration, stringToDate} from "../../utils/utils";
 import {Chart} from "react-google-charts";
 import {AdapterDayjs} from "@mui/x-date-pickers/AdapterDayjs";
 import {MobileDateTimePicker} from "@mui/x-date-pickers/MobileDateTimePicker";
 import dayjs from "dayjs";
 import {LocalizationProvider} from "@mui/x-date-pickers/LocalizationProvider";
 
-const AlertsDetails = () => {
-    const alert = useSelector(state => state.setAlertReducer.alert)
+const AlertsDetails = ({details, history}) => {
     const [commentFormIsOpened, setCommentFormIsOpened] = useState(false)
     const [commentFormContent, setCommentFormContent] = useState('')
     const user = useSelector( state => state.authReducer.user)
@@ -17,11 +16,8 @@ const AlertsDetails = () => {
     const [historyStart, setHistoryStart] = useState(new Date(Date.now() - 24 * 60 * 60 * 1000))
     const [historyEnd, setHistoryEnd] = useState(new Date(Date.now()))
 
-
-    //TODO change this data
-
     //init data array
-    const data = [
+    const rawData = [
         [
             {type: "string", id: "Title"},
             {type: "string", id: "Severity"},
@@ -33,40 +29,10 @@ const AlertsDetails = () => {
     //init colors array
     const colors = []
 
-
-    //alert history data from backend
-    const rawData = {
-        history: [
-            [
-                "OK",
-                new Date (2024, 4, 30, 15, 42),
-                new Date(2024, 4, 30, 15, 52),
-            ],
-            [
-                "WARNING",
-                new Date (2024, 4, 30, 15, 52),
-                new Date(2024, 4, 30, 16, 7),
-            ],
-            [
-                "CRITICAL",
-                new Date (2024, 4, 30, 16, 7),
-                new Date(2024, 4, 30, 16, 58),
-            ],
-            [
-                "OK",
-                new Date (2024, 4, 30, 16, 58),
-                new Date(2024, 4, 30, 17, 40),
-            ],
-        ]
-    }
-
-
-
-    for (let item in rawData.history) {
-        rawData.history[item].unshift("STATUS")
-        data.push(rawData.history[item])
-        switch (rawData.history[item][1]){
-            case "OK":
+    for (let i in history) {
+        rawData.push(history[i])
+        switch (history[i][1]){
+            case "RESOLVED":
                 colors.push("#aee238")
                 break
             case "WARNING":
@@ -80,6 +46,7 @@ const AlertsDetails = () => {
         }
     }
 
+    const data = rawData.map(array => array.map( item => stringToDate(item)))
 
     const options = {
         timeline: {
@@ -107,7 +74,7 @@ const AlertsDetails = () => {
         document.getElementById('commentArea').value = ''
         setCommentFormContent('')
         const processedString = commentFormContent.split(/\s+/).map(word => processAlertComment(word, user.usersCommentReplaceRules))
-        alert.alert.comment = (
+        details.comment = (
             <>
                 {processedString.map((element, index) => (
                     <React.Fragment key={index}>{element} </React.Fragment>
@@ -129,7 +96,7 @@ const AlertsDetails = () => {
     }
 
     let fontColor
-    switch (alert.alert.severity.toUpperCase()) {
+    switch (details.severity.toUpperCase()) {
         case "WARNING":
             fontColor = '#DBBE3B'
             break
@@ -147,30 +114,30 @@ const AlertsDetails = () => {
             <div className={styles.alertHeader}>
                 <div className={styles.alertLogo}/>
                 <div className={styles.alertTitle} style={{ color: fontColor}}>
-                    {alert.alert.severity}
+                    {details.severity}
                 </div>
             </div>
             <div className={styles.alertDetailsBody}>
                 <ul className={styles.alertCommonInfo}>
                     <li className={styles.alertInfoItem}>
                         <p className={styles.alertInfoKey}>Problem:</p>
-                        <p className={styles.alertInfoValue}>{alert.alert.alertName}</p>
+                        <p className={styles.alertInfoValue}>{details.alertName}</p>
                     </li>
                     <li className={styles.alertInfoItem}>
                         <p className={styles.alertInfoKey}>Problem Host:</p>
-                        <p className={styles.alertInfoValue}>{alert.alert.host}</p>
+                        <p className={styles.alertInfoValue}>{details.host}</p>
                     </li>
                     <li className={styles.alertInfoItem}>
                         <p className={styles.alertInfoKey}>Alert Duration: </p>
-                        <p className={styles.alertInfoValue}>{processDuration(alert.alert.fired)}</p>
+                        <p className={styles.alertInfoValue}>{processDuration(details.fired)}</p>
                     </li>
                     <li className={styles.alertInfoItem}>
                         <p className={styles.alertInfoKey}>Responsible Engineer: </p>
-                        <p className={styles.alertInfoValue}>{alert.alert.responsibleUser ? alert.alert.responsibleUser : "UNHANDLED"}</p>
+                        <p className={styles.alertInfoValue}>{details.responsibleUser ? details.responsibleUser : "UNHANDLED"}</p>
                     </li>
                     <li className={styles.alertInfoItem}>
                         <p className={styles.alertInfoKey}>Alert Details: </p>
-                        <p className={styles.alertInfoValue}>{alert.alert.msg}</p>
+                        <p className={styles.alertInfoValue}>{details.msg}</p>
                     </li>
                     <li className={styles.alertInfoItem}>
                         <p className={styles.alertInfoKey}>Comments: </p>
@@ -178,7 +145,7 @@ const AlertsDetails = () => {
                             e.preventDefault()
                             onCommentClick()
                         }}/>
-                        <p className={styles.alertInfoValue}>{alert.alert.comment}</p>
+                        <p className={styles.alertInfoValue}>{details.comment}</p>
                     </li>
                 </ul>
                 <div className={commentFormIsOpened ? styles.commentBlock : styles.disabledBlock}>
@@ -202,23 +169,23 @@ const AlertsDetails = () => {
                     </button>
                 </div>
                 {
-                    alert.alert.customFields ?
+                    details.customFields ?
                         <ul className={styles.alertCommonInfo}>
-                            {Object.keys(alert.alert.customFields).map((key) => (
+                            {Object.keys(details.customFields).map((key) => (
                                 <li className={styles.alertInfoItem}>
                                     <p className={styles.alertInfoKey}>{key}: </p>
-                                    {alert.alert.customFields[key].startsWith("https://") ? (
+                                    {details.customFields[key].startsWith("https://") ? (
                                         <a
                                             className={styles.alertInfoLink}
-                                            href={alert.alert.customFields[key]}
+                                            href={details.customFields[key]}
                                             target="_blank"
                                             rel="noopener noreferrer"
                                         >
-                                            {alert.alert.customFields[key].split('/')[2]}
+                                            {details.customFields[key].split('/')[2]}
                                         </a>
                                     ) : (
                                         <p className={styles.alertInfoValue}>
-                                            {alert.alert.customFields[key]}
+                                            {details.customFields[key]}
                                         </p>
                                     )}
                                 </li>
