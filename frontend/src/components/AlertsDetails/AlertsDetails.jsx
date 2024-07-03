@@ -7,6 +7,7 @@ import {AdapterDayjs} from "@mui/x-date-pickers/AdapterDayjs";
 import {MobileDateTimePicker} from "@mui/x-date-pickers/MobileDateTimePicker";
 import dayjs from "dayjs";
 import {LocalizationProvider} from "@mui/x-date-pickers/LocalizationProvider";
+import AlertService from "../../services/AlertService";
 
 const AlertsDetails = ({details, history}) => {
     const [commentFormIsOpened, setCommentFormIsOpened] = useState(false)
@@ -15,9 +16,11 @@ const AlertsDetails = ({details, history}) => {
     const textareaRef = useRef(null)
     const [historyStart, setHistoryStart] = useState(new Date(Date.now() - 24 * 60 * 60 * 1000))
     const [historyEnd, setHistoryEnd] = useState(new Date(Date.now()))
+    const [data, setData] = useState([])
+    const [colors, setColors] = useState([])
 
     //init data array
-    const rawData = [
+    const dataSample = [
         [
             {type: "string", id: "Title"},
             {type: "string", id: "Severity"},
@@ -26,27 +29,35 @@ const AlertsDetails = ({details, history}) => {
         ]
     ]
 
-    //init colors array
-    const colors = []
+    const rawData = [...dataSample]
 
+    //init initColors array
+    const initColors = []
+
+    //set colors for every item in timeline
     for (let i in history) {
         rawData.push(history[i])
         switch (history[i][1]){
             case "RESOLVED":
-                colors.push("#aee238")
+                initColors.push("#aee238")
                 break
             case "WARNING":
-                colors.push("#faeb2e")
+                initColors.push("#faeb2e")
                 break
             case "CRITICAL":
-                colors.push("#fa2516")
+                initColors.push("#fa2516")
                 break
             default:
-                colors.push("#9f9c9c")
+                initColors.push("#9f9c9c")
         }
     }
 
-    const data = rawData.map(array => array.map( item => stringToDate(item)))
+    useEffect(() => {
+        const initData = rawData.map(array => array.map( item => stringToDate(item)))
+        setData(initData)
+        setColors(initColors)
+    }, [history])
+
 
     const options = {
         timeline: {
@@ -56,7 +67,7 @@ const AlertsDetails = ({details, history}) => {
             },
         },
         backgroundColor: "#ebf8fa",
-        colors: colors
+        colors: initColors
     };
 
     const onCommentClick = () => {
@@ -90,13 +101,48 @@ const AlertsDetails = ({details, history}) => {
         }
     }
 
-    const onHistorySearchClick = (e) => {
+    const onHistorySearchClick = async (e) => {
         e.preventDefault()
-        console.log(`Get Alert status history from ${historyStart} to ${historyEnd}`)
+        const params = {
+            alert_id : details.alert_id ? details.alert_id : details._id,
+            start: Math.floor(new Date(historyStart).getTime()/1000),
+            end: Math.floor(new Date(historyEnd).getTime()/1000),
+        }
+        const customRawData = [...dataSample]
+        const customColors = []
+        try {
+            const response = await AlertService.getAlert(params)
+            const historyRequest = response.data.history.map(item => ["STATUS", ...item])
+
+            for (let i in historyRequest) {
+                customRawData.push(historyRequest[i])
+                switch (historyRequest[i][1]){
+                    case "RESOLVED":
+                        customColors.push("#aee238")
+                        break
+                    case "WARNING":
+                        customColors.push("#faeb2e")
+                        break
+                    case "CRITICAL":
+                        customColors.push("#fa2516")
+                        break
+                    default:
+                        customColors.push("#9f9c9c")
+                }
+            }
+            setColors(customColors)
+            const customInitData = customRawData.map(array => array.map( item => stringToDate(item)))
+            setData(customInitData)
+        } catch (err) {
+            console.log(err)
+        }
     }
 
     let fontColor
     switch (details.severity.toUpperCase()) {
+        case "RESOLVED":
+            fontColor = '#779f27'
+            break
         case "WARNING":
             fontColor = '#DBBE3B'
             break
