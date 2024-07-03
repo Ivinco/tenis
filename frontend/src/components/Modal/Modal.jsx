@@ -32,8 +32,17 @@ const Modal = (content) => {
            const fetchAlert = async () => {
                try {
                    const response = await AlertService.getAlert(params)
-                   setAlertDetails (response.data.details)
-                   setAlertHistory (response.data.history.map(item => ["STATUS", ...item]))
+                   if (response.status === 200) {
+                       setAlertDetails (response.data.details)
+                       setAlertHistory (response.data.history.map(item => ["STATUS", ...item]))
+                   } else if(response.status === 404) {
+                       dispatch(setModalError("Alert not find"))
+                       console.log(response.status)
+                   } else {
+                       dispatch(setModalError("Oops. Something went wrong. Please, try again"))
+                       console.log(response.status)
+                   }
+
 
                } catch (e) {
                    console.log(`Error: ${e}`)
