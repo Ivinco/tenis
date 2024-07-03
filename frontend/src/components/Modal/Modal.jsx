@@ -71,6 +71,7 @@ const Modal = (content) => {
     if (!portalElement){
         return null
     }
+
     return ReactDOM.createPortal((
             <div className={styles.overlay}>
                 <div className={styles.modal}>
@@ -79,7 +80,7 @@ const Modal = (content) => {
                     />
                     {modalMessage && <ErrorMessage message={modalMessage}/> }
                     {portalParam === 'login' && <AuthForm/>}
-                    {alertParam && <AlertsDetails details={alertDetails} history={alertHistory}/>}
+                    {alertParam && alertDetails._id && <AlertsDetails details={alertDetails} history={alertHistory}/>}
                     {portalParam === 'userInfo' && <UserInfo/>}
                     {portalParam === 'silenceRules' && <SilenceWindow/>}
                 </div>
