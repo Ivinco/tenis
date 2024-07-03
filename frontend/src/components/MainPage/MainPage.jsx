@@ -10,6 +10,7 @@ import Modal from "../Modal/Modal";
 import {useEffect} from "react";
 import {openModal} from "../../store/reducers/modalReducer";
 import usePortalParam from "../../hooks/usePortalParam";
+import {useSearchParams} from "react-router-dom";
 
 
 function MainPage(){
@@ -18,7 +19,9 @@ function MainPage(){
     const isOpenedSideBar = useSelector(state => state.hiddenMenu.isOpenedSideBar)
     const modalContent = useSelector(state => state.switchModal.content)
     const isLoggedIn = useSelector(state => state.authReducer.isLogged)
+    const [searchParams, setSearchParams] = useSearchParams();
     const setPortalParams = usePortalParam()
+    const alertParam = searchParams.get("alert_id")
 
 
     const onSideBarClick = () => {
@@ -28,9 +31,17 @@ function MainPage(){
         dispatch(switchActiveHeaderMenuItem(null))
     }
 
+    useEffect(()=>{
+        if(isLoggedIn && alertParam){
+            dispatch(openModal())
+        }
+    }, [dispatch, isLoggedIn, alertParam])
+
     useEffect(() => {
         if (!isLoggedIn){
             dispatch(openModal())
+            searchParams.delete("alert_id")
+            searchParams.delete("portal")
             setPortalParams("login")
         }
         else {
