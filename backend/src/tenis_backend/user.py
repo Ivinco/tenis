@@ -56,6 +56,9 @@ class User:
     def update(self, user_id, update_data):
         """Update user data based on the provided fields"""
         
+        if 'password' in update_data:
+            update_data['password'] = self.encrypt_password(update_data['password'])
+
         result = self.db.users.update_one(
             {"_id": ObjectId(user_id)},
             {
@@ -107,7 +110,7 @@ class User:
 
     def encrypt_password(self, password):
         """Encrypt password"""
-        return generate_password_hash(password)
+        return generate_password_hash(password, method='pbkdf2:sha256')
 
     def login(self, email, password):
         """Login a user"""
