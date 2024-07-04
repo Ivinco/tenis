@@ -1,4 +1,5 @@
 from datetime import datetime, timezone
+from bson.objectid import ObjectId
 import re
 
 
@@ -20,6 +21,24 @@ def lookup_alert(alerts, alert):
                 a['project'] == alert['project'] and
                 a['alertName'] == alert['alertName'] and
                 a['plugin_id'] == alert['plugin_id']):
+                return a
+        return None
+    except TypeError:
+        return None
+
+
+def lookup_alert_by_id(alerts, alert_id):
+    """
+    Check if alert is already in the list
+    :param alerts: Global list of alerts
+    :param alert_id: Alert_id (str or ObjectId) to check
+    :return: First element in the alerts list that matches, or None
+    """
+    if type(alert_id) is str:
+        alert_id = ObjectId(alert_id)
+    try:
+        for a in alerts:
+            if a['_id'] == alert_id:
                 return a
         return None
     except TypeError:
