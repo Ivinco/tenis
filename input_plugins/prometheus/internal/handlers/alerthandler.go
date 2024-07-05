@@ -12,7 +12,7 @@ import (
 	"net/http"
 )
 
-func AlertHandler(logger *slog.Logger, filePath string, project string, serverUrl string, token string) http.HandlerFunc {
+func AlertHandler(logger *slog.Logger, filePath string, project string, pluginId string, serverUrl string, token string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		const op = "handlers.alert.AlertHandler"
 		batchSize := 5000
@@ -30,8 +30,6 @@ func AlertHandler(logger *slog.Logger, filePath string, project string, serverUr
 
 		var rawAlerts []alertprocessor.RawAlert
 
-		alerts, err := alertprocessor.ProcessAlert(log, r.Context(), project, body)
-
 		if err = json.Unmarshal(body, &rawAlerts); err != nil {
 			logger.Error("Error unmarshalling request data", sl.Err(err))
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
@@ -48,7 +46,7 @@ func AlertHandler(logger *slog.Logger, filePath string, project string, serverUr
 				alertChunks = append(alertChunks, rawAlerts[i:end])
 			}
 			for _, chunk := range alertChunks {
-				alerts, err := alertprocessor.ProcessAlert(logger, r.Context(), project, chunk)
+				alerts, err := alertprocessor.ProcessAlert(logger, r.Context(), project, pluginId, chunk)
 				if err != nil {
 					logger.Error("Error processing alerts chunk", sl.Err(err))
 					http.Error(w, "Internal Server Error", http.StatusInternalServerError)
@@ -76,7 +74,7 @@ func AlertHandler(logger *slog.Logger, filePath string, project string, serverUr
 			}
 		}
 
-		alerts, err := alertprocessor.ProcessAlert(logger, r.Context(), project, rawAlerts)
+		alerts, err := alertprocessor.ProcessAlert(logger, r.Context(), project, pluginId, rawAlerts)
 
 		resp, err := alertsender.AlertSender(logger, alerts, serverUrl, token)
 
@@ -100,7 +98,6 @@ func AlertHandler(logger *slog.Logger, filePath string, project string, serverUr
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			return
 		}
-
 
 		logger.Info("Alerts sent to backend", slog.String("status", resp.Status()))
 
