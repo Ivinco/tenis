@@ -112,6 +112,8 @@ def send_events(args, events, dump, tenis):
             while pack:
                 try:
                     resp = tenis.post(args.server + '/in', json=alerts_dick)
+                    if int(resp.status_code) >= 400:
+                        logging.critical(f"Error during sending events to TENIS: {resp.status_code} {resp.text}")
                     if args.debug:
                         print(resp.status_code, resp.text, '\n', alerts_dick)
                 except Exception as e:
