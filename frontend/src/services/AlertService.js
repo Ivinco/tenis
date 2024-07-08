@@ -46,4 +46,8 @@ export default class AlertService {
         }
         return api.get (`/alerts`, config)
     }
+
+    static async postComment (payload) {
+        return api.post('/comment', payload)
+    }
 }
