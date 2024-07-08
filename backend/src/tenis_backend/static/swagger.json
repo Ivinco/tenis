@@ -247,6 +247,116 @@
         }
       }
     },
+    "/comment" :{
+      "post":{
+       "security": [
+          {
+          "bearerAuth": []
+          }
+        ],  
+        "summary": "Alerts - get alert's comment",
+        "responses": {
+          "200": {
+            "description": "Get Token for user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/auth"
+                }
+              }
+            }
+          }          
+        }
+      }
+    },
+    "/history" :{
+      "get":{
+       "security": [
+          {
+          "bearerAuth": []
+          }
+        ],  
+        "summary": "User - get user's email",
+        "responses": {
+          "200": {
+            "description": "Get Token for user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/auth"
+                }
+              }
+            }
+          }          
+        }
+      }
+    },
+    "/alerts" :{
+      "get":{
+       "security": [
+          {
+          "bearerAuth": []
+          }
+        ],  
+        "summary": "Alerts - get alerts' history",
+        "responses": {
+          "200": {
+            "description": "Get Token for user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/auth"
+                }
+              }
+            }
+          }          
+        }
+      }
+    },
+    "/out" :{
+      "get":{
+       "security": [
+          {
+          "bearerAuth": []
+          }
+        ],  
+        "summary": "User - get user's email",
+        "responses": {
+          "200": {
+            "description": "Get Token for user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/auth"
+                }
+              }
+            }
+          }          
+        }
+      }
+    },
+    "/in" :{
+      "get":{
+       "security": [
+          {
+          "bearerAuth": []
+          }
+        ],  
+        "summary": "User - get user's email",
+        "responses": {
+          "200": {
+            "description": "Get Token for user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/auth"
+                }
+              }
+            }
+          }          
+        }
+      }
+    },
     "/users" :{
       "get":{
         "summary": "User - get list of all users",
@@ -266,6 +376,11 @@
     },
     "/user" :{
       "post":{
+        "security": [
+          {
+          "bearerAuth": []
+          }
+        ],
         "summary": "User - Return user by id",
         "requestBody": {
           "content": {
@@ -300,6 +415,11 @@
     },
     "/user/get_by_email" :{
       "post":{
+        "security": [
+          {
+          "bearerAuth": []
+          }
+        ],
         "summary": "User - Return user by email",
         "requestBody": {
           "content": {
@@ -334,6 +454,11 @@
     },
     "/user/add" :{
       "post":{
+        "security": [
+          {
+          "bearerAuth": []
+          }
+        ],
         "summary": "User - Create new User",
         "requestBody": {
           "content": {
@@ -368,6 +493,11 @@
     },
     "/user/del" :{
       "post":{
+        "security": [
+          {
+          "bearerAuth": []
+          }
+        ],
         "summary": "User - Removing user with id",
         "requestBody": {
           "content": {
@@ -402,6 +532,11 @@
     },
     "/user/disable" :{
       "post":{
+        "security": [
+          {
+          "bearerAuth": []
+          }
+        ],
         "summary": "User - Disable user by id",
         "requestBody": {
           "content": {
@@ -436,6 +571,11 @@
     },
     "/user/enable" :{
       "post":{
+        "security": [
+          {
+          "bearerAuth": []
+          }
+        ],
         "summary": "User - Enable user by id",
         "requestBody": {
           "content": {
@@ -470,17 +610,19 @@
     },
     "/user/update" :{
       "post":{
-        "summary": "User - Update user data",
+        "security": [
+          {
+          "bearerAuth": []
+          }
+        ],
+        "summary": "User - Update user info",
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
                 "properties": {
-                  "email": {
-                    "type": "string"
-                  },
-                  "password": {
+                  "userID": {
                     "type": "string"
                   }
                 }
