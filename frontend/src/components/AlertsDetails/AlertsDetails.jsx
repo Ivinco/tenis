@@ -1,6 +1,6 @@
 import React, {useEffect, useRef, useState} from 'react';
 import styles from './AlertsDetails.module.css'
-import {useSelector} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {processAlertComment, processDuration, stringToDate} from "../../utils/utils";
 import {Chart} from "react-google-charts";
 import {AdapterDayjs} from "@mui/x-date-pickers/AdapterDayjs";
@@ -8,8 +8,10 @@ import {MobileDateTimePicker} from "@mui/x-date-pickers/MobileDateTimePicker";
 import dayjs from "dayjs";
 import {LocalizationProvider} from "@mui/x-date-pickers/LocalizationProvider";
 import AlertService from "../../services/AlertService";
+import {setModalError} from "../../store/reducers/modalReducer";
 
 const AlertsDetails = ({details, history}) => {
+    const dispatch = useDispatch();
     const [commentFormIsOpened, setCommentFormIsOpened] = useState(false)
     const [commentFormContent, setCommentFormContent] = useState('')
     const user = useSelector( state => state.authReducer.user)
@@ -80,11 +82,22 @@ const AlertsDetails = ({details, history}) => {
         }
     }, [commentFormIsOpened]);
 
-    const onSendCommentClick = () => {
+    const onSendCommentClick =  async () => {
         setCommentFormIsOpened(false)
         document.getElementById('commentArea').value = ''
-        setCommentFormContent('')
+        const alert_id = details.alert_id ? details.alert_id : details._id
         const processedString = commentFormContent.split(/\s+/).map(word => processAlertComment(word, user.usersCommentReplaceRules))
+        const commentRequest = {
+            alert_id: alert_id,
+            comment: commentFormContent
+        }
+        try {
+            const commentResponse = await AlertService.postComment(commentRequest)
+        } catch (e) {
+            dispatch (setModalError("Oops, something went wrong"))
+        }
+
+        setCommentFormContent('')
         details.comment = (
             <>
                 {processedString.map((element, index) => (
