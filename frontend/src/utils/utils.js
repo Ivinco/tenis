@@ -1,3 +1,5 @@
+import {sha256} from "js-sha256";
+
 export function processTimeStamp (unixDateString) {
     const unixTime = parseInt(unixDateString, 10);
     const dateObject = new Date(unixTime * 1000);
@@ -70,4 +72,18 @@ export function sortList (list, field, direction) {
 export function stringToDate (string) {
         const date = new Date(string);
         return isNaN(date.getTime()) ? string : date;
+}
+
+export function prepareUser (data) {
+    const user_raw = {
+        userName: data.name,
+        userId: data._id,
+        userEmail: data.email,
+        userImage: `https://gravatar.com/avatar/${sha256(data.email)}?s=150`,
+        userPhone: data.phone ? data.phone : null,
+        usersCommentReplaceRules: data.commentReplaceRules ? data.commentReplaceRules : null,
+        userProjects: data.projects
+    }
+    const user = {...user_raw, userProjects: ['All', ...user_raw.userProjects]}
+    return user
 }

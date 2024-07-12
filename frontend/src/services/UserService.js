@@ -6,8 +6,8 @@ export default class UserService{
         return api.get('/whoami')
     }
 
-    static async ackAlerts (alerts) {
-        return api.post ('/in', {"update": alerts})
+    static async editUser (payload) {
+        return api.post( '/user/update', payload );
     }
 
 
