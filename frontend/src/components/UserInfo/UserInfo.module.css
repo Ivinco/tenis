@@ -1,3 +1,17 @@
+.loadOverlay {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background-color: rgba(224, 232, 247, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 .userInfoHeader {
     display: flex;
     height: 15%;
@@ -28,6 +42,35 @@
     width: 100%;
 }
 
+.userEditButtonsBlock {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+}
+
+.userEditButton {
+    width: 100%;
+    padding: 3px 5px;
+    margin: 10px 0;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.userEditButton:hover {
+    transform: scale(1.1);
+}
+
+.userEditButtonActive {
+    background-color: #0A9393;
+}
+
+.hiddenElement {
+    visibility: hidden;
+}
+
 .userInfoAvatar {
     width: 150px;
     height: 150px;
@@ -45,15 +88,41 @@
     width: 50%;
 }
 
-.userInfoItem {
+.userEditForm {
     font-size: 1.5rem;
     margin: 12px auto 0 25px;
     padding: 0;
 }
 
+.userInfoItem {
+    font-size: 1.5rem;
+    margin: 12px auto 0 25px;
+    padding: 1px;
+}
+
+.resetPassBlock {
+    display: flex;
+}
+
+.resetPassForm {
+    display: flex;
+    flex-direction: column;
+    margin: 30px auto 0;
+}
+
+.resetPassField {
+    font-size: 1.5rem;
+    margin: 12px auto 0 25px;
+    text-align: center;
+}
+
+.resetPassField::placeholder {
+    font-size: 1rem;
+}
+
 .logoutButton {
     width: 45%;
-    margin: 60px auto 0;
+    margin: 60px auto;
     padding: 14px 20px;
     border-radius: 10px;
     background-color: #0A9393;

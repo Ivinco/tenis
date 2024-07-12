@@ -6,8 +6,8 @@ import {loginAction} from "../../store/reducers/authReducer";
 import {closeModal} from "../../store/reducers/modalReducer";
 import AuthService from "../../services/AuthService";
 import {setModalError} from "../../store/reducers/modalReducer";
-import {sha256} from "js-sha256";
 import usePortalParam from "../../hooks/usePortalParam";
+import {prepareUser} from "../../utils/utils";
 
 
 const AuthForm = () => {
@@ -20,29 +20,27 @@ const AuthForm = () => {
         try {
             const response = await AuthService.login(email, password)
                     localStorage.setItem('token', response.data.access_token)
-                    const user_raw = {
-                        userName: response.data.user.name,
-                        userId: response.data.user._id,
-                        userEmail: response.data.user.email,
-                        userImage: `https://gravatar.com/avatar/${sha256(response.data.user.email)}?s=150`,
-                        usersCommentReplaceRules: response.data.user.commentReplaceRules,
-                        userProjects: response.data.user.projects
-                        }
-                    const user = {...user_raw, userProjects: ['All', ...user_raw.userProjects]}
+            const user = prepareUser(response.data.user)
                     dispatch(loginAction(user))
                     setPortalParams()
                     dispatch(closeModal())
         }
         catch (e) {
-            switch (e.request.status){
-                case 401:
-                    dispatch(setModalError("Login failed"))
-                    setPortalParams()
-                    break
-                default:
-                    dispatch(setModalError("Oops. Something went wrong. Please, try a bit later"))
-                    setPortalParams()
+            if (e.request.status) {
+                switch (e.request.status){
+                    case 401:
+                        dispatch(setModalError("Login failed"))
+                        setPortalParams()
+                        break
+                    default:
+                        dispatch(setModalError("Oops. Something went wrong. Please, try a bit later"))
+                        setPortalParams()
+                }
+            } else {
+                dispatch(setModalError("Oops. Something went wrong. Please, try a bit later"))
+                setPortalParams()
             }
+
         }
     }
 
