@@ -300,8 +300,8 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "project": {
-                    "alert_id": "string"
+                  "datetime": {
+                    "type": "string"
                   }                 
                 }
               }
@@ -360,6 +360,11 @@
     },
     "/users" :{
       "get":{
+        "security": [
+          {
+          "bearerAuth": []
+          }
+        ], 
         "summary": "User - get list of all users",
         "responses": {
           "200": {
