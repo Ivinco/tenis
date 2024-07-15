@@ -248,7 +248,7 @@
       }
     },
     "/comment": {
-      "get":{
+      "post":{
         "security": [
           {
           "bearerAuth": []
@@ -293,21 +293,18 @@
           "bearerAuth": []
           }
         ],        
-        "summary": "Alert - Method to get all active alerts on requested timestamp",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "project": {
-                    "alert_id": "string"
-                  }                 
-                }
-              }
-            }
+        "parameters": [
+          {
+            "name": "datetime",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "description": "Datetime in epoch format"
           }
-        },
+        ],
         "responses": {
           "200": {
             "description": "Get Token for user",
