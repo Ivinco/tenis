@@ -247,14 +247,31 @@
         }
       }
     },
-    "/comment" :{
+    "/comment": {
       "post":{
-       "security": [
+        "security": [
           {
           "bearerAuth": []
           }
-        ],  
-        "summary": "Alerts - get alert's comment",
+        ],        
+        "summary": "Alert - Method to change alert's comment field",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "alert_id": {
+                    "type": "string"
+                  },
+                  "comment": {
+                    "type": "string"
+                  }                 
+                }
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "Get Token for user",
@@ -269,14 +286,28 @@
         }
       }
     },
-    "/history" :{
-      "get":{
-       "security": [
+    "/history": {
+      "post":{
+        "security": [
           {
           "bearerAuth": []
           }
-        ],  
-        "summary": "User - get user's email",
+        ],        
+        "summary": "Alert - Method to get all active alerts on requested timestamp",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "project": {
+                    "alert_id": "string"
+                  }                 
+                }
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "Get Token for user",
@@ -291,14 +322,28 @@
         }
       }
     },
-    "/alerts" :{
-      "get":{
-       "security": [
+    "/alerts": {
+      "post":{
+        "security": [
           {
           "bearerAuth": []
           }
-        ],  
-        "summary": "Alerts - get alerts' history",
+        ],        
+        "summary": "Alert - Endpoint to get details for a single alert with its status history",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "project": {
+                    "alert_id": "string"
+                  }                 
+                }
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "Get Token for user",
@@ -388,10 +433,10 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "email": {
+                  "id": {
                     "type": "string"
                   },
-                  "password": {
+                  "email": {
                     "type": "string"
                   }
                 }
@@ -427,10 +472,10 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "email": {
+                  "id": {
                     "type": "string"
                   },
-                  "password": {
+                  "email": {
                     "type": "string"
                   }
                 }
@@ -505,10 +550,10 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "email": {
+                  "id": {
                     "type": "string"
                   },
-                  "password": {
+                  "email": {
                     "type": "string"
                   }
                 }
@@ -544,10 +589,10 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "email": {
+                  "id": {
                     "type": "string"
                   },
-                  "password": {
+                  "email": {
                     "type": "string"
                   }
                 }
@@ -583,10 +628,10 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "email": {
+                  "id": {
                     "type": "string"
                   },
-                  "password": {
+                  "email": {
                     "type": "string"
                   }
                 }
@@ -622,7 +667,7 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "userID": {
+                  "id": {
                     "type": "string"
                   }
                 }
