@@ -300,8 +300,8 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "datetime": {
-                    "type": "string"
+                  "project": {
+                    "alert_id": "string"
                   }                 
                 }
               }
@@ -330,20 +330,35 @@
           }
         ],        
         "summary": "Alert - Endpoint to get details for a single alert with its status history",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "alert_id": {
-                    "type": "string"
-                  }                 
-                }
-              }
-            }
+        "parameters": [
+          {
+            "name": "alert_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID of the alert"
+          },
+          {
+            "name": "start",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "description": "Start time in epoch format"
+          },
+          {
+            "name": "end",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "description": "End time in epoch format"
           }
-        },
+        ],
         "responses": {
           "200": {
             "description": "Get Token for user",
@@ -360,11 +375,6 @@
     },
     "/users" :{
       "get":{
-        "security": [
-          {
-          "bearerAuth": []
-          }
-        ], 
         "summary": "User - get list of all users",
         "responses": {
           "200": {
