@@ -662,7 +662,8 @@
                   "password": {
                     "type": "string"
                   }
-                }
+                },
+                "required": ["id"]
               }
             }
           }
