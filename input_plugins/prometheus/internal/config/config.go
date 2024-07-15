@@ -9,6 +9,7 @@ import (
 
 type ConfFile struct {
 	Env        string     `yaml:"env" env-default:"local"`
+	PluginId   string     `yaml:"plugin_id" env-required:"true"`
 	Server     Server     `yaml:"server" env-required:"true"`
 	HttpServer HttpServer `yaml:"httpServer" env-required:"true"`
 }

@@ -1,27 +1,28 @@
 import React, {useEffect, useRef, useState} from 'react';
 import styles from './AlertsDetails.module.css'
-import {useSelector} from "react-redux";
-import {processAlertComment, processDuration} from "../../utils/utils";
+import {useDispatch, useSelector} from "react-redux";
+import {processAlertComment, processDuration, stringToDate} from "../../utils/utils";
 import {Chart} from "react-google-charts";
 import {AdapterDayjs} from "@mui/x-date-pickers/AdapterDayjs";
 import {MobileDateTimePicker} from "@mui/x-date-pickers/MobileDateTimePicker";
 import dayjs from "dayjs";
 import {LocalizationProvider} from "@mui/x-date-pickers/LocalizationProvider";
+import AlertService from "../../services/AlertService";
+import {setModalError} from "../../store/reducers/modalReducer";
 
-const AlertsDetails = () => {
-    const alert = useSelector(state => state.setAlertReducer.alert)
+const AlertsDetails = ({details, history}) => {
+    const dispatch = useDispatch();
     const [commentFormIsOpened, setCommentFormIsOpened] = useState(false)
     const [commentFormContent, setCommentFormContent] = useState('')
     const user = useSelector( state => state.authReducer.user)
     const textareaRef = useRef(null)
     const [historyStart, setHistoryStart] = useState(new Date(Date.now() - 24 * 60 * 60 * 1000))
     const [historyEnd, setHistoryEnd] = useState(new Date(Date.now()))
-
-
-    //TODO change this data
+    const [data, setData] = useState([])
+    const [colors, setColors] = useState([])
 
     //init data array
-    const data = [
+    const dataSample = [
         [
             {type: "string", id: "Title"},
             {type: "string", id: "Severity"},
@@ -30,55 +31,34 @@ const AlertsDetails = () => {
         ]
     ]
 
-    //init colors array
-    const colors = []
+    const rawData = [...dataSample]
 
+    //init initColors array
+    const initColors = []
 
-    //alert history data from backend
-    const rawData = {
-        history: [
-            [
-                "OK",
-                new Date (2024, 4, 30, 15, 42),
-                new Date(2024, 4, 30, 15, 52),
-            ],
-            [
-                "WARNING",
-                new Date (2024, 4, 30, 15, 52),
-                new Date(2024, 4, 30, 16, 7),
-            ],
-            [
-                "CRITICAL",
-                new Date (2024, 4, 30, 16, 7),
-                new Date(2024, 4, 30, 16, 58),
-            ],
-            [
-                "OK",
-                new Date (2024, 4, 30, 16, 58),
-                new Date(2024, 4, 30, 17, 40),
-            ],
-        ]
-    }
-
-
-
-    for (let item in rawData.history) {
-        rawData.history[item].unshift("STATUS")
-        data.push(rawData.history[item])
-        switch (rawData.history[item][1]){
-            case "OK":
-                colors.push("#aee238")
+    //set colors for every item in timeline
+    for (let i in history) {
+        rawData.push(history[i])
+        switch (history[i][1]){
+            case "RESOLVED":
+                initColors.push("#aee238")
                 break
             case "WARNING":
-                colors.push("#faeb2e")
+                initColors.push("#faeb2e")
                 break
             case "CRITICAL":
-                colors.push("#fa2516")
+                initColors.push("#fa2516")
                 break
             default:
-                colors.push("#9f9c9c")
+                initColors.push("#9f9c9c")
         }
     }
+
+    useEffect(() => {
+        const initData = rawData.map(array => array.map( item => stringToDate(item)))
+        setData(initData)
+        setColors(initColors)
+    }, [history])
 
 
     const options = {
@@ -89,7 +69,7 @@ const AlertsDetails = () => {
             },
         },
         backgroundColor: "#ebf8fa",
-        colors: colors
+        colors: initColors
     };
 
     const onCommentClick = () => {
@@ -102,12 +82,23 @@ const AlertsDetails = () => {
         }
     }, [commentFormIsOpened]);
 
-    const onSendCommentClick = () => {
+    const onSendCommentClick =  async () => {
         setCommentFormIsOpened(false)
         document.getElementById('commentArea').value = ''
-        setCommentFormContent('')
+        const alert_id = details.alert_id ? details.alert_id : details._id
         const processedString = commentFormContent.split(/\s+/).map(word => processAlertComment(word, user.usersCommentReplaceRules))
-        alert.alert.comment = (
+        const commentRequest = {
+            alert_id: alert_id,
+            comment: commentFormContent
+        }
+        try {
+            const commentResponse = await AlertService.postComment(commentRequest)
+        } catch (e) {
+            dispatch (setModalError("Oops, something went wrong"))
+        }
+
+        setCommentFormContent('')
+        details.comment = (
             <>
                 {processedString.map((element, index) => (
                     <React.Fragment key={index}>{element} </React.Fragment>
@@ -123,13 +114,48 @@ const AlertsDetails = () => {
         }
     }
 
-    const onHistorySearchClick = (e) => {
+    const onHistorySearchClick = async (e) => {
         e.preventDefault()
-        console.log(`Get Alert status history from ${historyStart} to ${historyEnd}`)
+        const params = {
+            alert_id : details.alert_id ? details.alert_id : details._id,
+            start: Math.floor(new Date(historyStart).getTime()/1000),
+            end: Math.floor(new Date(historyEnd).getTime()/1000),
+        }
+        const customRawData = [...dataSample]
+        const customColors = []
+        try {
+            const response = await AlertService.getAlert(params)
+            const historyRequest = response.data.history.map(item => ["STATUS", ...item])
+
+            for (let i in historyRequest) {
+                customRawData.push(historyRequest[i])
+                switch (historyRequest[i][1]){
+                    case "RESOLVED":
+                        customColors.push("#aee238")
+                        break
+                    case "WARNING":
+                        customColors.push("#faeb2e")
+                        break
+                    case "CRITICAL":
+                        customColors.push("#fa2516")
+                        break
+                    default:
+                        customColors.push("#9f9c9c")
+                }
+            }
+            setColors(customColors)
+            const customInitData = customRawData.map(array => array.map( item => stringToDate(item)))
+            setData(customInitData)
+        } catch (err) {
+            console.log(err)
+        }
     }
 
     let fontColor
-    switch (alert.alert.severity.toUpperCase()) {
+    switch (details.severity.toUpperCase()) {
+        case "RESOLVED":
+            fontColor = '#779f27'
+            break
         case "WARNING":
             fontColor = '#DBBE3B'
             break
@@ -147,30 +173,30 @@ const AlertsDetails = () => {
             <div className={styles.alertHeader}>
                 <div className={styles.alertLogo}/>
                 <div className={styles.alertTitle} style={{ color: fontColor}}>
-                    {alert.alert.severity}
+                    {details.severity}
                 </div>
             </div>
             <div className={styles.alertDetailsBody}>
                 <ul className={styles.alertCommonInfo}>
                     <li className={styles.alertInfoItem}>
                         <p className={styles.alertInfoKey}>Problem:</p>
-                        <p className={styles.alertInfoValue}>{alert.alert.alertName}</p>
+                        <p className={styles.alertInfoValue}>{details.alertName}</p>
                     </li>
                     <li className={styles.alertInfoItem}>
                         <p className={styles.alertInfoKey}>Problem Host:</p>
-                        <p className={styles.alertInfoValue}>{alert.alert.host}</p>
+                        <p className={styles.alertInfoValue}>{details.host}</p>
                     </li>
                     <li className={styles.alertInfoItem}>
                         <p className={styles.alertInfoKey}>Alert Duration: </p>
-                        <p className={styles.alertInfoValue}>{processDuration(alert.alert.fired)}</p>
+                        <p className={styles.alertInfoValue}>{processDuration(details.fired)}</p>
                     </li>
                     <li className={styles.alertInfoItem}>
                         <p className={styles.alertInfoKey}>Responsible Engineer: </p>
-                        <p className={styles.alertInfoValue}>{alert.alert.responsibleUser ? alert.alert.responsibleUser : "UNHANDLED"}</p>
+                        <p className={styles.alertInfoValue}>{details.responsibleUser ? details.responsibleUser : "UNHANDLED"}</p>
                     </li>
                     <li className={styles.alertInfoItem}>
                         <p className={styles.alertInfoKey}>Alert Details: </p>
-                        <p className={styles.alertInfoValue}>{alert.alert.msg}</p>
+                        <p className={styles.alertInfoValue}>{details.msg}</p>
                     </li>
                     <li className={styles.alertInfoItem}>
                         <p className={styles.alertInfoKey}>Comments: </p>
@@ -178,7 +204,7 @@ const AlertsDetails = () => {
                             e.preventDefault()
                             onCommentClick()
                         }}/>
-                        <p className={styles.alertInfoValue}>{alert.alert.comment}</p>
+                        <p className={styles.alertInfoValue}>{details.comment}</p>
                     </li>
                 </ul>
                 <div className={commentFormIsOpened ? styles.commentBlock : styles.disabledBlock}>
@@ -202,23 +228,23 @@ const AlertsDetails = () => {
                     </button>
                 </div>
                 {
-                    alert.alert.customFields ?
+                    details.customFields ?
                         <ul className={styles.alertCommonInfo}>
-                            {Object.keys(alert.alert.customFields).map((key) => (
+                            {Object.keys(details.customFields).map((key) => (
                                 <li className={styles.alertInfoItem}>
                                     <p className={styles.alertInfoKey}>{key}: </p>
-                                    {alert.alert.customFields[key].startsWith("https://") ? (
+                                    {details.customFields[key].startsWith("https://") ? (
                                         <a
                                             className={styles.alertInfoLink}
-                                            href={alert.alert.customFields[key]}
+                                            href={details.customFields[key]}
                                             target="_blank"
                                             rel="noopener noreferrer"
                                         >
-                                            {alert.alert.customFields[key].split('/')[2]}
+                                            {details.customFields[key].split('/')[2]}
                                         </a>
                                     ) : (
                                         <p className={styles.alertInfoValue}>
-                                            {alert.alert.customFields[key]}
+                                            {details.customFields[key]}
                                         </p>
                                     )}
                                 </li>

@@ -123,7 +123,7 @@ const Alert = ({alert, isGroupRecheck}) => {
     }
 
     const handleInfoButton = () => {
-        searchParams.set("alert", alert._id)
+        searchParams.set("alert_id", alert._id)
         setSearchParams(searchParams)
         dispatch(setDetailedAlert({alert}))
         dispatch(openModal())

@@ -12,6 +12,7 @@ should be provided either as command flag or as system environment variable.
 Command flag takes precedence over environment variable. Config file has the next blocks:
 
 - **env**: defines working environment. Can be *local*, *dev* or *prod*.
+- **plugin_id**: defines a unique id og current instance of the plugin 
 - **server**: defines parameters for Tenis backend server
   - **address**: URL address of Tenis backend server
   - **token**: Token for authentication on Tenis backend server
@@ -29,6 +30,7 @@ Here is a sample of config file:
 
 ```yaml
 env: "local"
+plugin_id: "tenis_pip"
 server:
   address: "https://tenis-backend.local.com"
   token: "tenis.backend.token"
@@ -46,6 +48,20 @@ Keep in mind, that configs contain some sensitive data, like token to communicat
 auth credentials which prometheus should use to send alerts to plugin. In prod environment you would prefer to omit 
 them in config file and set them by command flags or environment variables. Command flags take precedence over
 environment variables.
+
+Tenis Prometheus Plugin is seen as Alert Manager by Prometheus. So, to make Prometheus send alerts to plugin you should
+set it in **alertmanagers** section of prometheus.yaml file. Here is the example of prometheus config to use Tenis Prometheus Plugin:
+
+```yaml
+alerting:
+  alertmanagers:
+  - basic_auth:
+      username: prometheus
+      password: 123password
+    static_configs:
+    - targets:
+      - tenis_pip_plugin_host:8080
+```
 
 For proper displaying of alerts in Tenis UI your alerts definitions in prometheus rules.yml file should contain severity
 label and descriptions annotation. If you want to have the link to some fix instructions related to alert, you should 

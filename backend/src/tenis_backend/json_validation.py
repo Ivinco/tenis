@@ -137,6 +137,27 @@ silence_schema = {
     "additionalProperties": False
 }
 
+# JSON schema to validate inbound alert comment JSON
+comment_schema = {
+    "required": [
+        "alert_id",
+        "comment",
+    ],
+    "properties": {
+        "alert_id": {
+            "type": "string",
+            "pattern": "^[ -~]*$",
+            "maxLength": 255
+        },
+        "comment": {
+            "type": "string",
+            "pattern": "^[ -~]*$",
+            "maxLength": 2000
+        }
+    },
+    "additionalProperties": False
+}
+
 # JSON schema to validate inbound plugin command JSON
 command_schema = {
     "type": "array",

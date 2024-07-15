@@ -26,11 +26,13 @@ type PreparedAlert struct {
 	User         string                 `json:"responsibleUser"`
 	Comment      string                 `json:"comment"`
 	Silenced     bool                   `json:"silenced"`
+	PluginId     string                 `json:"plugin_id"`
 	CustomFields map[string]interface{} `json:"customFields"`
 }
 
 type ResolvedAlert struct {
 	Project   string `json:"project"`
+	PluginId  string `json:"plugin_id"`
 	Host      string `json:"host"`
 	AlertName string `json:"alertName"`
 }
@@ -43,8 +45,7 @@ type RawAlert struct {
 	Labels       map[string]interface{} `json:"labels"`
 }
 
-
-func ProcessAlert(logger *slog.Logger, ctx context.Context, project string, rawAlerts []RawAlert) ([]byte, error) {
+func ProcessAlert(logger *slog.Logger, ctx context.Context, project string, pluginId string, rawAlerts []RawAlert) ([]byte, error) {
 	const op = "helpers/alertprocessor/PrecessAlert"
 	logger.With(
 		slog.String("op", op),
@@ -59,6 +60,7 @@ func ProcessAlert(logger *slog.Logger, ctx context.Context, project string, rawA
 			logger.Info("Resolved alert:", slog.String("alertName", item.Labels["alertname"].(string)))
 			var alert ResolvedAlert
 			alert.Project = project
+			alert.PluginId = pluginId
 			if instance, ok := item.Labels["instance"].(string); ok {
 				alert.Host = strings.Split(instance, ":")[0]
 			} else {
@@ -73,6 +75,7 @@ func ProcessAlert(logger *slog.Logger, ctx context.Context, project string, rawA
 		} else {
 			var alert PreparedAlert
 			alert.Project = project
+			alert.PluginId = pluginId
 			if instance, ok := item.Labels["instance"].(string); ok {
 				alert.Host = strings.Split(instance, ":")[0]
 			} else {

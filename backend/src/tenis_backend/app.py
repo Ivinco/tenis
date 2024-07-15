@@ -17,11 +17,11 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from email_validator import validate_email, EmailNotValidError
 from werkzeug.exceptions import HTTPException, Unauthorized, BadRequest, InternalServerError
 
-from .alert import load_alerts, lookup_alert, update_alerts, regexp_alerts, make_history_entry, is_resolved
+from .alert import load_alerts, lookup_alert, update_alerts, regexp_alerts, make_history_entry, is_resolved, lookup_alert_by_id
 from .auth import create_token, token_required, token_required_ws, plugin_token_required
 from .user import User
 from .json_validation import schema, silence_schema, user_schema, user_add_schema, user_update_schema, \
-    history_request_schema, command_schema, single_alert_history_schema
+    history_request_schema, command_schema, single_alert_history_schema, comment_schema
 from flask_swagger_ui import get_swaggerui_blueprint
 
 # Global vars init
@@ -561,7 +561,30 @@ def silenced(user):
     """
     Method to return a json list of 'silence' rules
     """
-    return json.dumps(silence_rules, default=str), 200
+    return json.dumps(silence_rules, default=str), 200\
+
+
+@app.route('/comment', methods=['POST'])
+@token_required()
+def comment(user):
+    """
+    Method to change alert's comment field accept json like {"alert_id":"fsfeaw12314e52351","comment":"test"}
+    """
+    try:
+        data = request.json
+        jsonschema.validate(instance=data, schema=comment_schema)
+    except jsonschema.exceptions.ValidationError as e:
+        raise BadRequest(e.message)
+
+    alert = lookup_alert_by_id(alerts, data['alert_id'])
+
+    if alert:
+        alert['comment'] = data['comment']
+        try:
+            app.db['current'].update_one({'_id': alert['_id']}, {"$set": {'comment': data['comment']}})
+        except pymongo.errors.PyMongoError as e:
+            raise InternalServerError("Failed to update alert comment in MongoDB: %s" % e)
+    return 'OK', 200
 
 
 @app.route('/healz')

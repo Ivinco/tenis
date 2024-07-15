@@ -6,10 +6,10 @@ import {BACKEND_SERVER} from "../../utils/vars";
 import UserService from "../../services/UserService";
 import {loginAction} from "../../store/reducers/authReducer";
 import axios from "axios";
-import {sha256} from 'js-sha256'
 import {closeModal} from "../../store/reducers/modalReducer";
 import {startLoadAction, stopLoadAction} from "../../store/reducers/loadingReducer";
 import LoadingWindow from "../LoadingWindow/LoadingWindow";
+import {prepareUser} from "../../utils/utils";
 
 function App () {
     const dispatch = useDispatch()
@@ -24,15 +24,7 @@ function App () {
                     const refresh = await axios.get(`${BACKEND_SERVER}/refresh`, {withCredentials: true})
                     localStorage.setItem('token', refresh.data.access_token)
                     const fetchUser = await UserService.getUser()
-                    const raw_user = {
-                        userName: fetchUser.data.user.name,
-                        userId: fetchUser.data.user._id,
-                        userEmail: fetchUser.data.user.email,
-                        userImage: `https://gravatar.com/avatar/${sha256(fetchUser.data.user.email)}?s=150`,
-                        usersCommentReplaceRules: fetchUser.data.user.commentReplaceRules,
-                        userProjects: fetchUser.data.user.userProjects
-                    }
-                    const user = {...raw_user, userProjects: ['All', ...raw_user.userProjects]}
+                    const user = prepareUser(fetchUser.data)
                     dispatch(loginAction(user))
                     dispatch(closeModal())
                 } catch (e) {
