@@ -84,7 +84,7 @@ def make_history_entry(alert):
     """ Return history entry for the given alert.
         This is effectively just a part of alert's data needed for the history collection. """
     return {
-        'alert_id': alert['_id'],
+        'alert_id': alert['alertId'],
         'logged': datetime.now(timezone.utc),
         'project': alert['project'],
         'host': alert['host'],
