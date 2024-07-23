@@ -381,23 +381,23 @@ def ack(user):
     if 'ack' in data:
         for item in data['ack']:
             for alert in alerts:
-                ack_id = item['alert_id']
-                if ack_id == alert['alert_id']:
+                ack_id = item['alertId']
+                if ack_id == alert['alertId']:
                     alert['responsibleUser'] = ack_user
                     updated_alerts.append(alert)
                     update_alerts_query.append(
-                        pymongo.UpdateOne({'alert_id': alert['alert_id']}, {"$set": {"responsibleUser": ack_user}}))
+                        pymongo.UpdateOne({'alert_id': alert['alertId']}, {"$set": {"responsibleUser": ack_user}}))
                     break
 
     if 'unack' in data:
         for item in data['unack']:
             for alert in alerts:
-                ack_id = item['alert_id']
-                if ack_id == alert['alert_id']:
+                ack_id = item['alertId']
+                if ack_id == alert['alertId']:
                     alert['responsibleUser'] = ''
                     updated_alerts.append(alert)
                     update_alerts_query.append(
-                        pymongo.UpdateOne({'alert_id': alert['alert_id']}, {"$set": {"responsibleUser": ''}}))
+                        pymongo.UpdateOne({'alert_id': alert['alertId']}, {"$set": {"responsibleUser": ''}}))
                     break
 
     send_alerts(updated_alerts, update_alerts_query)
