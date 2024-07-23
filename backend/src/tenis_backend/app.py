@@ -2,6 +2,7 @@ import atexit
 import hashlib
 import json
 import time
+from copy import deepcopy
 
 import jsonschema
 import os
@@ -380,23 +381,23 @@ def ack(user):
     if 'ack' in data:
         for item in data['ack']:
             for alert in alerts:
-                ack_id = ObjectId(item['alertId'])
-                if ack_id == alert['_id']:
+                ack_id = item['alert_id']
+                if ack_id == alert['alert_id']:
                     alert['responsibleUser'] = ack_user
                     updated_alerts.append(alert)
                     update_alerts_query.append(
-                        pymongo.UpdateOne({'_id': alert['_id']}, {"$set": {"responsibleUser": ack_user}}))
+                        pymongo.UpdateOne({'alert_id': alert['alert_id']}, {"$set": {"responsibleUser": ack_user}}))
                     break
 
     if 'unack' in data:
         for item in data['unack']:
             for alert in alerts:
-                ack_id = ObjectId(item['alertId'])
-                if ack_id == alert['_id']:
+                ack_id = item['alert_id']
+                if ack_id == alert['alert_id']:
                     alert['responsibleUser'] = ''
                     updated_alerts.append(alert)
                     update_alerts_query.append(
-                        pymongo.UpdateOne({'_id': alert['_id']}, {"$set": {"responsibleUser": ''}}))
+                        pymongo.UpdateOne({'alert_id': alert['alert_id']}, {"$set": {"responsibleUser": ''}}))
                     break
 
     send_alerts(updated_alerts, update_alerts_query)
@@ -901,7 +902,7 @@ def inbound():
                 id_string = a['project'] + a['host'] + a['alertName'] + a['plugin_id']
                 hash_object = hashlib.sha256(id_string.encode())
                 alert_id = hash_object.hexdigest()
-                a['alertId'] = alert_id
+                a['alert_id'] = alert_id
                 if is_resolved(a): continue  # do not process resolved alerts in 'update' section
 
                 if silence_rules:
@@ -916,7 +917,7 @@ def inbound():
 
                 # if severity changed, this should be logged to history collection
                 if existing_alert['severity'] != a['severity']:
-                    a['alertId'] = existing_alert['alertId']
+                    a['alert_id'] = existing_alert['alert_id']
                     new_history_entries.append(make_history_entry(a))
 
                 # found this alert in global list, maybe alert attributes have changed?
@@ -928,7 +929,7 @@ def inbound():
                             attr]  # note this won't affect the global list since existing_alert is a copy
                 if new_attributes:
                     update_alerts_query.append(
-                        pymongo.UpdateOne({'alertId': existing_alert['alertId']}, {"$set": new_attributes}))
+                        pymongo.UpdateOne({'alert_id': existing_alert['alert_id']}, {"$set": new_attributes}))
                     updated_alerts.append(existing_alert)
 
             if not new_alerts and not updated_alerts:  # all submitted alerts are already in the system
@@ -936,9 +937,9 @@ def inbound():
 
             if new_alerts:
                 try:
-                    res = app.db['current'].insert_many(new_alerts)
+                    res = app.db['current'].insert_many(deepcopy(new_alerts))
                     for i, _id in enumerate(res.inserted_ids):
-                        new_alerts[i]['_id'] = _id
+                        # new_alerts[i]['_id'] = _id
                         new_history_entries.append(make_history_entry(new_alerts[i]))
                     alerts.extend(new_alerts)
                     # note that socketio.emit can be only done after insert_many:
@@ -982,7 +983,7 @@ def inbound():
                 resolved_alerts.append(a)
                 a['severity'] = 'RESOLVED'
                 resolved_history_entries.append(make_history_entry(a))
-                resolved_ids.append(a['alertId'])
+                resolved_ids.append(a['alert_id'])
 
             if len(resolved_alerts) == 0:
                 return 'OK', 200  # submitted alerts list does not match a single alert from the global list
@@ -991,7 +992,7 @@ def inbound():
                 alerts.remove(a)  # remove from global in-mem list
 
             try:
-                app.db['current'].delete_many({'alertId': {'$in': resolved_ids}})
+                app.db['current'].delete_many({'alert_id': {'$in': resolved_ids}})
             except pymongo.errors.PyMongoError as e:
                 raise InternalServerError("Failed to save alerts in MongoDB: %s" % e)
             try:

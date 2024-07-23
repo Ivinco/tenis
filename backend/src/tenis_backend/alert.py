@@ -5,7 +5,7 @@ import re
 
 def load_alerts(mongo_collection):
     """ Load all alerts from the database upon startup """
-    return list(mongo_collection.find({}))
+    return list(mongo_collection.find({}, {'_id': 0}))
 
 
 def lookup_alert(alerts, alert):
@@ -84,7 +84,7 @@ def make_history_entry(alert):
     """ Return history entry for the given alert.
         This is effectively just a part of alert's data needed for the history collection. """
     return {
-        'alert_id': alert['alertId'],
+        'alert_id': alert['alert_id'],
         'logged': datetime.now(timezone.utc),
         'project': alert['project'],
         'host': alert['host'],
