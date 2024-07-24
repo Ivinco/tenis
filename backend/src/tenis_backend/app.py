@@ -550,7 +550,7 @@ def comment(user):
     if alert:
         alert['comment'] = data['comment']
         try:
-            app.db['current'].update_one({'_id': alert['alert_id']}, {"$set": {'comment': data['comment']}})
+            app.db['current'].update_one({'alert_id': alert['alert_id']}, {"$set": {'comment': data['comment']}})
         except pymongo.errors.PyMongoError as e:
             raise InternalServerError("Failed to update alert comment in MongoDB: %s" % e)
     return 'OK', 200
