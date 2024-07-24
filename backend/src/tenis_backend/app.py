@@ -260,7 +260,7 @@ def get_alert_details(alert_id, start_tstmp, end_tstmp):
                     history.pop(i)
             # if there are no records in history_period gap, it means that alert was in resolved status
             if history[0][1] > datetime.utcfromtimestamp(int(start_tstmp)):
-                prev_status = ["RESOLVED", datetime.utcfromtimestamp(int(start_tstmp)), history[0][1]]
+                prev_status = ["NO DATA", datetime.utcfromtimestamp(int(start_tstmp)), history[0][1]]
                 history.insert(0, prev_status)
             # cut history period to the start timestamp
             if history[0][1] < datetime.utcfromtimestamp(int(start_tstmp)):
