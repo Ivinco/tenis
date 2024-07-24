@@ -21,7 +21,7 @@ from werkzeug.exceptions import HTTPException, Unauthorized, BadRequest, Interna
 from werkzeug.security import generate_password_hash
 
 from .alert import load_alerts, lookup_alert, update_alerts, regexp_alerts, make_history_entry, is_resolved, \
-    lookup_alert_by_id
+    lookup_alert_by_id, load_collection
 from .auth import create_token, token_required, token_required_ws, plugin_token_required
 from .user import User
 from .json_validation import schema, silence_schema, user_schema, user_add_schema, user_update_schema, \
@@ -88,7 +88,7 @@ def check_silence(list_of_alerts, list_of_rules):
 
 # Load silence rules from the DB
 with alerts_lock:
-    silence_rules = load_alerts(app.db['silence'])
+    silence_rules = load_collection(app.db['silence'])
     # check if alerts needs to be silenced
     check_silence(alerts, silence_rules)
 
@@ -382,22 +382,22 @@ def ack(user):
         for item in data['ack']:
             for alert in alerts:
                 ack_id = item['alertId']
-                if ack_id == alert['alertId']:
+                if ack_id == alert['alert_id']:
                     alert['responsibleUser'] = ack_user
                     updated_alerts.append(alert)
                     update_alerts_query.append(
-                        pymongo.UpdateOne({'alert_id': alert['alertId']}, {"$set": {"responsibleUser": ack_user}}))
+                        pymongo.UpdateOne({'alert_id': alert['alert_id']}, {"$set": {"responsibleUser": ack_user}}))
                     break
 
     if 'unack' in data:
         for item in data['unack']:
             for alert in alerts:
                 ack_id = item['alertId']
-                if ack_id == alert['alertId']:
+                if ack_id == alert['alert_id']:
                     alert['responsibleUser'] = ''
                     updated_alerts.append(alert)
                     update_alerts_query.append(
-                        pymongo.UpdateOne({'alert_id': alert['alertId']}, {"$set": {"responsibleUser": ''}}))
+                        pymongo.UpdateOne({'alert_id': alert['alert_id']}, {"$set": {"responsibleUser": ''}}))
                     break
 
     send_alerts(updated_alerts, update_alerts_query)
@@ -420,6 +420,8 @@ def silence(user):
         raise InternalServerError("Too broad regex pattern")
 
     # check if we already have similar rule
+    print("silence_rule")
+    print(silence_rule)
     for rule in silence_rules:
         test = {
             '_id': rule['_id'],
@@ -529,11 +531,9 @@ def silenced(user):
     """
     Method to return a json list of 'silence' rules
     """
-    return json.dumps(silence_rules, default=str), 200 \
- \
-                                                   @ app.route('/comment', methods=['POST'])
-
-
+    print(silence_rules)
+    return json.dumps(silence_rules, default=str), 200
+@app.route('/comment', methods=['POST'])
 @token_required()
 def comment(user):
     """
@@ -550,7 +550,7 @@ def comment(user):
     if alert:
         alert['comment'] = data['comment']
         try:
-            app.db['current'].update_one({'_id': alert['_id']}, {"$set": {'comment': data['comment']}})
+            app.db['current'].update_one({'_id': alert['alert_id']}, {"$set": {'comment': data['comment']}})
         except pymongo.errors.PyMongoError as e:
             raise InternalServerError("Failed to update alert comment in MongoDB: %s" % e)
     return 'OK', 200

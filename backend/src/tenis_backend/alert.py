@@ -4,8 +4,13 @@ import re
 
 
 def load_alerts(mongo_collection):
-    """ Load all alerts from the database upon startup """
+    """ Load all alerts without _id from the database upon startup """
     return list(mongo_collection.find({}, {'_id': 0}))
+
+
+def load_collection(mongo_collection):
+    """ Load data from db collection with _id field """
+    return list(mongo_collection.find({}))
 
 
 def lookup_alert(alerts, alert):
