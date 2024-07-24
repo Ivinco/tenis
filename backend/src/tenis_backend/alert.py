@@ -39,11 +39,9 @@ def lookup_alert_by_id(alerts, alert_id):
     :param alert_id: Alert_id (str or ObjectId) to check
     :return: First element in the alerts list that matches, or None
     """
-    if type(alert_id) is str:
-        alert_id = ObjectId(alert_id)
     try:
         for a in alerts:
-            if a['_id'] == alert_id:
+            if a['alert_id'] == alert_id:
                 return a
         return None
     except TypeError:
