@@ -126,14 +126,14 @@ export default function MainDisplay() {
         hostnameGroups.forEach(group => alertGroups.push(group))
 
         const hostnameAlerts = alertsToGroup(alertGroups)
-        ungroupedAlerts = alertsToDisplay.filter(alert => !hostnameAlerts.has(alert._id));
+        ungroupedAlerts = alertsToDisplay.filter(alert => !hostnameAlerts.has(alert.alert_id));
         //Here we are grouping alerts by Alert Name
         const groupsByAlertName = groupByField(ungroupedAlerts, 'alertName')
         //Process alerts grouped by Alert Name
         const alertnameGroups = alertNameGroups(groupsByAlertName)
         alertnameGroups.forEach(group => alertGroups.push(group))
         const alertnameAlerts = alertsToGroup(alertGroups)
-        ungroupedAlerts = ungroupedAlerts.filter(alert => !alertnameAlerts.has(alert._id))
+        ungroupedAlerts = ungroupedAlerts.filter(alert => !alertnameAlerts.has(alert.alert_id))
     }
 
     const handleSortButton = (feature) => {

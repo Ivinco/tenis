@@ -10,7 +10,7 @@ import {type} from "@testing-library/user-event/dist/type";
 
 const defaultdAlert = {
 alert: {
-    _id: '',
+    alert_id: '',
     project: '',
     host: '',
     fired: '',

@@ -87,7 +87,7 @@ const AlertsDetails = ({details, history}) => {
             },
         },
         backgroundColor: "#ebf8fa",
-        colors: initColors
+        colors: colors
     };
 
     const onCommentClick = () => {
@@ -103,7 +103,7 @@ const AlertsDetails = ({details, history}) => {
     const onSendCommentClick =  async () => {
         setCommentFormIsOpened(false)
         document.getElementById('commentArea').value = ''
-        const alert_id = details.alert_id ? details.alert_id : details._id
+        const alert_id = details.alert_id
         const commentRequest = {
             alert_id: alert_id,
             comment: commentFormContent
@@ -127,7 +127,7 @@ const AlertsDetails = ({details, history}) => {
     const onHistorySearchClick = async (e) => {
         e.preventDefault()
         const params = {
-            alert_id : details.alert_id ? details.alert_id : details._id,
+            alert_id : details.alert_id,
             start: Math.floor(new Date(historyStart).getTime()/1000),
             end: Math.floor(new Date(historyEnd).getTime()/1000),
         }
@@ -136,6 +136,7 @@ const AlertsDetails = ({details, history}) => {
         try {
             const response = await AlertService.getAlert(params)
             const historyRequest = response.data.history.map(item => ["STATUS", ...item])
+
 
             for (let i in historyRequest) {
                 customRawData.push(historyRequest[i])
