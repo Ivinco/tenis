@@ -11,6 +11,15 @@ How to work with the code:
 - `$ sh install.sh` to install locally built package on the current machine (requires sudo)
 
 Once the package is built and installed:
+- generate unique API_TOKEN and save it to `/etc/default/tenis_backend`:
+```
+$ sudo mkdir -p /etc/default
+$ t=`echo $RANDOM | openssl md5 | cut -d' ' -f2`
+cat > /etc/default/tenis_backend <<EOD
+API_TOKEN=$t
+EOD
+```
+- remember your API_TOKEN, it will be needed to configure frontend
 - make sure MongoDB is up and running. By default, backend expects mongod to listen on `localhost` (default Mongo port `27017`), uses database `tenis` without authorization (this can be configured via `MONGO_HOST` and `MONGO_DBNAME` environment variables)
 - you will have to perform basic Mongo initialization: create database called `tenis` and create `Admin` user with password hash that matches `123qwe`:
 ```
@@ -32,8 +41,6 @@ db.history.createIndex(
   { project: 1, host: 1, alertName: 1, logged: 1 },
   { unique: false }
 )
-
-
 ```
 - finally, [re]start backend service:
 ```
@@ -58,4 +65,3 @@ And finally, access endpoint that requires authorization:
 $ curl -H 'Authorization: Bearer eyJ0eXAiO-rVit4ygaEA8rg8FyOGc' http://localhost:8000/whoami
 You are authorized as sys@ivinco.com
 ```
-Currently it's the only backend functionality available. More to come soon.
