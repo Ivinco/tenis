@@ -7,3 +7,4 @@ Type=simple
 Restart=always
 ExecStart=/usr/bin/python3 -m tenis_backend
 WantedBy=multi-user.target
+EnvironmentFile=/etc/default/tenis-backend

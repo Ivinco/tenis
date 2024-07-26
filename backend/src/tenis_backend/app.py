@@ -38,7 +38,7 @@ app.db = app.mongodb_client[mongo_dbname]
 app.config['SECRET_KEY'] = os.getenv('SECRET', 'big-tenis')
 app.config['LISTEN_PORT'] = os.getenv('LISTEN_PORT', '8000')
 app.config['LISTEN_HOST'] = os.getenv('LISTEN_HOST', '0.0.0.0')
-app.config['API_TOKEN'] = os.getenv('API_TOKEN', 'asdfg')
+app.config['API_TOKEN'] = os.getenv('API_TOKEN')
 app.config['HISTORY_RETENTION_DAYS'] = 30
 app.config['HISTORY_PERIOD_MINUTES'] = 15
 app.config['SILENCE_PERIOD_SECONDS'] = 10  # Silence rules check interval, checks that endSilence is <= current time
