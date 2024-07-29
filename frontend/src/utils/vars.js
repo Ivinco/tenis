@@ -19,5 +19,5 @@ export const headerMenuItems = [
     //     action: setTimeZoneValue
     // }
 ]
-export const BACKEND_SERVER = window._env_.API_SERVER || "localhost:5000"
+export const BACKEND_SERVER = window._env_.API_SERVER || "localhost"
 export const BACKEND_PORT = window._env_.BACKEND_PORT || '443'
