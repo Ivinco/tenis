@@ -1,9 +1,9 @@
-import {BACKEND_SERVER, PORT} from "../utils/vars";
+import {BACKEND_SERVER, BACKEND_PORT} from "../utils/vars";
 import axios from "axios";
 
 const api = axios.create({
     withCredentials: true,
-    baseURL: `${BACKEND_SERVER}:${PORT}`
+    baseURL: `${BACKEND_SERVER}:${BACKEND_PORT}`
 })
 
 api.interceptors.request.use ((config) => {

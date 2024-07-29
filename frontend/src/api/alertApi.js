@@ -1,5 +1,5 @@
 import io from "socket.io-client"
-import {BACKEND_SERVER, PORT, URL} from "../utils/vars"
+import {BACKEND_SERVER} from "../utils/vars"
 
 class SocketAPI {
     static socket = null;
