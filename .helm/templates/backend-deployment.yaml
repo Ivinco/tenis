@@ -43,6 +43,8 @@ spec:
           value: {{ .Chart.Name }}-mongodb
         - name: MONGO_DATABASE
           value: {{ pluck .Values.werf.env .Values.mongodb.env.INIT_DB | first | default .Values.mongodb.env.INIT_DB._default }}
+        - name: API_TOKEN
+          value: {{ pluck .Values.werf.env .Values.mongodb.env.API_TOKEN | first | default .Values.mongodb.env.API_TOKEN._default }}
         livenessProbe:
           httpGet:
             path: /healz
