@@ -30,7 +30,7 @@ spec:
         - name: API_SERVER
           value: api.{{ .Values.env_url }}
         - name: BACKEND_PORT
-          value: 443
+          value: "443"
         ports:
         - name: http
           containerPort: 3000
