@@ -42,7 +42,7 @@ app.db = app.mongodb_client[mongo_dbname]
 app.config['SECRET_KEY'] = os.getenv('SECRET', 'big-tenis')
 app.config['LISTEN_PORT'] = os.getenv('LISTEN_PORT', '8000')
 app.config['LISTEN_HOST'] = os.getenv('LISTEN_HOST', '0.0.0.0')
-app.config['API_TOKEN'] = os.getenv('API_TOKEN', 'asdfg')
+app.config['API_TOKEN'] = os.getenv('API_TOKEN')
 app.config['HISTORY_RETENTION_DAYS'] = 30
 app.config['HISTORY_PERIOD_MINUTES'] = 15
 app.config['SILENCE_PERIOD_SECONDS'] = 10  # Silence rules check interval, checks that endSilence is <= current time
@@ -531,8 +531,10 @@ def silenced(user):
     """
     Method to return a json list of 'silence' rules
     """
-    print(silence_rules)
+
     return json.dumps(silence_rules, default=str), 200
+
+
 @app.route('/comment', methods=['POST'])
 @token_required()
 def comment(user):
@@ -553,6 +555,14 @@ def comment(user):
             app.db['current'].update_one({'alert_id': alert['alert_id']}, {"$set": {'comment': data['comment']}})
         except pymongo.errors.PyMongoError as e:
             raise InternalServerError("Failed to update alert comment in MongoDB: %s" % e)
+
+        # write to history
+        try:
+            app.db['history'].insert_one(make_history_entry(alert))
+        except pymongo.errors.PyMongoError as e:
+            print("Warning: failed to save history data: %s" % e)
+            pass
+
     return 'OK', 200
 
 
