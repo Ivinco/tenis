@@ -19,5 +19,5 @@ export const headerMenuItems = [
     //     action: setTimeZoneValue
     // }
 ]
-export const BACKEND_SERVER = process.env.REACT_APP_SERVER || "https://api.tenis-dev-2.k8s-test.ivinco.com"
-export const PORT = process.env.REACT_APP_PORT || '443'
+export const BACKEND_SERVER = window._env_.API_SERVER || "localhost"
+export const BACKEND_PORT = window._env_.BACKEND_PORT || '443'
