@@ -4,7 +4,12 @@ import re
 
 
 def load_alerts(mongo_collection):
-    """ Load all alerts from the database upon startup """
+    """ Load all alerts without _id from the database upon startup """
+    return list(mongo_collection.find({}, {'_id': 0}))
+
+
+def load_collection(mongo_collection):
+    """ Load data from db collection with _id field """
     return list(mongo_collection.find({}))
 
 
@@ -34,11 +39,9 @@ def lookup_alert_by_id(alerts, alert_id):
     :param alert_id: Alert_id (str or ObjectId) to check
     :return: First element in the alerts list that matches, or None
     """
-    if type(alert_id) is str:
-        alert_id = ObjectId(alert_id)
     try:
         for a in alerts:
-            if a['_id'] == alert_id:
+            if a['alert_id'] == alert_id:
                 return a
         return None
     except TypeError:
@@ -84,7 +87,7 @@ def make_history_entry(alert):
     """ Return history entry for the given alert.
         This is effectively just a part of alert's data needed for the history collection. """
     return {
-        'alert_id': alert['_id'],
+        'alert_id': alert['alert_id'],
         'logged': datetime.now(timezone.utc),
         'project': alert['project'],
         'host': alert['host'],

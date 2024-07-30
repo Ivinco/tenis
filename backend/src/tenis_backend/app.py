@@ -1,6 +1,8 @@
 import atexit
+import hashlib
 import json
 import time
+from copy import deepcopy
 
 import jsonschema
 import os
@@ -16,8 +18,10 @@ from flask_socketio import SocketIO, emit, send, disconnect
 from apscheduler.schedulers.background import BackgroundScheduler
 from email_validator import validate_email, EmailNotValidError
 from werkzeug.exceptions import HTTPException, Unauthorized, BadRequest, InternalServerError
+from werkzeug.security import generate_password_hash
 
-from .alert import load_alerts, lookup_alert, update_alerts, regexp_alerts, make_history_entry, is_resolved, lookup_alert_by_id
+from .alert import load_alerts, lookup_alert, update_alerts, regexp_alerts, make_history_entry, is_resolved, \
+    lookup_alert_by_id, load_collection
 from .auth import create_token, token_required, token_required_ws, plugin_token_required
 from .user import User
 from .json_validation import schema, silence_schema, user_schema, user_add_schema, user_update_schema, \
@@ -38,7 +42,7 @@ app.db = app.mongodb_client[mongo_dbname]
 app.config['SECRET_KEY'] = os.getenv('SECRET', 'big-tenis')
 app.config['LISTEN_PORT'] = os.getenv('LISTEN_PORT', '8000')
 app.config['LISTEN_HOST'] = os.getenv('LISTEN_HOST', '0.0.0.0')
-app.config['API_TOKEN'] = os.getenv('API_TOKEN', 'asdfg')
+app.config['API_TOKEN'] = os.getenv('API_TOKEN')
 app.config['HISTORY_RETENTION_DAYS'] = 30
 app.config['HISTORY_PERIOD_MINUTES'] = 15
 app.config['SILENCE_PERIOD_SECONDS'] = 10  # Silence rules check interval, checks that endSilence is <= current time
@@ -84,7 +88,7 @@ def check_silence(list_of_alerts, list_of_rules):
 
 # Load silence rules from the DB
 with alerts_lock:
-    silence_rules = load_alerts(app.db['silence'])
+    silence_rules = load_collection(app.db['silence'])
     # check if alerts needs to be silenced
     check_silence(alerts, silence_rules)
 
@@ -214,46 +218,30 @@ def get_alert_details(alert_id, start_tstmp, end_tstmp):
         start_tstmp = int(time.time()) - (24 * 3600) - (history_period * 60)
     if not end_tstmp:
         end_tstmp = int(time.time())
-    alert_cursor = app.db['current'].find_one({"_id": ObjectId(alert_id)})
     details = {}
     history = []
-    if alert_cursor:
-        # check if alert is active. If it is we take its details from current db
-        alert_cursor["_id"] = str(alert_cursor["_id"])
-        details = alert_cursor
-    history_cursor = app.db['history'].find_one({"alert_id": ObjectId(alert_id)})
+    history_query = {
+        "$and": [
+            {"alert_id": alert_id},
+            {"logged": {
+                "$gt": datetime.utcfromtimestamp(int(start_tstmp) - history_period * 60),
+                "$lte": datetime.utcfromtimestamp(int(end_tstmp)),
+            }}
+        ]
+    }
+    history_cursor = app.db['history'].find(history_query).sort('logged', 1)
     if history_cursor:
         """
         Check for alert history. If there is no any history records
         it means alert doesn't exist
         """
         last_status = None
-        project = history_cursor['project']
-        host = history_cursor['host']
-        alert_name = history_cursor['alertName']
-        history_query = {
-            "$and": [
-                {"project": project},
-                {"alertName": alert_name},
-                {"host": host},
-                {},
-                {"logged": {
-                    "$gt": datetime.utcfromtimestamp(int(start_tstmp) - history_period * 60),
-                    "$lte": datetime.utcfromtimestamp(int(end_tstmp)),
-                }}
-            ]
-        }
-        """
-        The alert can be identified by its project, host and alertName attributes.
-        After alert has been resolved and fired again, its id will be changed
-        """
-        alert_history_cursor = app.db['history'].find(history_query).sort('logged', 1)
-        alert_history = list(alert_history_cursor)
+        alert_history = list(history_cursor)
         if len(alert_history) > 0:
             prev_severity = None
             for record in alert_history:
                 record['_id'] = str(record['_id'])
-                record['alert_id'] = str(record['alert_id'])
+                record['alert_id'] = record['alert_id']
                 last_status = record
                 if record['severity'] != prev_severity:
                     history_entry = [record['severity'], record['logged']]
@@ -264,7 +252,7 @@ def get_alert_details(alert_id, start_tstmp, end_tstmp):
                 details = last_status
             # enrich history records by change severity level from the next record
             for i in range(len(history[:-1])):
-                history[i].append(history[i+1][1])
+                history[i].append(history[i + 1][1])
             history[-1].append(datetime.utcfromtimestamp(int(end_tstmp)))
             # if there are several records in history_period gap, we take the last one
             for i in range(len(history) - 1, -1, -1):
@@ -272,38 +260,16 @@ def get_alert_details(alert_id, start_tstmp, end_tstmp):
                     history.pop(i)
             # if there are no records in history_period gap, it means that alert was in resolved status
             if history[0][1] > datetime.utcfromtimestamp(int(start_tstmp)):
-                prev_status = ["RESOLVED", datetime.utcfromtimestamp(int(start_tstmp)), history[0][1]]
+                prev_status = ["NO DATA", datetime.utcfromtimestamp(int(start_tstmp)), history[0][1]]
                 history.insert(0, prev_status)
             # cut history period to the start timestamp
             if history[0][1] < datetime.utcfromtimestamp(int(start_tstmp)):
                 history[0][1] = datetime.utcfromtimestamp(int(start_tstmp))
-        else:
-            """
-            If there are no any records for selected period it means the alert was in resolved status.
-            We make the single history record with RESOLVED status and take alert details from the last record
-            """
-            query = {
-                "$and": [
-                    {"project": project},
-                    {"alertName": alert_name},
-                    {"host": host},
-                ]
-            }
-            last_alert_cursor = app.db['history'].find(query).sort('logged', -1).limit(1)
-            if last_alert_cursor:
-                last_alert = list(last_alert_cursor)[0]
-                last_alert['_id'] = str(last_alert['_id'])
-                last_alert['alert_id'] = str(last_alert['alert_id'])
-                details = last_alert
-            else:
-                return None
-            history.append(["OK", datetime.utcfromtimestamp(int(start_tstmp)), datetime.utcfromtimestamp(int(end_tstmp))])
         resp = {"details": details,
                 "history": history}
         return resp
     else:
         return None
-
 
 
 # swagger specific
@@ -415,21 +381,23 @@ def ack(user):
     if 'ack' in data:
         for item in data['ack']:
             for alert in alerts:
-                ack_id = ObjectId(item['alertId'])
-                if ack_id == alert['_id']:
+                ack_id = item['alertId']
+                if ack_id == alert['alert_id']:
                     alert['responsibleUser'] = ack_user
                     updated_alerts.append(alert)
-                    update_alerts_query.append(pymongo.UpdateOne({'_id': alert['_id']}, {"$set": {"responsibleUser": ack_user}}))
+                    update_alerts_query.append(
+                        pymongo.UpdateOne({'alert_id': alert['alert_id']}, {"$set": {"responsibleUser": ack_user}}))
                     break
 
     if 'unack' in data:
         for item in data['unack']:
             for alert in alerts:
-                ack_id = ObjectId(item['alertId'])
-                if ack_id == alert['_id']:
+                ack_id = item['alertId']
+                if ack_id == alert['alert_id']:
                     alert['responsibleUser'] = ''
                     updated_alerts.append(alert)
-                    update_alerts_query.append(pymongo.UpdateOne({'_id': alert['_id']}, {"$set": {"responsibleUser": ''}}))
+                    update_alerts_query.append(
+                        pymongo.UpdateOne({'alert_id': alert['alert_id']}, {"$set": {"responsibleUser": ''}}))
                     break
 
     send_alerts(updated_alerts, update_alerts_query)
@@ -452,6 +420,8 @@ def silence(user):
         raise InternalServerError("Too broad regex pattern")
 
     # check if we already have similar rule
+    print("silence_rule")
+    print(silence_rule)
     for rule in silence_rules:
         test = {
             '_id': rule['_id'],
@@ -561,7 +531,8 @@ def silenced(user):
     """
     Method to return a json list of 'silence' rules
     """
-    return json.dumps(silence_rules, default=str), 200\
+
+    return json.dumps(silence_rules, default=str), 200
 
 
 @app.route('/comment', methods=['POST'])
@@ -581,9 +552,17 @@ def comment(user):
     if alert:
         alert['comment'] = data['comment']
         try:
-            app.db['current'].update_one({'_id': alert['_id']}, {"$set": {'comment': data['comment']}})
+            app.db['current'].update_one({'alert_id': alert['alert_id']}, {"$set": {'comment': data['comment']}})
         except pymongo.errors.PyMongoError as e:
             raise InternalServerError("Failed to update alert comment in MongoDB: %s" % e)
+
+        # write to history
+        try:
+            app.db['history'].insert_one(make_history_entry(alert))
+        except pymongo.errors.PyMongoError as e:
+            print("Warning: failed to save history data: %s" % e)
+            pass
+
     return 'OK', 200
 
 
@@ -617,7 +596,7 @@ def login():
         now = datetime.now(timezone.utc)
         acccess_token_expires = now + app.config['JWT_ACCESS_TOKEN_EXPIRES']
         refresh_token_expires = now + app.config['JWT_REFRESH_TOKEN_EXPIRES']
-        
+
         access_token = create_token(user['_id'], app.config['SECRET_KEY'], 'access', acccess_token_expires)
         refresh_token = create_token(user['_id'], app.config['SECRET_KEY'], 'refresh', refresh_token_expires)
         resp = make_response(jsonify(access_token=access_token, user=user))
@@ -660,7 +639,6 @@ def send_alert_details(user):
     resp = get_alert_details(alert_id, start_timestamp, end_timestamp)
     return jsonify(resp), 200
     # return "OK", 200
-
 
 
 @app.route('/users')
@@ -755,13 +733,13 @@ def add_user(current_user):
         user = User().create(name, email, password, avatar, grouping, timezone, projects, phone)
         if user is None:
             return make_response(jsonify({"error": "User with this email already exists"}), 409)  # Конфликт
-        return jsonify(user), 201  
+        return jsonify(user), 201
     except Exception as e:
         return make_response(jsonify({"error": str(e)}), 500)
 
 
 @app.route('/user/del', methods=['POST'])
-@token_required() 
+@token_required()
 def del_user(current_user):
     """Removing user with id"""
     try:
@@ -774,7 +752,7 @@ def del_user(current_user):
         return make_response(jsonify({"error": "Please provide id in JSON format"}), 400)
 
     user_id = data['id']
-    
+
     try:
         valid_id = ObjectId(user_id)
     except:
@@ -790,7 +768,7 @@ def del_user(current_user):
 
 
 @app.route('/user/disable', methods=['POST'])
-@token_required() 
+@token_required()
 def disable_user(current_user):
     """Disable user by id"""
     try:
@@ -798,17 +776,17 @@ def disable_user(current_user):
         jsonschema.validate(instance=data, schema=user_schema)
     except jsonschema.exceptions.ValidationError as e:
         raise BadRequest(e.message)
-    
+
     if not data or 'id' not in data:
         return make_response(jsonify({"error": "Please provide id in JSON format"}), 400)
-    
+
     user_id = data['id']
-    
+
     try:
         valid_id = ObjectId(user_id)
     except:
         return make_response(jsonify({"error": "Invalid ID format"}), 400)
-    
+
     try:
         result = User().disable_account(user_id)
         if result is False:
@@ -819,7 +797,7 @@ def disable_user(current_user):
 
 
 @app.route('/user/enable', methods=['POST'])
-@token_required() 
+@token_required()
 def enable_user(current_user):
     """Enable user by id"""
     try:
@@ -827,17 +805,17 @@ def enable_user(current_user):
         jsonschema.validate(instance=data, schema=user_schema)
     except jsonschema.exceptions.ValidationError as e:
         raise BadRequest(e.message)
-    
+
     if not data or 'id' not in data:
         return make_response(jsonify({"error": "Please provide id in JSON format"}), 400)
-    
+
     user_id = data['id']
-    
+
     try:
         valid_id = ObjectId(user_id)
     except:
         return make_response(jsonify({"error": "Invalid ID format"}), 400)
-    
+
     try:
         result = User().enable_account(user_id)
         if result is False:
@@ -848,7 +826,7 @@ def enable_user(current_user):
 
 
 @app.route('/user/update', methods=['POST'])
-@token_required() 
+@token_required()
 def update_user(current_user):
     """Update user data"""
     try:
@@ -871,11 +849,11 @@ def update_user(current_user):
     # removing Active from data, cause we have separate functions for it
     if 'active' in data:
         active = data.pop('active')
-    
+
     # check if we have atleast one var for update
     if not data:
         return make_response(jsonify({"error": "No data provided for update"}), 400)
-    
+
     try:
         updated_user = User().update(user_id, data)
         if updated_user is None:
@@ -931,6 +909,10 @@ def inbound():
             update_alerts_query = []  # list to hold MongoDB query to update 'current' collection
             new_history_entries = []  # list of entries to add to 'history' collection
             for a in data['update']:
+                id_string = a['project'] + a['host'] + a['alertName'] + a['plugin_id']
+                hash_object = hashlib.sha256(id_string.encode())
+                alert_id = hash_object.hexdigest()
+                a['alert_id'] = alert_id
                 if is_resolved(a): continue  # do not process resolved alerts in 'update' section
 
                 if silence_rules:
@@ -945,17 +927,19 @@ def inbound():
 
                 # if severity changed, this should be logged to history collection
                 if existing_alert['severity'] != a['severity']:
-                    a['_id'] = existing_alert['_id']
+                    a['alert_id'] = existing_alert['alert_id']
                     new_history_entries.append(make_history_entry(a))
 
                 # found this alert in global list, maybe alert attributes have changed?
                 new_attributes = {}
                 for attr in ['fired', 'severity', 'msg', 'responsibleUser', 'comment', 'silenced', 'customFields']:
                     if existing_alert[attr] != a[attr]:  # works OK even for dicts (e.g. 'customFields' is a dict)
-                        new_attributes[attr] = a[attr]   # to be saved in DB
-                        existing_alert[attr] = a[attr]   # note this won't affect the global list since existing_alert is a copy
+                        new_attributes[attr] = a[attr]  # to be saved in DB
+                        existing_alert[attr] = a[
+                            attr]  # note this won't affect the global list since existing_alert is a copy
                 if new_attributes:
-                    update_alerts_query.append(pymongo.UpdateOne({'_id': existing_alert['_id']}, {"$set": new_attributes}))
+                    update_alerts_query.append(
+                        pymongo.UpdateOne({'alert_id': existing_alert['alert_id']}, {"$set": new_attributes}))
                     updated_alerts.append(existing_alert)
 
             if not new_alerts and not updated_alerts:  # all submitted alerts are already in the system
@@ -963,9 +947,9 @@ def inbound():
 
             if new_alerts:
                 try:
-                    res = app.db['current'].insert_many(new_alerts)
+                    res = app.db['current'].insert_many(deepcopy(new_alerts))
                     for i, _id in enumerate(res.inserted_ids):
-                        new_alerts[i]['_id'] = _id
+                        # new_alerts[i]['_id'] = _id
                         new_history_entries.append(make_history_entry(new_alerts[i]))
                     alerts.extend(new_alerts)
                     # note that socketio.emit can be only done after insert_many:
@@ -1009,7 +993,7 @@ def inbound():
                 resolved_alerts.append(a)
                 a['severity'] = 'RESOLVED'
                 resolved_history_entries.append(make_history_entry(a))
-                resolved_ids.append(a['_id'])
+                resolved_ids.append(a['alert_id'])
 
             if len(resolved_alerts) == 0:
                 return 'OK', 200  # submitted alerts list does not match a single alert from the global list
@@ -1018,7 +1002,7 @@ def inbound():
                 alerts.remove(a)  # remove from global in-mem list
 
             try:
-                app.db['current'].delete_many({'_id': {'$in': resolved_ids}})
+                app.db['current'].delete_many({'alert_id': {'$in': resolved_ids}})
             except pymongo.errors.PyMongoError as e:
                 raise InternalServerError("Failed to save alerts in MongoDB: %s" % e)
             try:

@@ -13,13 +13,31 @@ import {setModalError} from "../../store/reducers/modalReducer";
 const AlertsDetails = ({details, history}) => {
     const dispatch = useDispatch();
     const [commentFormIsOpened, setCommentFormIsOpened] = useState(false)
-    const [commentFormContent, setCommentFormContent] = useState('')
+    const [commentFormContent, setCommentFormContent] = useState(details.comment)
     const user = useSelector( state => state.authReducer.user)
     const textareaRef = useRef(null)
     const [historyStart, setHistoryStart] = useState(new Date(Date.now() - 24 * 60 * 60 * 1000))
     const [historyEnd, setHistoryEnd] = useState(new Date(Date.now()))
     const [data, setData] = useState([])
     const [colors, setColors] = useState([])
+    const [processedString, setProcessedString] = useState('')
+    const [alertComment, setAlertComment] = useState(null)
+
+    useEffect(() => {
+        const process = details.comment.split(/\s+/).map(word => processAlertComment(word, user.usersCommentReplaceRules))
+        setProcessedString(process)
+    },[details.comment])
+
+    useEffect(() => {
+        const comment = (
+            <>
+                {processedString ? processedString.map((element, index) => (
+                    <React.Fragment key={index}>{element} </React.Fragment>
+                )) : <></>}
+            </>
+        )
+        setAlertComment(comment)
+    },[processedString])
 
     //init data array
     const dataSample = [
@@ -69,7 +87,7 @@ const AlertsDetails = ({details, history}) => {
             },
         },
         backgroundColor: "#ebf8fa",
-        colors: initColors
+        colors: colors
     };
 
     const onCommentClick = () => {
@@ -85,8 +103,7 @@ const AlertsDetails = ({details, history}) => {
     const onSendCommentClick =  async () => {
         setCommentFormIsOpened(false)
         document.getElementById('commentArea').value = ''
-        const alert_id = details.alert_id ? details.alert_id : details._id
-        const processedString = commentFormContent.split(/\s+/).map(word => processAlertComment(word, user.usersCommentReplaceRules))
+        const alert_id = details.alert_id
         const commentRequest = {
             alert_id: alert_id,
             comment: commentFormContent
@@ -96,15 +113,8 @@ const AlertsDetails = ({details, history}) => {
         } catch (e) {
             dispatch (setModalError("Oops, something went wrong"))
         }
-
+        details.comment = commentFormContent
         setCommentFormContent('')
-        details.comment = (
-            <>
-                {processedString.map((element, index) => (
-                    <React.Fragment key={index}>{element} </React.Fragment>
-                ))}
-            </>
-        )
     }
 
     const handleEnterKey = (e) => {
@@ -117,7 +127,7 @@ const AlertsDetails = ({details, history}) => {
     const onHistorySearchClick = async (e) => {
         e.preventDefault()
         const params = {
-            alert_id : details.alert_id ? details.alert_id : details._id,
+            alert_id : details.alert_id,
             start: Math.floor(new Date(historyStart).getTime()/1000),
             end: Math.floor(new Date(historyEnd).getTime()/1000),
         }
@@ -126,6 +136,7 @@ const AlertsDetails = ({details, history}) => {
         try {
             const response = await AlertService.getAlert(params)
             const historyRequest = response.data.history.map(item => ["STATUS", ...item])
+
 
             for (let i in historyRequest) {
                 customRawData.push(historyRequest[i])
@@ -204,7 +215,7 @@ const AlertsDetails = ({details, history}) => {
                             e.preventDefault()
                             onCommentClick()
                         }}/>
-                        <p className={styles.alertInfoValue}>{details.comment}</p>
+                        <p className={styles.alertInfoValue}>{alertComment}</p>
                     </li>
                 </ul>
                 <div className={commentFormIsOpened ? styles.commentBlock : styles.disabledBlock}>
@@ -213,6 +224,7 @@ const AlertsDetails = ({details, history}) => {
                               maxLength="100"
                               id="commentArea"
                               ref={textareaRef}
+                              value={commentFormContent}
                               onChange={(e) => setCommentFormContent(e.target.value)}
                               onKeyDown={handleEnterKey}
                     />

@@ -90,7 +90,7 @@ const Modal = (content) => {
                     />
                     {modalMessage && <ErrorMessage message={modalMessage}/> }
                     {portalParam === 'login' && <AuthForm/>}
-                    {alertParam && alertDetails._id && <AlertsDetails details={alertDetails} history={alertHistory}/>}
+                    {alertParam && alertDetails.alert_id && <AlertsDetails details={alertDetails} history={alertHistory}/>}
                     {portalParam === 'userInfo' && <UserInfo/>}
                     {portalParam === 'silenceRules' && <SilenceWindow/>}
                 </div>
