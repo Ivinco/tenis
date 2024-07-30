@@ -561,7 +561,7 @@ def silenced(user):
     """
     Method to return a json list of 'silence' rules
     """
-    return json.dumps(silence_rules, default=str), 200\
+    return json.dumps(silence_rules, default=str), 200
 
 
 @app.route('/comment', methods=['POST'])
@@ -584,6 +584,14 @@ def comment(user):
             app.db['current'].update_one({'_id': alert['_id']}, {"$set": {'comment': data['comment']}})
         except pymongo.errors.PyMongoError as e:
             raise InternalServerError("Failed to update alert comment in MongoDB: %s" % e)
+
+        # write to history
+        try:
+            app.db['history'].insert_one(make_history_entry(alert))
+        except pymongo.errors.PyMongoError as e:
+            print("Warning: failed to save history data: %s" % e)
+            pass
+
     return 'OK', 200
 
 
