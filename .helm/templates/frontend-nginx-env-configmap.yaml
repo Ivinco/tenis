@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Chart.Name }}-nginx-env-config
+  labels:
+    app: {{ .Chart.Name }}-frontend
+data:
+  env-config.js: |-
+    window._env_ = {
+      API_SERVER: "${API_SERVER}",
+      PORT: "${BACKEND_PORT}"
+    };
