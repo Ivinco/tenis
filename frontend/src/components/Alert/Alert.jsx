@@ -55,7 +55,7 @@ const Alert = ({alert, isGroupRecheck}) => {
 
 
     const ackButtonHint = alert.responsibleUser ? "unhandle alert" : "handle alert";
-    const ackedAlert = {"alertId": alert._id}
+    const ackedAlert = {"alertId": alert.alert_id}
     const onAckHandle = async (ackedAlert) => {
         try {
             if (alert.responsibleUser === userEmail){
@@ -77,7 +77,7 @@ const Alert = ({alert, isGroupRecheck}) => {
         const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
         await delay(1000);
         try {
-            await AlertService.refreshAlerts([["recheck", alert._id]])
+            await AlertService.refreshAlerts([["recheck", alert.alert_id]])
         }
         catch (e) {
             dispatch(openModal())
@@ -123,7 +123,7 @@ const Alert = ({alert, isGroupRecheck}) => {
     }
 
     const handleInfoButton = () => {
-        searchParams.set("alert_id", alert._id)
+        searchParams.set("alert_id", alert.alert_id)
         setSearchParams(searchParams)
         dispatch(setDetailedAlert({alert}))
         dispatch(openModal())
@@ -159,7 +159,7 @@ const Alert = ({alert, isGroupRecheck}) => {
 
 
     return (
-        <div className={`${!isInspectMode ? styles.alertBody : styles.alertBody_small}`} key={alert._id}
+        <div className={`${!isInspectMode ? styles.alertBody : styles.alertBody_small}`} key={alert.alert_id}
              style={{backgroundColor: alertBackground, color: fontColor}}
         >
             <div
@@ -191,14 +191,14 @@ const Alert = ({alert, isGroupRecheck}) => {
             <div className={`${styles.silenceWindow} ${isEnabledSilenceWindow ? styles.silenceWindowActive : styles.silenceWindowDisabled} ${!isInspectMode ? null : styles.silenceWindow_small}`} >
                 <input type="text" className={`${styles.silenceDuration} ${!isInspectMode ? null : styles.silenceDuration_small}`}
                        placeholder="duration mins."
-                       id={`duration_${alert._id}`}
+                       id={`duration_${alert.alert_id}`}
                        ref={durationRef}
                        onKeyDown={handleKeyDown}
                        onChange={ e => setSilenceDuration(e.target.value)}
                 />
                 <input type="text" className={`${styles.silenceComment} ${!isInspectMode ? null : styles.silenceComment_small}`}
                           placeholder="comment"
-                          id={`comment_${alert._id}`}
+                          id={`comment_${alert.alert_id}`}
                           ref={commentRef}
                           onKeyDown={handleKeyDown}
                           onChange={e => setSilenceComment(e.target.value)}
