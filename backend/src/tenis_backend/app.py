@@ -357,7 +357,7 @@ def cmd(user):
             filtered_alerts = [a for a in alerts if a['alertName'] == alert_id]
             add_recheck_cmd(filtered_alerts)
         else:
-            filtered_alerts = [a for a in alerts if str(a['_id']) == alert_id]
+            filtered_alerts = [a for a in alerts if str(a['alert_id']) == alert_id]
             add_recheck_cmd(filtered_alerts)
 
     return "OK", 200
