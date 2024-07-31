@@ -121,7 +121,7 @@ metadata:
   name: tenis-backend
   labels:
     app: tenis-backend
-    component: backend #TODO В оригинальном чарте тут frontend
+    component: frontend
 spec:
   type: ClusterIP
   ports:
