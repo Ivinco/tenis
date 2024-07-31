@@ -83,7 +83,7 @@ metadata:
   name: {{ .Chart.Name }}-backend
   labels:
     app: {{ .Chart.Name }}-backend
-    component: frontend
+    component: backend
 spec:
   type: ClusterIP
   ports:
