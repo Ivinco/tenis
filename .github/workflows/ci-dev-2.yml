@@ -3,7 +3,6 @@ name: Manual deploy to dev-2
 env:
   WERF_SECRET_KEY: ${{ secrets.WERF_SECRET_KEY }}
   WERF_REPO: docker-registry.ivinco.com/tenis
-  REACT_APP_SERVER: https://api.tenis-dev-2.k8s-test.ivinco.com
 
 on:
   workflow_dispatch:
