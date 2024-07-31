@@ -77,7 +77,7 @@ const Alert = ({alert, isGroupRecheck}) => {
         const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
         await delay(1000);
         try {
-            await AlertService.refreshAlerts([["recheck_alert", alert.alert_id]])
+            await AlertService.refreshAlerts([["recheck", alert.alert_id]])
         }
         catch (e) {
             dispatch(openModal())
