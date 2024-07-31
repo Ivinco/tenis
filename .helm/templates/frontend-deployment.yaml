@@ -62,7 +62,6 @@ spec:
         - name: nginx-env-config
           mountPath: /usr/share/nginx/html/env-config.js
           subPath: env-config.js
-          readOnly: true
         resources:
           {{- toYaml .Values.frontend.resources | nindent 10 }}
       volumes:
