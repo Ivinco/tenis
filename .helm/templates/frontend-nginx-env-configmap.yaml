@@ -7,6 +7,6 @@ metadata:
 data:
   env-config.js: |-
     window._env_ = {
-      API_SERVER: "api.{{ .Values.env_url }}",
+      API_SERVER: "https://api.{{ .Values.env_url }}",
       PORT: "443"
     };
