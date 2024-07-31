@@ -87,7 +87,7 @@ metadata:
   name: tenis-mongodb-init
   labels:
     app: tenis-mongodb
-data:
+data: #TODO another project name in userProjects(?)
   init-script.sh: |-
     mongod --fork --logpath /var/log/mongod.log --bind_ip_all
     set -e
@@ -160,7 +160,7 @@ metadata:
 spec:
   ports:
     - port: 27017
-      targetPort: 27017
+      targetPort: 27017 #TODO service name (?)
   selector:
     app: tenis-mongodb
 ---
@@ -184,7 +184,7 @@ spec:
     spec:
       initContainers:
         - name: check-mongodb
-          image: busybox:1.31
+          image: busybox:1.31 # TODO own image?
           command:
             - ash
             - "-c"
@@ -199,7 +199,7 @@ spec:
           image: docker-registry.***.com/tenis:88c2e8d5cf003c74969404aea44bd170aa2a176ea3502bccd86b2060-1722439006797 #TODO-image
           imagePullPolicy: IfNotPresent
           ports:
-            - name: http
+            - name: http #TODO name - backend?
               containerPort: 8000
               protocol: TCP
           env:
@@ -251,7 +251,7 @@ spec:
         app: tenis-frontend
     spec:
       imagePullSecrets:
-        - name: registry-secret
+        - name: registry-secret #TODO add static secret? not private repo? semi-private-repo?
       containers:
         - name: tenis-frontend
           image: docker-registry.***.com/tenis:b566e3d2647ad91eb842ab929e5474de48aed269a5e94264dceb9139-1722439056167 #TODO-image
@@ -300,7 +300,7 @@ spec:
             limits:
               memory: 128Mi
             requests:
-              cpu: 50m
+              cpu: 50m #TODO review requirements
               memory: 128Mi
       volumes:
         - name: nginx-config-volume
@@ -327,7 +327,7 @@ spec:
         app: tenis-mongodb
     spec:
       imagePullSecrets:
-        - name: registry-secret
+        - name: registry-secret #TODO add static secret? not private repo? semi-private-repo?
       terminationGracePeriodSeconds: 10
       initContainers:
         - name: mongo-init
@@ -355,7 +355,7 @@ spec:
             - mongod
             - "--bind_ip_all"
           ports:
-            - containerPort: 27017
+            - containerPort: 27017 #TODO add name
           volumeMounts:
             - name: mongo-persistent-storage
               mountPath: /data/db
@@ -363,30 +363,30 @@ spec:
             limits:
               memory: 512Mi
             requests:
-              cpu: 200m
+              cpu: 200m #TODO review requirements
               memory: 512Mi
       volumes:
         - name: tenis-mongodb-init
           configMap:
             name: tenis-mongodb-init
-            defaultMode: 0777
+            defaultMode: 0777 #TODO review permissions
   volumeClaimTemplates:
     - metadata:
         name: mongo-persistent-storage
       spec:
         accessModes: ["ReadWriteOnce"]
-        storageClassName: "longhorn"
+        storageClassName: "longhorn" #TODO default storage class
         resources:
           requests:
-            storage: 10Gi
+            storage: 10Gi #TODO review storage requirements
 ---
 # Source: tenis/templates/ingress.yaml
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   annotations:
-    cert-manager.io/cluster-issuer: letsencrypt-prod
-    kubernetes.io/ingress.class: "nginx"
+    cert-manager.io/cluster-issuer: letsencrypt-prod # TODO own issuer?
+    kubernetes.io/ingress.class: "nginx" #TODO own ingress? default?
     nginx.ingress.kubernetes.io/enable-cors: "true"
     nginx.ingress.kubernetes.io/use-regex: "true"
     nginx.ingress.kubernetes.io/cors-allow-origin: "http://localhost:3000, https://*.***.com" #TODO cors
@@ -396,7 +396,7 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-    - host: tenis.k8s-test.***.com
+    - host: tenis.k8s-test.***.com #TODO domain
       http:
         paths:
           - backend:
@@ -408,7 +408,7 @@ spec:
             pathType: Prefix
   tls:
     - hosts:
-        - tenis.k8s-test.***.com
+        - tenis.k8s-test.***.com #TODO domain
       secretName: tenis-secret
 ---
 # Source: tenis/templates/ingress.yaml
@@ -427,7 +427,7 @@ metadata:
 spec:
   ingressClassName: nginx  #TODO ingress class
   rules:
-    - host: api.tenis.k8s-test.***.com
+    - host: api.tenis.k8s-test.***.com #TODO domain
       http:
         paths:
           - backend:
@@ -439,6 +439,6 @@ spec:
             pathType: Prefix
   tls:
     - hosts:
-        - api.tenis.k8s-test.***.com
+        - api.tenis.k8s-test.***.com #TODO domain
       secretName: tenis-api-secret
 
