@@ -8,5 +8,5 @@ data:
   env-config.js: |-
     window._env_ = {
       API_SERVER: "https://api.{{ .Values.env_url }}",
-      PORT: "443"
+      BACKEND_PORT: "443"
     };
