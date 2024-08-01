@@ -1,12 +1,14 @@
+#TODO Global - check for sensitive info
 apiVersion: v1
 kind: Namespace
 metadata:
   labels:
-    kubernetes.io/metadata.name: tenis-static #TODO change name
+    kubernetes.io/metadata.name: tenis-static
   name: tenis-static
 spec:
   finalizers:
   - kubernetes
+
 ---
 apiVersion: cert-manager.io/v1
 kind: Issuer
@@ -15,7 +17,7 @@ metadata:
 spec:
   acme:
     server: https://acme-v02.api.letsencrypt.org/directory
-    email: tenis@example.com
+    email: tenis-static@ivinco.com
     privateKeySecretRef:
       name: tenis-private-key-secret
     solvers:
@@ -24,7 +26,7 @@ spec:
           class: nginx
 
 ---
-apiVersion: v1 #TODO Global - check for sensitive info
+apiVersion: v1
 kind: ConfigMap
 metadata:
   name: tenis-nginx-config
@@ -92,28 +94,28 @@ data:
         }
     }
 ---
-# Source: tenis/templates/frontend-nginx-env-configmap.yaml
+# Source: tenis/templates/frontend-nginx-env-configmap.yaml TODO domain, maybe port
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: tenis-nginx-env-config
   labels:
-    app: tenis-frontend # TODO domain name, maybe port?
+    app: tenis-frontend
 data:
   env-config.js: |-
     window._env_ = {
-      API_SERVER: "https://api.benis.k8s-test.ivinco.com",
+      API_SERVER: "https://api.$DOMAIN_NAME",
       BACKEND_PORT: "443"
     };
 ---
-# Source: tenis/templates/mongodb-init-script-configmap.yaml
+# Source: tenis/templates/mongodb-init-script-configmap.yaml #TODO abother project name in projects
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: tenis-mongodb-init
   labels:
     app: tenis-mongodb
-data: #TODO another project name in userProjects(?)
+data:
   init-script.sh: |-
     mongod --fork --logpath /var/log/mongod.log --bind_ip_all
     set -e
@@ -219,7 +221,7 @@ spec:
             - ash
             - "-c"
             - |
-              until nc -z $MONGO_HOST 27017 #TODO тут tenis-mongodb был указан прямо так, надо убедиться что работает и тоже донести в остальной чарт
+              until nc -z $MONGO_HOST 27017
               do
                   echo "MongoDB is not ready"
                   sleep 1
@@ -377,7 +379,7 @@ spec:
             - name: INIT_USER_EMAIL
               value: sys@***.com #TODO check if variables work fine in containers
             - name: INIT_PASSWORD
-              value: pbkdf2:sha256:260000$ZsD1abJexW00CiVS$9a15040ef91f2f17f1a93772008beca8902aae776fac61a6e11132a82ee6d2ef
+              value: pbkdf2:sha256:260000$GKvgfDCCmvVXVbKi$538697dbe4192a5691bdb63c4e989d702db8da8dd80e87fdbb101a12b4ae56c3
       containers:
         - name: mongo
           image: mongo:7.0-rc
@@ -420,14 +422,14 @@ metadata:
     kubernetes.io/ingress.class: "nginx" #TODO own ingress? default?
     nginx.ingress.kubernetes.io/enable-cors: "true"
     nginx.ingress.kubernetes.io/use-regex: "true"
-    nginx.ingress.kubernetes.io/cors-allow-origin: "http://localhost:3000, https://*.benis.k8s-test.ivinco.com" #TODO cors
+    nginx.ingress.kubernetes.io/cors-allow-origin: "http://localhost:3000, https://*.$DOMAIN_NAME" #TODO cors
   name: tenis-frontend-ingress
   labels:
     component: frontend
 spec:
   ingressClassName: nginx
   rules:
-    - host: benis.k8s-test.ivinco.com #TODO domain
+    - host: $DOMAIN_NAME #TODO domain
       http:
         paths:
           - backend:
@@ -439,7 +441,7 @@ spec:
             pathType: Prefix
   tls:
     - hosts:
-        - benis.k8s-test.ivinco.com #TODO domain
+        - $DOMAIN_NAME #TODO domain
       secretName: tenis-secret
 ---
 # Source: tenis/templates/ingress.yaml
@@ -451,14 +453,14 @@ metadata:
     kubernetes.io/ingress.class: "nginx"  #TODO own ingress? default?
     nginx.ingress.kubernetes.io/enable-cors: "true"
     nginx.ingress.kubernetes.io/use-regex: "true"
-    nginx.ingress.kubernetes.io/cors-allow-origin: "http://localhost:3000, https://*.benis.k8s-test.ivinco.com"  #TODO cors
+    nginx.ingress.kubernetes.io/cors-allow-origin: "http://localhost:3000, https://*.$DOMAIN_NAME"  #TODO cors
   name: tenis-api-ingress
   labels:
     component: frontend
 spec:
   ingressClassName: nginx  #TODO ingress class
   rules:
-    - host: api.benis.k8s-test.ivinco.com #TODO domain
+    - host: api.$DOMAIN_NAME #TODO domain
       http:
         paths:
           - backend:
@@ -470,5 +472,6 @@ spec:
             pathType: Prefix
   tls:
     - hosts:
-        - api.benis.k8s-test.ivinco.com #TODO domain
+        - api.$DOMAIN_NAME #TODO domain
       secretName: tenis-api-secret
+
