@@ -76,8 +76,8 @@ metadata:
 data:
   env-config.js: |-
     window._env_ = {
-      API_SERVER: "https://api.benis.k8s-test.ivinco.com",
-      BACKEND_PORT: "443"
+      API_SERVER: "https://api.benis.k8s-test.ivinco.com", # TODO paste from variable $API_SERVER (?)
+      BACKEND_PORT: "443" # TODO decide if needs to be variable as wekk
     };
 ---
 # Source: tenis/templates/mongodb-init-script-configmap.yaml
@@ -103,11 +103,11 @@ data: #TODO another project name in userProjects(?)
     mongosh tenis --eval 'if (db.users.findOne({ name: "Admin" }) === null) {
       db.users.insertOne({
         name: "Admin",
-        email: "sys@ivinco.com",
-        password: "pbkdf2:sha256:260000$dyP37bv0XW09xsX2$6c6ae167482d39d928a75f08fe1b345361b0affbcd336505a6839eb0ed67778c",
+        email: "sys@example.com",
+        password: "scrypt:32768:8:1$ofMK9NIIBkQvR8ub$88ef7337873e65fb7b2e7362ee6dbc47bdaab5c95dc8036967f644dbd1f3d75697cc3b219e6e721cdff4ef2ca55c4e8156dd559e2b296e923bce79b2ffc3c17c",
         active: true,
         commentReplaceRules: {},
-        projects: ["Test"]
+        userProjects: ["Test"]
       });
     }'
 
@@ -192,7 +192,7 @@ spec:
             - ash
             - "-c"
             - |
-              until nc -z $MONGO_HOST 27017 #TODO тут tenis-mongodb был указан прямо так, надо убедиться что работает и тоже донести в остальной чарт
+              until nc -z $MONGO_HOST 27017
               do
                   echo "MongoDB is not ready"
                   sleep 1
@@ -211,7 +211,7 @@ spec:
             - name: MONGO_DATABASE
               value: tenis
             - name: API_TOKEN
-              value: wRmqxW7jxfFowHEx
+              value: some-token #TODO how this token generated? - asked
           livenessProbe:
             httpGet:
               path: /healz
@@ -350,7 +350,7 @@ spec:
             - name: INIT_USER_EMAIL
               value: sys@***.com #TODO check if variables work fine in containers
             - name: INIT_PASSWORD
-              value: pbkdf2:sha256:260000$ZsD1abJexW00CiVS$9a15040ef91f2f17f1a93772008beca8902aae776fac61a6e11132a82ee6d2ef
+              value: scrypt:32768:8:1$ofMK9NIIBkQvR8ub$88ef7337873e65fb7b2e7362ee6dbc47bdaab5c95dc8036967f644dbd1f3d75697cc3b219e6e721cdff4ef2ca55c4e8156dd559e2b296e923bce79b2ffc3c17c
       containers:
         - name: mongo
           image: mongo:7.0-rc
@@ -392,7 +392,7 @@ metadata:
     kubernetes.io/ingress.class: "nginx" #TODO own ingress? default?
     nginx.ingress.kubernetes.io/enable-cors: "true"
     nginx.ingress.kubernetes.io/use-regex: "true"
-    nginx.ingress.kubernetes.io/cors-allow-origin: "http://localhost:3000, https://*.benis.k8s-test.ivinco.com" #TODO cors
+    nginx.ingress.kubernetes.io/cors-allow-origin: "http://localhost:3000, https://*.***.com" #TODO cors
   name: tenis-frontend-ingress
   labels:
     component: frontend
@@ -423,7 +423,7 @@ metadata:
     kubernetes.io/ingress.class: "nginx"  #TODO own ingress? default?
     nginx.ingress.kubernetes.io/enable-cors: "true"
     nginx.ingress.kubernetes.io/use-regex: "true"
-    nginx.ingress.kubernetes.io/cors-allow-origin: "http://localhost:3000, https://*.benis.k8s-test.ivinco.com"  #TODO cors
+    nginx.ingress.kubernetes.io/cors-allow-origin: "http://localhost:3000, https://*.***.com"  #TODO cors
   name: tenis-api-ingress
   labels:
     component: frontend
@@ -444,3 +444,4 @@ spec:
     - hosts:
         - api.benis.k8s-test.ivinco.com #TODO domain
       secretName: tenis-api-secret
+
