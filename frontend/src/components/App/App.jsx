@@ -10,11 +10,16 @@ import {closeModal} from "../../store/reducers/modalReducer";
 import {startLoadAction, stopLoadAction} from "../../store/reducers/loadingReducer";
 import LoadingWindow from "../LoadingWindow/LoadingWindow";
 import {prepareUser} from "../../utils/utils";
+import usePortalParam from "../../hooks/usePortalParam";
 
 function App () {
     const dispatch = useDispatch()
     const isLoading = useSelector(state => state.switchLoadingWindow.isLoading)
     const totalAlerts = useSelector(state => state.setAlertReducer.totalAlertsNumber)
+    const setPortalParams = usePortalParam()
+    //TO BE DELETED
+    const isLogged  = useSelector(state => state.authReducer.isLogged)
+    const reduxUSer = useSelector(state => state.authReducer.user)
 
     useEffect( () => {
         async function checkAuth () {
@@ -25,8 +30,16 @@ function App () {
                     localStorage.setItem('token', refresh.data.access_token)
                     const fetchUser = await UserService.getUser()
                     const user = prepareUser(fetchUser.data)
+                    console.log(user)
                     dispatch(loginAction(user))
+                    setPortalParams()
                     dispatch(closeModal())
+
+                    console.log("Users After dispatch")
+                    console.log(reduxUSer)
+                    console.log("Login status")
+                    console.log(isLogged)
+
                 } catch (e) {
                     console.log(`Error while refreshing token: ${e}`)
                 } finally {
