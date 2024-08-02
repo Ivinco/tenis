@@ -24,7 +24,7 @@ function App () {
                     const refresh = await axios.get(`${BACKEND_SERVER}/refresh`, {withCredentials: true})
                     localStorage.setItem('token', refresh.data.access_token)
                     const fetchUser = await UserService.getUser()
-                    const user = prepareUser(fetchUser.data)
+                    const user = prepareUser(fetchUser.data.user)
                     dispatch(loginAction(user))
                     dispatch(closeModal())
                 } catch (e) {
