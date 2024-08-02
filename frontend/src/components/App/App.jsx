@@ -10,7 +10,6 @@ import {closeModal} from "../../store/reducers/modalReducer";
 import {startLoadAction, stopLoadAction} from "../../store/reducers/loadingReducer";
 import LoadingWindow from "../LoadingWindow/LoadingWindow";
 import {prepareUser} from "../../utils/utils";
-//import usePortalParam from "../../hooks/usePortalParam";
 
 function App () {
     const dispatch = useDispatch()
@@ -19,25 +18,13 @@ function App () {
 
     useEffect( () => {
         async function checkAuth () {
-            // if  (localStorage.getItem("token")){
-            //     dispatch(startLoadAction())
-            //     const refresh = await axios.get(`${BACKEND_SERVER}/refresh`, {withCredentials: true})
-            //     console.log("refresh")
-            //     loginAction(refresh.data)
-            //     const fetchUser = await UserService.getUser()
-            //     console.log("fetchedUser")
-            //     console.log(fetchUser)
-            //     const user = prepareUser(fetchUser.data)
-            //
-            // }
             if(localStorage.getItem('token')){
                 dispatch(startLoadAction())
                 try {
                     const refresh = await axios.get(`${BACKEND_SERVER}/refresh`, {withCredentials: true})
                     localStorage.setItem('token', refresh.data.access_token)
                     const fetchUser = await UserService.getUser()
-                    console.log("fetchedUser")
-                    const user = prepareUser(fetchUser.data)
+                    const user = prepareUser(fetchUser.data.user)
                     dispatch(loginAction(user))
                     dispatch(closeModal())
                 } catch (e) {
