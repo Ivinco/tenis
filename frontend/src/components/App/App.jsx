@@ -19,6 +19,17 @@ function App () {
 
     useEffect( () => {
         async function checkAuth () {
+            // if  (localStorage.getItem("token")){
+            //     dispatch(startLoadAction())
+            //     const refresh = await axios.get(`${BACKEND_SERVER}/refresh`, {withCredentials: true})
+            //     console.log("refresh")
+            //     loginAction(refresh.data)
+            //     const fetchUser = await UserService.getUser()
+            //     console.log("fetchedUser")
+            //     console.log(fetchUser)
+            //     const user = prepareUser(fetchUser.data)
+            //
+            // }
             if(localStorage.getItem('token')){
                 dispatch(startLoadAction())
                 try {
@@ -26,7 +37,6 @@ function App () {
                     localStorage.setItem('token', refresh.data.access_token)
                     const fetchUser = await UserService.getUser()
                     console.log("fetchedUser")
-                    console.log(fetchUser)
                     const user = prepareUser(fetchUser.data)
                     dispatch(loginAction(user))
                     dispatch(closeModal())

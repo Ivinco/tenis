@@ -75,6 +75,8 @@ export function stringToDate (string) {
 }
 
 export function prepareUser (data) {
+    console.log("Input data to prepareUser Function")
+    console.log(data)
     const user_raw = {
         userName: data.name,
         userId: data._id,
@@ -85,5 +87,7 @@ export function prepareUser (data) {
         userProjects: data.projects
     }
     const user = {...user_raw, userProjects: ['All', ...user_raw.userProjects]}
+    console.log("output data from prepareUser Function")
+    console.log(user)
     return user
 }
