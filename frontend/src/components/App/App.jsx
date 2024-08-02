@@ -10,13 +10,13 @@ import {closeModal} from "../../store/reducers/modalReducer";
 import {startLoadAction, stopLoadAction} from "../../store/reducers/loadingReducer";
 import LoadingWindow from "../LoadingWindow/LoadingWindow";
 import {prepareUser} from "../../utils/utils";
-import usePortalParam from "../../hooks/usePortalParam";
+//import usePortalParam from "../../hooks/usePortalParam";
 
 function App () {
     const dispatch = useDispatch()
     const isLoading = useSelector(state => state.switchLoadingWindow.isLoading)
     const totalAlerts = useSelector(state => state.setAlertReducer.totalAlertsNumber)
-    const setPortalParams = usePortalParam()
+    //const setPortalParams = usePortalParam()
     //TO BE DELETED
     const isLogged  = useSelector(state => state.authReducer.isLogged)
     const reduxUSer = useSelector(state => state.authReducer.user)
@@ -32,7 +32,7 @@ function App () {
                     const user = prepareUser(fetchUser.data)
                     console.log(user)
                     dispatch(loginAction(user))
-                    setPortalParams()
+                    //setPortalParams()
                     dispatch(closeModal())
 
                     console.log("Users After dispatch")
