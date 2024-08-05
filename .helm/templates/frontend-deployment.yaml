@@ -59,12 +59,18 @@ spec:
           mountPath: /etc/nginx/nginx.conf
           subPath: nginx.conf
           readOnly: true
+        - name: nginx-env-config
+          mountPath: /usr/share/nginx/html/env-config.js
+          subPath: env-config.js
         resources:
           {{- toYaml .Values.frontend.resources | nindent 10 }}
       volumes:
       - name: nginx-config-volume
         configMap:
           name: {{ .Chart.Name }}-nginx-config
+      - name: nginx-env-config
+        configMap:
+          name: {{ .Chart.Name }}-nginx-env-config
       {{- with .Values.frontend.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
