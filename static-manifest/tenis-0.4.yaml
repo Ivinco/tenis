@@ -1,5 +1,13 @@
 #TODO Global - check for sensitive info
-
+apiVersion: v1
+kind: Namespace
+metadata:
+  labels:
+    kubernetes.io/metadata.name: tenis-static
+  name: tenis-static
+spec:
+  finalizers:
+  - kubernetes
 ---
 apiVersion: cert-manager.io/v1
 kind: Issuer
