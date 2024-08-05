@@ -3,8 +3,8 @@ apiVersion: v1
 kind: Namespace
 metadata:
   labels:
-    kubernetes.io/metadata.name: tenis-static
-  name: tenis-static
+    kubernetes.io/metadata.name: tenis
+  name: tenis
 spec:
   finalizers:
   - kubernetes
@@ -13,6 +13,7 @@ apiVersion: cert-manager.io/v1
 kind: Issuer
 metadata:
   name: tenis-cert-issuer
+  namespace: tenis
 spec:
   acme:
     server: https://acme-v02.api.letsencrypt.org/directory
@@ -29,6 +30,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: tenis-nginx-config
+  namespace: tenis
   labels:
     component: frontend
 data:
@@ -98,12 +100,13 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: tenis-nginx-env-config
+  namespace: tenis
   labels:
     app: tenis-frontend
 data:
   env-config.js: |-
     window._env_ = {
-      API_SERVER: "https://api.$DOMAIN_NAME",
+      API_SERVER: "https://api.${DOMAIN_NAME}",
       BACKEND_PORT: "443"
     };
 ---
@@ -112,6 +115,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: tenis-mongodb-init
+  namespace: tenis
   labels:
     app: tenis-mongodb
 data:
@@ -146,6 +150,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: tenis-backend
+  namespace: tenis
   labels:
     app: tenis-backend
     component: frontend
@@ -164,6 +169,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: tenis-frontend
+  namespace: tenis
   labels:
     app: tenis-frontend
     component: frontend
@@ -182,6 +188,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: tenis-mongodb
+  namespace: tenis
   labels:
     app: tenis-mongodb
 spec:
@@ -197,6 +204,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: tenis-backend
+  namespace: tenis
   labels:
     app: tenis-backend
     component: backend
@@ -212,7 +220,7 @@ spec:
     spec:
       initContainers:
         - name: check-mongodb
-          image: busybox:1.31 # TODO own image?
+          image: busybox:1.31
           env:
             - name: MONGO_HOST
               value: tenis-mongodb
@@ -268,6 +276,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: tenis-frontend
+  namespace: tenis
   labels:
     app: tenis-frontend
     component: frontend
@@ -346,6 +355,7 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: tenis-mongodb
+  namespace: tenis
 spec:
   serviceName: "mongodb"
   replicas: 1
@@ -380,7 +390,7 @@ spec:
             - mongod
             - "--bind_ip_all"
           ports:
-            - containerPort: 27017 #TODO ckeck name works fine
+            - containerPort: 27017
               name: mongodb
           volumeMounts:
             - name: mongo-persistent-storage
@@ -395,16 +405,15 @@ spec:
         - name: tenis-mongodb-init
           configMap:
             name: tenis-mongodb-init
-            defaultMode: 0777 #TODO2 review permissions
+            defaultMode: 0644 #TODO2 review permissions
   volumeClaimTemplates:
     - metadata:
         name: mongo-persistent-storage
       spec:
         accessModes: ["ReadWriteOnce"]
-        storageClassName: "longhorn" #TODO2 default storage class
         resources:
           requests:
-            storage: 10Gi #TODO2 review storage requirements
+            storage: 4Gi
 ---
 # Source: tenis/templates/ingress.yaml
 apiVersion: networking.k8s.io/v1
@@ -415,14 +424,15 @@ metadata:
     kubernetes.io/ingress.class: "nginx" #TODO own ingress? default?
     nginx.ingress.kubernetes.io/enable-cors: "true"
     nginx.ingress.kubernetes.io/use-regex: "true"
-    nginx.ingress.kubernetes.io/cors-allow-origin: "http://localhost:3000, https://*.$DOMAIN_NAME" #TODO cors
+    nginx.ingress.kubernetes.io/cors-allow-origin: "http://localhost:3000, https://*.${DOMAIN_NAME}" #TODO cors
   name: tenis-frontend-ingress
+  namespace: tenis
   labels:
     component: frontend
 spec:
   ingressClassName: nginx
   rules:
-    - host: $DOMAIN_NAME #TODO domain
+    - host: ${DOMAIN_NAME}
       http:
         paths:
           - backend:
@@ -434,7 +444,7 @@ spec:
             pathType: Prefix
   tls:
     - hosts:
-        - $DOMAIN_NAME #TODO domain
+        - ${DOMAIN_NAME}
       secretName: tenis-secret
 ---
 # Source: tenis/templates/ingress.yaml
@@ -446,14 +456,15 @@ metadata:
     kubernetes.io/ingress.class: "nginx"  #TODO own ingress? default?
     nginx.ingress.kubernetes.io/enable-cors: "true"
     nginx.ingress.kubernetes.io/use-regex: "true"
-    nginx.ingress.kubernetes.io/cors-allow-origin: "http://localhost:3000, https://*.$DOMAIN_NAME"  #TODO cors
+    nginx.ingress.kubernetes.io/cors-allow-origin: "http://localhost:3000, https://*.${DOMAIN_NAME}"
   name: tenis-api-ingress
+  namespace: tenis
   labels:
     component: frontend
 spec:
   ingressClassName: nginx  #TODO ingress class
   rules:
-    - host: api.$DOMAIN_NAME #TODO domain
+    - host: api.${DOMAIN_NAME}
       http:
         paths:
           - backend:
@@ -465,5 +476,5 @@ spec:
             pathType: Prefix
   tls:
     - hosts:
-        - api.$DOMAIN_NAME #TODO domain
+        - api.${DOMAIN_NAME}
       secretName: tenis-api-secret
