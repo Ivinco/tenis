@@ -49,6 +49,8 @@ auth credentials which prometheus should use to send alerts to plugin. In prod e
 them in config file and set them by command flags or environment variables. Command flags take precedence over
 environment variables.
 
+#### Using with Prometheus
+
 Tenis Prometheus Plugin is seen as Alert Manager by Prometheus. So, to make Prometheus send alerts to plugin you should
 set it in **alertmanagers** section of prometheus.yaml file. Here is the example of prometheus config to use Tenis Prometheus Plugin:
 
@@ -78,6 +80,24 @@ also put it in alert labels. Here is the simple example of alert definition in p
   annotations:
     descriptions: "Metrics exporter on {{.Labels.instance}} is unavailable"
 ```
+
+#### Using with VictoriaMetrics
+
+Prometheus Input Plugin can be used with VictoriaMetrics infrastructure without Prometheus as well. No any changes are
+needed on the plugin side. The things you need to do to use the plugin with VictoriaMetrics are to define it as `notifier`
+in vmalert.
+
+Here is the example of vmalert run command
+```shell
+/path/to/vmalert \
+-rule=/etc/vmalert/config.yml \
+-datasource.url=https://$VICTORIAMETRICS_SERVER:8428 \
+-remoteWrite.url=https://$VICTORIAMETRICS_SERVER:8428
+-notifier.url=http://$TENIS_INPUT_PLUGIN_URL:$TENIS_INPUT_PLUGIN_PORT \
+-notifier.basicAuth.username=$TENIS_INPUT_PLUGIN_USER \
+-notifier.basicAuth.password=$TENIS_INPUT_PLUGIN_PASSWORD
+```
+
 
 In case backend server is unavailable for some reason, Input Plugin will save resolved alerts to temp file,
 and will try to send them again according to time interval which is set in `httpServer.resendInterval`. After 
