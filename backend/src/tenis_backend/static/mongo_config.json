@@ -1,0 +1,10 @@
+{
+    "mongo_migrate": {
+        "CODE_VERSION": "20240719102922",
+        "DEBUG_MODE": false,
+        "MONGO_HOST": "localhost",
+        "MONGO_PORT": 27017,
+        "DATABASE": "tenis",
+        "MIGRATIONS_PATH": "mongo_migrations"
+    }
+}
