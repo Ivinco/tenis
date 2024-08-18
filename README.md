@@ -5,7 +5,7 @@ T.E.N.I.S. stands for Team Event Notificaton and Interoperability System!
 # Installation
 
 ## Helm
-It's a little bit complicated way, but more common one
+It's a little bit more complicated than using werf, but more common one
 ### Prerequisites
 - helm
 - Ready to use k8s cluster with configured kubeconfig
