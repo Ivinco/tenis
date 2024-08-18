@@ -3,12 +3,41 @@
 T.E.N.I.S. stands for Team Event Notificaton and Interoperability System!
 
 # Installation
+
+## Helm
+It's a little bit complicated way, but more common one
+### Prerequisites
+- helm
+- Ready to use k8s cluster with configured kubeconfig
+- Registry (for manual deployment you should be logged in if your registry is protected with auth)
+- Registry secret (this chart expects a secret called registry-secret)
+### Procedure
+- Build and publish images in your repo
+  - You can use `build-and-push.sh` script. Images repo should be available as $REPO env variable
+  - You can also pass $TAG variable, to specify a tag, `latest` is used if no $TAG variable available
+- Add `mongodb.env.INIT_PASSWORD` and `mongodb.env.API_TOKEN` in `values.yaml`. It should be added like that. Note, it's not safe to keep passwords in the repo, you'll have to come up with a secure way on your own, or you can use encryption provided by [werf](#easy-way-werf)
+```
+mongodb:
+  env:
+    INIT_PASSWORD:
+      _default: <your default password here>
+      dev: <example of your password for werf.env=dev>
+    API_TOKEN:
+      _default: <Your API token>
+```
+To understand more about what kind of password should be used, look [here]
+(#how-to-generate-new-password-for-mongodb-init-user)
+- Add `env_url`. You can add it in `values.yaml` or directly with helm install command
+- Install chart (example)
+```
+$ helm -n <k8s-namespace> install <release-name> .helm --set werf.image.backend="backend image in you repo" --set werf.image.frontend="<frontend image in your repo>" --set werf.image.mongodb="<mongodb image in your repo (or from public repo, right now basic image is used)>" --set werf.env=dev --set env_url="test.example.com"
+```
 ## Easy way (werf)
 ### Prerequisites
 - [werf](werf.io)
 - Ready to use k8s cluster with configured kubeconfig
 - Registry (for manual deployment you should be logged in if your registry is protected with auth)
-- Registry secret (in this app it's called registry-secret, but you can alter it as you wish)
+- Registry secret (in this app it's called registry-secret)
 ### Procedure
 - Prepare the environment
   - Add werf secret key (In repo root)
@@ -30,32 +59,6 @@ T.E.N.I.S. stands for Team Event Notificaton and Interoperability System!
 ### Notes
 For CI/CD purposes, WERF_SECRET_KEY variable should be added to the project variables and made available for use.
 
-
-## Complicated way (helm)
-### Prerequisites
-- helm
-- Ready to use k8s cluster with configured kubeconfig
-- Registry (for manual deployment you should be logged in if your registry is protected with auth)
-- Registry secret (in this app it's called registry-secret, but you can alter it as you wish)
-### Procedure
-- Create Dockerfiles or build Frontend and Backend images in any convinient way
-  - You can take `werf.yaml` as a reference, it shows every step of build process
-  - Build your images, tag them appropriately and push to your registry
-  - Substitute `{{ .Values.werf.images.(frontend|backend) }}` in frontend and backend deployments with your created images
-- Add `mongodb.env.INIT_PASSWORD` in `values.yaml`. It should be added like that
-```
-mongodb:
-  env:
-    INIT_PASSWORD:
-      _default: <your default password here>
-      dev: <example of your password for werf.env=dev>
-```
-To understand more about what kind of password should be used, look [here](#how-to-generate-new-password-for-mongodb-init-user)
-- Add `env_url`. You can add it in `values.yaml` or directly with helm install command
-- Install chart (example)
-```
-$ helm -n <k8s-namespace> install <release-name> .helm --set werf.env=dev --set env_url="test.example.com"
-```
 
 # Deep dive
 ## How images are built
