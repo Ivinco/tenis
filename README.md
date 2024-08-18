@@ -3,6 +3,13 @@
 T.E.N.I.S. stands for Team Event Notificaton and Interoperability System!
 
 # Installation
+## Quick install
+Static manifest is available for demo purposes, it only expects $DOMAIN_NAME variable to be passed with kubectl apply. You can do it this way:
+```
+export DOMAIN_NAME=benis.bg502.ru; curl -s https://raw.githubusercontent.com/Ivinco/tenis/774d61c9c0e6f2dbebd8fec5638239650bcb21c9/static-manifest/tenis-0.4.yaml | envsubst '${DOMAIN_NAME}' | kubectl create -f -
+```
+
+
 
 ## Helm
 It's a little bit more complicated than using werf, but more common one
