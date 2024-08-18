@@ -1,0 +1,2 @@
+# Dockerfile for MongoDB
+FROM mongo:7.0-rc
