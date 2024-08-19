@@ -1,0 +1,10 @@
+# Dockerfile for Backend
+FROM python:alpine3.17
+
+WORKDIR /app
+
+COPY backend /app
+
+COPY backend/pyproject.toml /app/
+RUN pip install .
+CMD [ "/usr/local/bin/python3", "-m", "tenis_backend" ]
