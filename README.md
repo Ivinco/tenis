@@ -23,6 +23,7 @@ It's a little bit more complicated than using werf, but more common one
   - You can use `build-and-push.sh` script. Images repo should be available as $REPO env variable
   - You can also pass $TAG variable, to specify a tag, `latest` is used if no $TAG variable available
 - Add `mongodb.env.INIT_PASSWORD` and `mongodb.env.API_TOKEN` in `values.yaml`. It should be added like that. Note, it's not safe to keep passwords in the repo, you'll have to come up with a secure way on your own, or you can use encryption provided by [werf](#easy-way-werf)
+- API token - is a string of ASCII symbols up to 64 bytes
 ```
 mongodb:
   env:
