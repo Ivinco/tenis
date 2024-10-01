@@ -210,7 +210,6 @@ def get_alert_details(alert_id, start_tstmp, end_tstmp):
     :param alert_id: required param, id of needed alert
     :param start_tstmp: optional start timestamp of current alert history str type
     :param end_tstmp: optional end timestamp of current alert history str type
-
     """
     history_period = app.config['HISTORY_PERIOD_MINUTES']
     # If no timestamps in request, the default period is for last 24 hours
@@ -378,12 +377,14 @@ def ack(user):
     ack_user = user['email']
     updated_alerts = []  # list of updated alerts
     update_alerts_query = []  # list to hold MongoDB query to update 'current' collection
+    new_history_entries = []  # list of entries to add to 'history' collection
     if 'ack' in data:
         for item in data['ack']:
             for alert in alerts:
                 ack_id = item['alertId']
                 if ack_id == alert['alert_id']:
                     alert['responsibleUser'] = ack_user
+                    new_history_entries.append(make_history_entry(alert))
                     updated_alerts.append(alert)
                     update_alerts_query.append(
                         pymongo.UpdateOne({'alert_id': alert['alert_id']}, {"$set": {"responsibleUser": ack_user}}))
@@ -396,11 +397,19 @@ def ack(user):
                 if ack_id == alert['alert_id']:
                     alert['responsibleUser'] = ''
                     updated_alerts.append(alert)
+                    new_history_entries.append(make_history_entry(alert))
                     update_alerts_query.append(
                         pymongo.UpdateOne({'alert_id': alert['alert_id']}, {"$set": {"responsibleUser": ''}}))
                     break
 
     send_alerts(updated_alerts, update_alerts_query)
+    if new_history_entries:
+        try:
+            app.db['history'].insert_many(new_history_entries)
+        except pymongo.errors.PyMongoError as e:
+            print("Warning: failed to save history data: %s" % e)
+            pass
+
     return "OK", 200
 
 
@@ -861,6 +870,109 @@ def update_user(current_user):
         return jsonify(updated_user), 200
     except Exception as e:
         return make_response(jsonify({"error": str(e)}), 500)
+
+
+@app.route('/stats', methods=['GET'])
+@token_required()
+def stats(current_user):
+    """
+    Method to get aggregated alerts statistics. Example:
+    http://tenis.net/stats?startDate=17277223432&endDate=17278223432&user=john
+
+    :return: json with stats:
+        average_reaction_time – average period from alert has been fired till alert has been acked
+        total_number_of_alerts – the number of alerts which were fired in the selected period
+        total_alert_seconds – total period of firing alerts
+        total_unhandled_seconds - total time of unhandled alerts in seconds
+    """
+    start_date = datetime.utcfromtimestamp(int(request.args.get("startDate")))
+    end_date = datetime.utcfromtimestamp(int(request.args.get("endDate")))
+    user = request.args.get("user")
+    now = datetime.now()
+
+    if start_date > end_date:
+        return "Start date later than end date", 416
+    if start_date > now:
+        return "Start date way into future", 416
+    if not start_date:
+        start_date = now - timedelta(hours=24)
+
+    if end_date > now:
+        end_date = now
+    if not end_date:
+        end_date = now
+    if not user:
+        user = ".*"
+
+    query = {'logged': {'$gte': start_date, '$lte': end_date}, 'responsibleUser': {'$regex': user}}
+    piece_of_history = list(app.db['history'].find(query).sort({'logged': 1}))
+
+    # History data example
+    # {
+    #   _id: ObjectId("66f75d78a8746469991b136a"),
+    #   alert_id: 'e10c3272812cc58b54421a61949e6976f042fbc8064df0f386f63cd24363f03e',
+    #   plugin_id: 'NIP_BR',
+    #   logged: ISODate("2024-09-28T01:35:52.731Z"),
+    #   project: 'Boardreader',
+    #   host: 'kafka_output_cluster',
+    #   alertName: 'Kafka Input Rate boards_mumsnet_prod_premium_out - boards',
+    #   severity: 'CRITICAL',
+    #   responsibleUser: '',
+    #   fired: 1727485022,
+    #   msg: 'CRITICAL: Input rate - 0 docs/sec (outside of range 0.1:20)',
+    #   silenced: false,
+    #   comment: '',
+    #   customFields: {
+    #     fixInstructions: 'https://wiki.ivinco.com/prj:boardreader:howto:fix_nagios_alerts:kafka_offset'
+    #   }
+    # }
+
+    total_unhandled_seconds = 0
+    average_reaction_time = 0
+    total_alert_seconds = 0
+    number_of_reactions = 0
+    reaction_tmp = {}
+    firing_tmp = {}
+    number_tmp = {}
+
+    for event in piece_of_history:
+        aid = event['alert_id']
+        sev = event['severity']
+        num = f"{aid} {event['fired']}"
+
+        if aid not in reaction_tmp.keys():
+            reaction_tmp[aid] = event['logged']
+
+        if aid not in firing_tmp.keys():
+            firing_tmp[aid] = event['logged']
+
+        if num not in number_tmp.keys():
+            number_tmp[num] = num
+
+        if sev == 'RESOLVED':
+            if aid in firing_tmp.keys():
+                alert_fired = event['logged'] - firing_tmp[aid]
+                total_alert_seconds += alert_fired.total_seconds()
+                del firing_tmp[aid]
+
+        if event['responsibleUser']:
+            if aid in reaction_tmp.keys():
+                number_of_reactions += 1
+                reaction_time = event['logged'] - reaction_tmp[aid]
+                total_unhandled_seconds += reaction_time.total_seconds()
+                del reaction_tmp[aid]
+
+    if number_of_reactions:
+        average_reaction_time = total_unhandled_seconds / number_of_reactions
+
+    stats_total = {
+        'total_unhandled_seconds': int(total_unhandled_seconds),
+        'total_number_of_alerts': len(number_tmp),
+        'average_reaction_time': int(average_reaction_time),
+        'total_alert_seconds': int(total_alert_seconds),
+    }
+
+    return json.dumps(stats_total, default=str), 200
 
 
 @app.route('/out', methods=['GET'])
