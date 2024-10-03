@@ -905,7 +905,10 @@ def stats(current_user):
         user = ".*"
 
     query = {'logged': {'$gte': start_date, '$lte': end_date}, 'responsibleUser': {'$regex': user}}
-    piece_of_history = list(app.db['history'].find(query).sort({'logged': 1}))
+    try:
+        piece_of_history = list(app.db['history'].find(query).sort({'logged': 1}))
+    except pymongo.errors.PyMongoError as e:
+        raise InternalServerError("Failed to load history from MongoDB: %s" % e)
 
     # History data example
     # {
