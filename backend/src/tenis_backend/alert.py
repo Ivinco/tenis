@@ -1,5 +1,4 @@
 from datetime import datetime, timezone
-from bson.objectid import ObjectId
 import re
 
 
@@ -108,6 +107,16 @@ def is_resolved(alert):
     try:
         s = alert['severity'].lower()
         if s == 'ok' or s == 'resolved':
+            return True
+    except TypeError:
+        pass
+    return False
+
+
+def is_emergency(alert):
+    """ Return true if alert['alertName'] starts with EMERGENCY and alert['severity'] is CRITICAL"""
+    try:
+        if re.search(r'^EMERGENCY', alert['alertName']) and alert['severity'] == 'CRITICAL':
             return True
     except TypeError:
         pass

@@ -1,32 +1,30 @@
-import atexit
-import hashlib
+import os
 import json
 import time
-from copy import deepcopy
-
-import jsonschema
-import os
-import re
-import threading
+import atexit
+import hashlib
 import pymongo
+import threading
+import jsonschema
 
-from datetime import datetime, timezone, timedelta
-from bson.objectid import ObjectId
-from flask import Flask, request, jsonify, make_response
+from copy import deepcopy
 from flask_cors import CORS
-from flask_socketio import SocketIO, emit, send, disconnect
-from apscheduler.schedulers.background import BackgroundScheduler
+from bson.objectid import ObjectId
+from flask_socketio import SocketIO, emit
+from datetime import datetime, timezone, timedelta
+from flask_swagger_ui import get_swaggerui_blueprint
+from flask import Flask, request, jsonify, make_response
 from email_validator import validate_email, EmailNotValidError
+from apscheduler.schedulers.background import BackgroundScheduler
 from werkzeug.exceptions import HTTPException, Unauthorized, BadRequest, InternalServerError
-from werkzeug.security import generate_password_hash
 
-from .alert import load_alerts, lookup_alert, update_alerts, regexp_alerts, make_history_entry, is_resolved, \
-    lookup_alert_by_id, load_collection
-from .auth import create_token, token_required, token_required_ws, plugin_token_required
 from .user import User
+from .escalation import start_twilio_carousel
+from .auth import create_token, token_required, token_required_ws, plugin_token_required
 from .json_validation import schema, silence_schema, user_schema, user_add_schema, user_update_schema, \
     history_request_schema, command_schema, single_alert_history_schema, comment_schema
-from flask_swagger_ui import get_swaggerui_blueprint
+from .alert import load_alerts, lookup_alert, update_alerts, regexp_alerts, make_history_entry, is_resolved, \
+    lookup_alert_by_id, load_collection, is_emergency
 
 # Global vars init
 app = Flask(__name__)
@@ -43,9 +41,14 @@ app.config['SECRET_KEY'] = os.getenv('SECRET', 'big-tenis')
 app.config['LISTEN_PORT'] = os.getenv('LISTEN_PORT', '8000')
 app.config['LISTEN_HOST'] = os.getenv('LISTEN_HOST', '0.0.0.0')
 app.config['API_TOKEN'] = os.getenv('API_TOKEN')
+app.config['TWILIO'] = os.getenv('TWILIO')          # Twilio url with creds
+app.config['TEST_PHONE'] = os.getenv('TEST_PHONE')  # Phone number to test Twilio
 app.config['HISTORY_RETENTION_DAYS'] = 30
 app.config['HISTORY_PERIOD_MINUTES'] = 15
-app.config['SILENCE_PERIOD_SECONDS'] = 10  # Silence rules check interval, checks that endSilence is <= current time
+app.config['SILENCE_PERIOD_SECONDS'] = 10   # Silence rules check interval, checks that endSilence is <= current time
+app.config['EMERGENCY_PERIOD_SECONDS'] = 5  # EMERGENCY alerts escalation check interval in seconds
+app.config['EMERGENCY_THRESHOLD'] = 5   # Minutes to wait till start EMERGENCY alert escalation if it's not acked
+app.config['WAIT_TILL_NEXT_CALL'] = 60  # Seconds to wait after EMERGENCY call till start another call
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 
 # This can be useful for testing
@@ -68,6 +71,9 @@ with alerts_lock:
 #      ...
 # }
 commands = {}
+
+# Dick of EMERGENCY alerts to escalate if not taken in work
+emergency = {}
 
 
 def check_silence(list_of_alerts, list_of_rules):
@@ -94,6 +100,27 @@ with alerts_lock:
 
 
 # Internal periodic tasks via BackgroundScheduler
+def check_emergency():
+    cancel_emergency = []
+    for alert_id, alert_details in emergency.items():
+        if alert_details['twilio']:
+            continue
+        alert_start = datetime.fromtimestamp(alert_details['start'])
+        check_time = alert_start + timedelta(minutes=app.config['EMERGENCY_THRESHOLD'])
+        if check_time < datetime.now():
+            alert = lookup_alert_by_id(alerts, alert_id)
+            if not alert or alert['responsibleUser'] or alert['silenced'] or is_resolved(alert):
+                cancel_emergency.append(alert_id)
+                continue
+
+            emergency[alert_id]['twilio'] = True
+            waitime = app.config['WAIT_TILL_NEXT_CALL']
+            if start_twilio_carousel(app.config['TWILIO'], app.config['TEST_PHONE'], alerts, alert_id, waitime):
+                cancel_emergency.append(alert_id)
+    for alert_id in cancel_emergency:
+        del emergency[alert_id]
+
+
 def silence_scheduler():
     """
     Check if silence period is over
@@ -109,8 +136,10 @@ def silence_scheduler():
 
 
 def db_retention():
-    """ Delete old history entries.
-        Also, make intermediate record for each active alert in the DB to history table - needed for reports generation. """
+    """
+    Delete old history entries.
+    Also, make intermediate record for each active alert in the DB to history table - needed for reports generation.
+    """
     print("Starting DB history retention background process...")
     try:
         cutoff = now = datetime.now(timezone.utc) - timedelta(days=app.config['HISTORY_RETENTION_DAYS'])
@@ -137,6 +166,8 @@ def db_retention():
 scheduler = BackgroundScheduler()
 job = scheduler.add_job(db_retention, 'interval', minutes=app.config['HISTORY_PERIOD_MINUTES'])
 job2 = scheduler.add_job(silence_scheduler, 'interval', seconds=app.config['SILENCE_PERIOD_SECONDS'])
+if app.config['TWILIO']:
+    job3 = scheduler.add_job(check_emergency, 'interval', seconds=app.config['EMERGENCY_PERIOD_SECONDS'], max_instances=5)
 scheduler.start()
 
 
@@ -1033,9 +1064,13 @@ def inbound():
                 if silence_rules:
                     check_silence([a], silence_rules)
 
+                if is_emergency(a):
+                    emergency[alert_id] = {'start': a['fired'], 'twilio': False}
+
                 existing_alert = lookup_alert(alerts, a)
                 if existing_alert is None:  # new alert
                     new_alerts.append(a)
+
                     continue  # next 'a' from data['update]', please
 
                 existing_alert = existing_alert.copy()  # we will update global list later
@@ -1098,8 +1133,8 @@ def inbound():
         return 'OK', 200
 
     if 'resolve' in data:
-        resolved_alerts = []
         resolved_ids = []
+        resolved_alerts = []
         resolved_history_entries = []
         with alerts_lock:
             for entry in data['resolve']:
@@ -1115,6 +1150,11 @@ def inbound():
 
             for a in resolved_alerts:
                 alerts.remove(a)  # remove from global in-mem list
+                if is_emergency(a):
+                    try:
+                        del emergency[a['alert_id']]
+                    except KeyError:
+                        pass
 
             try:
                 app.db['current'].delete_many({'alert_id': {'$in': resolved_ids}})
