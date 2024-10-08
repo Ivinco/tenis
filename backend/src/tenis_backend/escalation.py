@@ -3,6 +3,7 @@ import base64
 import requests
 from time import sleep
 from .alert import lookup_alert_by_id, is_resolved
+from werkzeug.exceptions import InternalServerError
 
 
 def twilio_call(twilio_url, method, cmd='', opt=None):
@@ -24,7 +25,11 @@ def twilio_call(twilio_url, method, cmd='', opt=None):
     if method == 'post':
         method = twilio.post
 
-    resp = method(twilio_url + cmd, params=opt)
+    try:
+        resp = method(twilio_url + cmd, params=opt)
+    except Exception as e:
+        raise InternalServerError("Failed to call Twilio: %s" % e)
+
     data = {}
     if resp.ok:
         data = resp.json()
@@ -33,7 +38,7 @@ def twilio_call(twilio_url, method, cmd='', opt=None):
     return data
 
 
-def start_twilio_carousel(twilio_url, test_phone='', alerts=None, alert_id='', wait_till_next_round=60):
+def start_twilio_carousel(twilio_url, test_phone=None, alerts=None, alert_id=None, wait_till_next_round=60):
     """
     Function to start calling admins via Twilio
 
@@ -70,19 +75,22 @@ def start_twilio_carousel(twilio_url, test_phone='', alerts=None, alert_id='', w
         # }
         if test_phone:
             admin_data['phone'] = test_phone  # for debug purposes
-            print(admin_data)
+            print(json.dumps(admin_data))
         if 'phone' not in admin_data.keys():
             hero_number += 1
             sleep(5)
             continue
 
-        xml_template = f'''
-            <?xml version="1.0" encoding="UTF-8"?>
+        admin_url_name = admin_data['name'].replace(" ", "+")
+        xml_template = f'''<?xml version="1.0" encoding="UTF-8"?>
             <Response>
                 <Say voice="alice" language="en-US">
                     Hi, {admin_data['name']}. We've got an {alert['alertName']}!
-                    But don't worry it's just a test.
                 </Say>
+                <Gather numDigits="1" timeout="2" action="{twilio_url}/twilio.php?type=digit&amp;emergencyId={alert_id}&amp;name={admin_url_name}">
+                    <Say voice="alice" language="en-US">Press 3 to accept the responsibility. Drop the call if you are not ready.</Say>
+                    <Play>{twilio_url}/blueoyster.mp3</Play>
+                </Gather>
             </Response>
         '''
 
@@ -102,7 +110,7 @@ def start_twilio_carousel(twilio_url, test_phone='', alerts=None, alert_id='', w
         # }
 
         if test_phone:
-            print(call_check)
+            print(json.dumps(call_check))
         if 'status' not in call_check.keys() or call_check['status'].lower() != 'ok':
             hero_number += 1
             sleep(5)
@@ -156,9 +164,18 @@ def start_twilio_carousel(twilio_url, test_phone='', alerts=None, alert_id='', w
             #         "events": "/2010-04-01/Account/...67dc/Events.json"
             #     }
             # }
-            call_status = call_details['status']
+            call_status = str(call_details['status'])
             if test_phone:
-                print(call_details)
+                print(json.dumps(call_details))
+
+            fin_url = call_check['url'].replace('.json', '/Events.json')
+            fin_check = twilio_call(fin_url, 'get')
+            if test_phone:
+                print(json.dumps(fin_check['end']))
+            if fin_check['end'] == 3:
+                ack_name = admin_data['name'].replace(' ', '_')
+                alert['responsibleUser'] = f'{ack_name}_twilio'
+                return True
 
             if n > 7:
                 break
