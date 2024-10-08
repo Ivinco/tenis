@@ -75,7 +75,7 @@ def start_twilio_carousel(twilio_url, test_phone=None, alerts=None, alert_id=Non
         # }
         if test_phone:
             admin_data['phone'] = test_phone  # for debug purposes
-            print(json.dumps(admin_data))
+            print(json.dumps(admin_data, indent=2))
         if 'phone' not in admin_data.keys():
             hero_number += 1
             sleep(5)
@@ -110,7 +110,7 @@ def start_twilio_carousel(twilio_url, test_phone=None, alerts=None, alert_id=Non
         # }
 
         if test_phone:
-            print(json.dumps(call_check))
+            print(json.dumps(call_check, indent=2))
         if 'status' not in call_check.keys() or call_check['status'].lower() != 'ok':
             hero_number += 1
             sleep(5)
@@ -166,12 +166,12 @@ def start_twilio_carousel(twilio_url, test_phone=None, alerts=None, alert_id=Non
             # }
             call_status = str(call_details['status'])
             if test_phone:
-                print(json.dumps(call_details))
+                print(json.dumps(call_details, indent=2))
 
             fin_url = call_check['url'].replace('.json', '/Events.json')
             fin_check = twilio_call(fin_url, 'get')
             if test_phone:
-                print(json.dumps(fin_check['end']))
+                print(fin_check['end'])
             if fin_check['end'] == 3:
                 ack_name = admin_data['name'].replace(' ', '_')
                 alert['responsibleUser'] = f'{ack_name}_twilio'
