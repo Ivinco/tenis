@@ -1,0 +1,207 @@
+.mainPage   {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+}
+
+.controlBar {
+    display: flex;
+    margin: 80px auto 0 60px;
+}
+
+.buttonBlock {
+    display: flex;
+    flex-direction: column;
+    margin: 0 40px auto 0;
+}
+
+.userBlock {
+    background-color: #656B7A;
+    border-radius: 10px;
+}
+
+.timeRangeBlock {
+    background-color: #656B7A;
+    border-radius: 10px;
+}
+
+.button {
+    border: none;
+    cursor: pointer;
+    background-color: #656B7A;
+    padding: 15px;
+    font-size: 1.7rem;
+    color: white;
+    border-radius: 10px;
+    width: 300px
+}
+
+.dropdownBlock {
+    display: none;
+    flex-direction: column;
+    padding: 0;
+
+}
+
+.userDropdownBlock {
+    display: none;
+}
+.timeRangeDropdownBlock {
+    display: none;
+}
+
+.dropdownItem {
+    font-size: 1.7rem;
+    color: white;
+    text-align: center;
+    width: 90%;
+    list-style: none;
+    padding: 0;
+    margin: 15px auto;
+}
+
+.dropdownItem:hover {
+    color: black;
+    background-color: white;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.dateForm {
+    margin-top: 5px;
+}
+
+.reportButton {
+    background-color: #e1fafa;
+    color: #000000;
+    border: solid 1px #000000;
+}
+
+.reportTitleBlock {
+    display: flex;
+    flex-direction: column;
+    width: 90%;
+    max-width: 1600px;
+    margin: 80px auto 0 60px;
+    justify-content: center;
+}
+
+.reportTitle {
+    font-size: 3rem;
+    text-align: center;
+}
+
+.reportSubTitle {
+    font-size: 2rem;
+    text-align: center;
+}
+
+.reportTable {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    width: 90%;
+    max-width: 1600px;
+    margin: 80px auto auto 60px;
+    border: 1px solid black;
+}
+
+.tableCell {
+    padding: 15px;
+    border: 1px solid black;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 58px;
+    font-size: 1.7rem;
+}
+
+.userBlock:hover .userDropdownBlock {
+    display: flex;
+}
+
+.timeRangeBlock:hover .timeRangeDropdownBlock {
+    display: flex;
+}
+
+@media screen and (max-width: 2150px) {
+    .controlBar {
+        margin: 60px auto 0 40px;
+    }
+    .buttonBlock {
+        margin: 0 30px auto 0;
+    }
+    .button {
+        padding: 10px;
+        font-size: 1rem;
+        width: 200px
+    }
+    .dropdownItem {
+        font-size: 1rem;
+        margin: 10px auto;
+    }
+    .reportTitleBlock {
+        width: 90%;
+        max-width: 1250px;
+        margin: 60px auto 0 40px;
+    }
+    .reportTitle {
+        font-size: 2.5rem;
+    }
+
+    .reportSubTitle {
+        font-size: 1.5rem;
+    }
+    .reportTable {
+        width: 90%;
+        max-width: 1250px;
+        margin: 60px auto auto 40px;
+    }
+
+    .tableCell {
+        padding: 10px;
+        height: 40px;
+        font-size: 1rem;
+    }
+}
+
+@media screen and (max-width: 1510px) {
+    .controlBar {
+        margin: 40px auto 0 30px;
+    }
+    .buttonBlock {
+        margin: 0 20px auto 0;
+    }
+    .button {
+        padding: 7px;
+        font-size: 0.7rem;
+        width: 150px
+    }
+    .dropdownItem {
+        font-size: 0.7rem;
+        margin: 7px auto;
+    }
+    .reportTitleBlock {
+        width: 90%;
+        max-width: 650px;
+        margin: 40px auto 0 20px;
+    }
+    .reportTitle {
+        font-size: 2rem;
+    }
+
+    .reportSubTitle {
+        font-size: 1rem;
+    }
+    .reportTable {
+        width: 90%;
+        max-width: 650px;
+        margin: 40px auto auto 20px;
+    }
+
+    .tableCell {
+        padding: 7px;
+        height: 30px;
+        font-size: 0.7rem;
+    }
+}
