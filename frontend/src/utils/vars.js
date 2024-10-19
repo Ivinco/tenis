@@ -5,7 +5,7 @@ export const sideBarMenuItems = [
     {value: 'Normal', action: MAIN_DISPLAY},
     {value: 'Silenced', action: SILENCED_DISPLAY},
     {value: 'History', action: HISTORY_DISPLAY},
-    // {value: 'Stats', action: STATS_DISPLAY}
+    {value: 'Stats', action: STATS_DISPLAY}
 
 ]
 export const headerMenuItems = [
@@ -19,5 +19,5 @@ export const headerMenuItems = [
     //     action: setTimeZoneValue
     // }
 ]
-export const BACKEND_SERVER = window._env_ && window._env_.API_SERVER ? window._env_.API_SERVER : "http://127.0.0.1"
-export const BACKEND_PORT = window._env_ && window._env_.BACKEND_PORT ? window._env_.BACKEND_PORT : '5000'
+export const BACKEND_SERVER = window._env_ && window._env_.API_SERVER ? window._env_.API_SERVER : "https://api.tenis-dev.k8s-test.ivinco.com"
+export const BACKEND_PORT = window._env_ && window._env_.BACKEND_PORT ? window._env_.BACKEND_PORT : '443'
