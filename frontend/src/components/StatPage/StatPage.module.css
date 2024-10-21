@@ -115,6 +115,19 @@
     height: 58px;
     font-size: 1.7rem;
 }
+.loadOverlay {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background-color: rgba(224, 232, 247, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 
 .userBlock:hover .userDropdownBlock {
     display: flex;
