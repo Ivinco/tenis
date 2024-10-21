@@ -9,6 +9,7 @@ import dayjs from "dayjs";
 import {LocalizationProvider} from "@mui/x-date-pickers/LocalizationProvider";
 import {startOfWeek, startOfDay, startOfMonth, startOfYear, endOfDay, endOfWeek, endOfMonth, subWeeks} from 'date-fns'
 import StatService from "../../services/StatService";
+import ReactLoading from "react-loading";
 
 function StatPage() {
     const dispatch = useDispatch();
@@ -19,6 +20,7 @@ function StatPage() {
     const [statsStart, setStatsStart] = useState(new Date(Date.now() - 24 * 60 * 60 * 1000));
     const [statsEnd, setStatsEnd] = useState(new Date(Date.now()));
     const [reportData, setReportData] = useState(null);
+    const [isLoading, setIsLoading] = useState(false);
 
     const processTimeRange = () => {
         switch (selectedTimeRange) {
@@ -88,14 +90,18 @@ function StatPage() {
             const startTimestamp = Math.floor(statsStart.getTime() / 1000);
             const endTimestamp = Math.floor(statsEnd.getTime() / 1000);
             const userParam = selectedUser !== 'All' ? selectedUser : undefined;
+            setIsLoading(true);
             const response = await StatService.getStats(userParam, startTimestamp, endTimestamp);
             setReportData(response.data);
         } catch (error) {
             dispatch(setModalError("Failed to fetch the report"));
+            setIsLoading(false);
         }
+        setIsLoading(false);
     }
 
     return (
+        <>
         <div className={styles.mainPage}>
             <div className={styles.controlBar}>
                 <div className={`${styles.buttonBlock} ${styles.userBlock}`}>
@@ -164,6 +170,17 @@ function StatPage() {
                 </div>
             )}
         </div>
+            {
+                isLoading
+                    ?
+                    <div className={styles.loadOverlay}>
+                        <ReactLoading color={'#01A2D8'} type={"spin"} height={200} width={100}/>
+                    </div>
+                    :
+                    <></>
+            }
+        </>
+
     );
 }
 
