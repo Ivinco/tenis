@@ -85,6 +85,10 @@ function StatPage() {
         processTimeRange()
     }, [selectedTimeRange]);
 
+    const formatDate = (date) => {
+        return dayjs(date).format('YYYY-MM-DD HH:mm:ss');
+    }
+
     const getReport = async () => {
         try {
             const startTimestamp = Math.floor(statsStart.getTime() / 1000);
@@ -93,7 +97,7 @@ function StatPage() {
             setIsLoading(true);
             const response = await StatService.getStats(userParam, startTimestamp, endTimestamp);
             setReportData(response.data);
-        } catch (error) {
+        } catch (e) {
             dispatch(setModalError("Failed to fetch the report"));
             setIsLoading(false);
         }
@@ -123,13 +127,19 @@ function StatPage() {
                 </div>
                 <div className={`${styles.buttonBlock} ${styles.dateForm}`}>
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
-                        <MobileDateTimePicker value={dayjs(statsStart)} onChange={e => setStatsStart(e)}
+                        <MobileDateTimePicker value={dayjs(statsStart)} onChange={(e) => {
+                            const changedDate = formatDate(e);
+                            setStatsStart(new Date(changedDate))
+                        }}
                                               ampm={false}/>
                     </LocalizationProvider>
                 </div>
                 <div className={`${styles.buttonBlock} ${styles.dateForm}`}>
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
-                        <MobileDateTimePicker value={dayjs(statsEnd)} onChange={e => setStatsEnd(e)}
+                        <MobileDateTimePicker value={dayjs(statsEnd)} onChange={(e) => {
+                            const changedDate = formatDate(e);
+                            setStatsEnd(new Date(changedDate))
+                        }}
                                               ampm={false}
                                               inputFormat="YYYY-MM-DD HH:mm"
                         />
@@ -145,7 +155,7 @@ function StatPage() {
             {reportData && (
                 <div className={styles.reportTitleBlock}>
                     <h1 className={styles.reportTitle}> {`Statistics Report for ${selectedUser} user(s)`} </h1>
-                    <h2 className={styles.reportSubTitle}>{ `Period from ${dayjs(statsStart).format("MMM DD YYYY HH:mm:ss")} to ${dayjs(statsEnd).format("MMM DD YYYY HH:mm:ss")}`}</h2>
+                    <h2 className={styles.reportSubTitle}>{ `Period from ${dayjs(statsStart).format("MMM DD YYYY HH:mm")} to ${dayjs(statsEnd).format("MMM DD YYYY HH:mm")}`}</h2>
                 </div>
 
             )}
