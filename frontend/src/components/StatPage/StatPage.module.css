@@ -19,11 +19,13 @@
 .userBlock {
     background-color: #656B7A;
     border-radius: 10px;
+    position: relative;
 }
 
 .timeRangeBlock {
     background-color: #656B7A;
     border-radius: 10px;
+    position: relative;
 }
 
 .button {
@@ -40,7 +42,14 @@
 .dropdownBlock {
     display: none;
     flex-direction: column;
-    padding: 0;
+    border-radius: 10px;
+    padding: 0 0 20px;
+    width: 100%;
+    top: 35px;
+    background-color: #656B7A;
+    max-height: 50vh;
+    overflow-y: auto;
+    position: absolute;
 
 }
 
@@ -153,6 +162,11 @@
         font-size: 1rem;
         margin: 10px auto;
     }
+
+    .dropdownBlock {
+        top: 10px;
+
+    }
     .reportTitleBlock {
         width: 90%;
         max-width: 1250px;
@@ -189,6 +203,10 @@
         padding: 7px;
         font-size: 0.7rem;
         width: 150px
+    }
+
+    .dropdownBlock {
+        top: 5px;
     }
     .dropdownItem {
         font-size: 0.7rem;
