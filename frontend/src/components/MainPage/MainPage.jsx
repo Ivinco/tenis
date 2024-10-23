@@ -11,6 +11,8 @@ import {useEffect} from "react";
 import {openModal} from "../../store/reducers/modalReducer";
 import usePortalParam from "../../hooks/usePortalParam";
 import {useSearchParams} from "react-router-dom";
+import {STATS_DISPLAY} from "../../store/actions/DISPLAY_ACTIONS";
+import StatPage from "../StatPage/StatPage";
 
 
 function MainPage(){
@@ -22,6 +24,7 @@ function MainPage(){
     const [searchParams, setSearchParams] = useSearchParams();
     const setPortalParams = usePortalParam()
     const alertParam = searchParams.get("alert_id")
+    const displayMode = useSelector(state => state.setDisplay.display)
 
 
     const onSideBarClick = () => {
@@ -61,9 +64,7 @@ function MainPage(){
                     ></button>
                 </div>
                 {
-                    isLoggedIn && (
-                        <MainDisplay/>
-                    )
+                    isLoggedIn ? displayMode === STATS_DISPLAY ? <StatPage/> : <MainDisplay/> : null
                 }
 
             </div>

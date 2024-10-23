@@ -10,5 +10,9 @@ export default class UserService{
         return api.post( '/user/update', payload );
     }
 
+    static async getUsers () {
+        return api.get('/users')
+    }
+
 
 }
