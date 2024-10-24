@@ -101,7 +101,7 @@ spec:
                 - -c
                 - |
                   set -x
-                  FILENAME="$MONGO_DATABASE-$MONGO_DATABASE-backup-$(date +%F).gz"
+                  FILENAME="$MONGO_DATABASE-$MONGO_COLLECTION-backup-$(date +%F).gz"
                   echo "Using filename: $FILENAME"
                   mongodump --uri=$MONGO_URI --db=$MONGO_DATABASE --collection=$MONGO_COLLECTION --gzip --archive=$BACKUP_PATH/$FILENAME && \
                   s3cmd put $BACKUP_PATH/$FILENAME $S3_BUCKET/$FILENAME && \
