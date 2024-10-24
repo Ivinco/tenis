@@ -100,6 +100,9 @@ spec:
                 - /bin/sh
                 - -c
                 - |
+                  set -x
+                  FILENAME="$MONGO_DATABASE-$MONGO_DATABASE-backup-$(date +%F).gz"
+                  echo "Using filename: $FILENAME"
                   mongodump --uri=$MONGO_URI --db=$MONGO_DATABASE --collection=$MONGO_COLLECTION --gzip --archive=$BACKUP_PATH/$FILENAME && \
                   s3cmd put $BACKUP_PATH/$FILENAME $S3_BUCKET/$FILENAME && \
                   rm $BACKUP_PATH/$FILENAME
@@ -112,15 +115,13 @@ spec:
                   value: "history"
                 - name: BACKUP_PATH
                   value: "/tmp/mongodb_backup"
-                - name: FILENAME
-                  value: "$(date +%F)-backup.gz"
                 - name: S3_BUCKET
                   value: "s3://mongodb-backups"
               volumeMounts:
                 - name: backup-storage
                   mountPath: /tmp/mongodb_backup
                 - name: s3cfg-volume
-                  mountPath: /root/.s3cfg
+                  mountPath: /data/db/.s3cfg
                   subPath: .s3cfg
           restartPolicy: OnFailure
           volumes:
