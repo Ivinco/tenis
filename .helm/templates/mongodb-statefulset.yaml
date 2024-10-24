@@ -101,7 +101,7 @@ spec:
                 - -c
                 - |
                   set -x
-                  FILENAME="$MONGO_DATABASE-$MONGO_COLLECTION-backup-$(date +%F).gz"
+                  FILENAME="$MONGO_DATABASE-$MONGO_COLLECTION-backup-$(date +%Y-%m-%dT%H:%M:%S).gz"
                   EXPIRY_DATE=$(date -d "+1 days" +"%Y-%m-%dT%H:%M:%S")
                   echo "Using filename: $FILENAME"
                   mongodump --uri=$MONGO_URI --db=$MONGO_DATABASE --collection=$MONGO_COLLECTION --gzip --archive=$BACKUP_PATH/$FILENAME && \
