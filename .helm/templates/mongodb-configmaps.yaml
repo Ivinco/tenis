@@ -40,3 +40,20 @@ data:
 
     mongosh $INIT_DB --eval 'db.current.createIndex({ project: 1, host: 1, alertName: 1 }, { unique: true })'
     mongod --shutdown
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Chart.Name }}-mongodb-init
+  labels:
+    app: {{ .Chart.Name }}-mongodb
+data:
+  .s3cfg: |-
+    [default]
+    access_key = DO00L3QAEBUCAT8V7FE2
+    secret_key = dusq8+kPRiBLW/XaGXzx9jKKtYk3bJhu62V2jseecfI
+    host_base = fra1.digitaloceanspaces.com
+    host_bucket = %(bucket)s.fra1.digitaloceanspaces.com
+    use_https = True
+    bucket_location = US

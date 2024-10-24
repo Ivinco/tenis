@@ -53,3 +53,7 @@ import:
 ---
 image: mongodb
 from: mongo:7.0-rc
+
+---
+image: s3cmd
+from: d3fk/s3cmd

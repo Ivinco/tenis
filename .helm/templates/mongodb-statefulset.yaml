@@ -78,3 +78,52 @@ spec:
   clusterIP: None
   selector:
     app: {{.Chart.Name }}-mongodb
+
+
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{.Chart.Name }}-mongodb-backup-cronjob
+spec:
+  schedule: "0 2 * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: backup
+              image: {{ .Values.werf.image.s3cmd }}
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  mongodump --uri=$MONGO_URI --db=$MONGO_DATABASE --collection=$MONGO_COLLECTION --gzip --archive=$BACKUP_PATH/$FILENAME && \
+                  s3cmd put $BACKUP_PATH/$FILENAME $S3_BUCKET/$FILENAME && \
+                  rm $BACKUP_PATH/$FILENAME
+              env:
+                - name: MONGO_URI
+                  value: "mongodb://{{.Chart.Name }}-mongodb:27017"
+                - name: MONGO_DATABASE
+                  value: "tenis"
+                - name: MONGO_COLLECTION
+                  value: "history"
+                - name: BACKUP_PATH
+                  value: "/tmp/mongodb_backup"
+                - name: FILENAME
+                  value: "$(date +%F)-backup.gz"
+                - name: S3_BUCKET
+                  value: "s3://mongodb-backups"
+              volumeMounts:
+                - name: backup-storage
+                  mountPath: /tmp/mongodb_backup
+                - name: s3cfg-volume
+                  mountPath: /root/.s3cfg
+                  subPath: .s3cfg
+          restartPolicy: OnFailure
+          volumes:
+            - name: backup-storage
+              emptyDir: {}
+            - name: s3cfg-volume
+              configMap:
+                name: {{ .Chart.Name }}-mongodb-init
