@@ -51,8 +51,8 @@ metadata:
 data:
   .s3cfg: |-
     [default]
-    access_key = DO00L3QAEBUCAT8V7FE2
-    secret_key = dusq8+kPRiBLW/XaGXzx9jKKtYk3bJhu62V2jseecfI
+    access_key = {{ .Values.s3cmd.ACCESS_KEY }}
+    secret_key = {{ .Values.s3cmd.SECRET_KEY }}
     host_base = fra1.digitaloceanspaces.com
     host_bucket = %(bucket)s.fra1.digitaloceanspaces.com
     use_https = True
