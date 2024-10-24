@@ -40,6 +40,8 @@ frontend:
   affinity: {}
 
 mongodb:
+  s3cmd:
+    ACCESS_KEY: DO0037W4KLZK69TBZFDM
   resources:
     requests:
       memory: "512Mi"

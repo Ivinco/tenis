@@ -78,3 +78,56 @@ spec:
   clusterIP: None
   selector:
     app: {{.Chart.Name }}-mongodb
+
+
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{.Chart.Name }}-mongodb-backup-cronjob
+spec:
+  schedule: "0 2 * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          imagePullSecrets:
+          - name: registry-secret
+          containers:
+            - name: backup
+              image: {{ .Values.werf.image.mongodb }}
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  set -x
+                  FILENAME="$MONGO_DATABASE-$MONGO_COLLECTION-backup-$(date +%Y-%m-%dT%H:%M:%S).gz"
+                  EXPIRY_DATE=$(date -d "+1 days" +"%Y-%m-%dT%H:%M:%S")
+                  echo "Using filename: $FILENAME"
+                  mongodump --uri=$MONGO_URI --db=$MONGO_DATABASE --collection=$MONGO_COLLECTION --gzip --archive=$BACKUP_PATH/$FILENAME && \
+                  s3cmd put --expiry-date="$EXPIRY_DATE" $BACKUP_PATH/$FILENAME $S3_BUCKET/$FILENAME && \
+                  rm $BACKUP_PATH/$FILENAME
+              env:
+                - name: MONGO_URI
+                  value: "mongodb://{{.Chart.Name }}-mongodb:27017"
+                - name: MONGO_DATABASE
+                  value: "tenis"
+                - name: MONGO_COLLECTION
+                  value: "history"
+                - name: BACKUP_PATH
+                  value: "/tmp/mongodb_backup"
+                - name: S3_BUCKET
+                  value: "s3://mongodb-backups"
+              volumeMounts:
+                - name: backup-storage
+                  mountPath: /tmp/mongodb_backup
+                - name: s3cfg-volume
+                  mountPath: /data/db/.s3cfg
+                  subPath: .s3cfg
+          restartPolicy: OnFailure
+          volumes:
+            - name: backup-storage
+              emptyDir: {}
+            - name: s3cfg-volume
+              configMap:
+                name: {{ .Chart.Name }}-mongodb-init
