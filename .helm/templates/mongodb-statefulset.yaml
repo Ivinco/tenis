@@ -91,9 +91,11 @@ spec:
     spec:
       template:
         spec:
+          imagePullSecrets:
+          - name: registry-secret
           containers:
             - name: backup
-              image: {{ .Values.werf.image.s3cmd }}
+              image: {{ .Values.werf.image.mongodb }}
               command:
                 - /bin/sh
                 - -c

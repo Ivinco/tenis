@@ -53,7 +53,11 @@ import:
 ---
 image: mongodb
 from: mongo:7.0-rc
+shell:
+  install:
+  - apt-get update
+  - apt-get install -y python3-pip
+  - pip3 install s3cmd
+  - apt-get clean
+  - rm -rf /var/lib/apt/lists/*
 
----
-image: s3cmd
-from: d3fk/s3cmd
